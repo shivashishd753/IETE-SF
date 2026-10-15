@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import IntroLoader from "./components/introloader";
+import IntroLoader from "./components/introloader"
+
 
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -21,6 +22,7 @@ import {
 
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [logoOpacity, setLogoOpacity] = useState(1);
 useEffect(() => {
   const handleScroll = () => {
@@ -59,7 +61,7 @@ useEffect(() => {
   <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 xl:flex 2xl:gap-7">
     {[
       { label: "Home", href: "#home", Icon: HomeIcon },
-      { label: "About", href: "#about", Icon: Info },
+      { label: "About", href: "/about", Icon: Info },
       { label: "Members", href: "#members", Icon: UsersRound },
       { label: "Alumni", href: "#alumni", Icon: GraduationCap },
       { label: "Events", href: "#events", Icon: CalendarDays },
@@ -116,7 +118,7 @@ useEffect(() => {
     <div className="absolute left-0 right-0 top-[calc(100%+10px)] rounded-2xl border border-white/10 bg-[#080B12]/95 p-3 shadow-2xl backdrop-blur-2xl xl:hidden">
       {[
         { label: "Home", href: "#home", Icon: HomeIcon },
-        { label: "About", href: "#about", Icon: Info },
+        { label: "About", href: "/about", Icon: Info },
         { label: "Members", href: "#members", Icon: UsersRound },
         { label: "Alumni", href: "#alumni", Icon: GraduationCap },
         { label: "Events", href: "#events", Icon: CalendarDays },
@@ -416,7 +418,7 @@ useEffect(() => {
 
 
     <a
-      href="#about"
+      href="/about"
       className="mt-14 flex flex-col items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-slate-500 transition-colors hover:text-blue-300"
     >
       <span className="flex h-10 w-6 items-start justify-center rounded-full border border-slate-600 p-1.5">
