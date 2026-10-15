@@ -645,3 +645,60 @@ body {
   }
 }
 
+
+/* Letters fly in and assemble */
+.welcome-formation .fall-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(var(--x), var(--y)) rotate(var(--rotation, 18deg))
+    scale(0.45);
+  filter: blur(5px);
+  animation: letter-assemble 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.12s + var(--i) * 0.055s);
+}
+
+@keyframes letter-assemble {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(18deg) scale(0.45);
+    filter: blur(5px);
+  }
+  70% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.welcome-formation-line {
+  transform: scaleX(0);
+  transform-origin: center;
+  animation: formation-line 0.6s ease-out 1.5s forwards;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+@keyframes formation-line {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-formation .fall-letter {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
+  }
+
+  .welcome-formation-line {
+    transform: scaleX(1);
+    animation: none;
+  }
+}
+
+
