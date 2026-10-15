@@ -9,7 +9,7 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 
 
-import IetePyramid from "./components/Ietepyramid";
+// import IetePyramid from "./components/Ietepyramid";
 
 
 
@@ -44,7 +44,7 @@ useEffect(() => {
 
   return (
     <>
-  <IntroLoader />
+  {/* <IntroLoader /> */}
     <main id="home" className="min-h-screen overflow-hidden bg-[#070B18] text-white">
 
 
@@ -331,9 +331,8 @@ useEffect(() => {
 </div> */}
 
 
-
     
-{/* Centerpiece 3D pyramid */}
+{/* Centerpiece 3D pyramid
 <div
   className="w-full max-w-[min(76vw,520px)]"
   style={{
@@ -344,7 +343,7 @@ useEffect(() => {
   }}
 >
   <IetePyramid />
-</div>
+</div> */}
 
 
     
