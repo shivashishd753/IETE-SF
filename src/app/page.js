@@ -224,25 +224,28 @@ useEffect(() => {
 
 
 
-    {/* Centerpiece logo */}
-    <div
-      className="w-full max-w-[min(76vw,520px)]"
-      style={{
-        opacity: logoOpacity,
-        transform: `translateY(${(1 - logoOpacity) * -24}px)`,
-        transition: "opacity 80ms linear",
-        willChange: "opacity, transform",
-      }}
-    >
-      <img
-        src="/iete-3D.svg"
-        alt="IETE-SF three-dimensional emblem"
-        className="h-auto w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.55)]"
-        fetchPriority="high"
-      />
-    </div>
 
-    <div className="mt-9 sm:mt-12">
+
+{/* Centerpiece logo */}
+<div
+  className="pointer-events-none fixed left-1/2 top-[45%] z-0 w-full max-w-[min(76vw,520px)] -translate-x-1/2 -translate-y-1/2"
+  style={{
+    opacity: logoOpacity,
+    transition: "opacity 80ms linear",
+    willChange: "opacity",
+  }}
+>
+  <img
+    src="/iete-3D.svg"
+    alt="IETE-SF three-dimensional emblem"
+    className="h-auto w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.55)]"
+    fetchPriority="high"
+  />
+</div>
+
+
+
+    {/* <div className="relative z-10 mt-7 sm:mt-10">
       <p className="text-sm font-medium tracking-[0.32em] text-slate-200 sm:text-base">
         LEARN <span className="mx-2 text-blue-400">/</span>
         BUILD <span className="mx-2 text-blue-400">/</span>
@@ -252,79 +255,114 @@ useEffect(() => {
       <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-slate-500 sm:text-xs sm:tracking-[0.4em]">
         Technology · Innovation · Community
       </p>
-    </div>
-
-    
+    </div> */}
 
 
-{/* Falling-letter welcome animation */}
-<div className="welcome-formation mt-5 flex w-full flex-col items-center sm:mt-7">
-  <h2 className="flex flex-col items-center gap-1 text-center font-black uppercase">
-    <span className="welcome-word flex justify-center text-sm tracking-[0.45em] text-cyan-200 sm:text-lg">
-      {"WELCOME".split("").map((letter, i) => (
-        <span
-          key={`welcome-${i}`}
-          className="fall-letter"
-          style={{
-            "--i": i,
-            "--x": `${((i * 37) % 7 - 3) * 65}px`,
-            "--y": `${((i * 23) % 5 - 2) * 70}px`,
-          }}
-        >
-          {letter}
-        </span>
-      ))}
-    </span>
 
-    <span className="flex flex-wrap justify-center gap-x-3 text-4xl leading-tight sm:gap-x-4 sm:text-6xl md:text-7xl">
-      {"BATCH".split("").map((letter, i) => (
-        <span
-          key={`batch-${i}`}
-          className="fall-letter text-white"
-          style={{
-            "--i": i + 7,
-            "--x": `${((i * 41) % 7 - 3) * 75}px`,
-            "--y": `${((i * 29) % 5 - 2) * 75}px`,
-          }}
-        >
-          {letter}
-        </span>
-      ))}
 
-      {"2K26".split("").map((letter, i) => (
-        <span
-          key={`year-${i}`}
-          className="fall-letter bg-gradient-to-b from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent"
-          style={{
-            "--i": i + 12,
-            "--x": `${((i * 31) % 7 - 3) * 80}px`,
-            "--y": `${((i * 19) % 5 - 2) * 85}px`,
-          }}
-        >
-          {letter}
-        </span>
-      ))}
+{/* Who We Are */}
+<section className="relative z-10 mt-[55vh] w-full px-6 pb-16 text-center sm:px-12 md:px-20 lg:px-28">
+  <p className="text-xs font-semibold uppercase tracking-[0.7em] text-cyan-300 sm:text-2xl">
+    Who We Are
+  </p>
+
+  <h2 className="mt-4 font-serif text-3xl font-semibold leading-tight text-white sm:text-4xl md:text-5xl">
+    Advancing Technology.
+    <span className="mt-2 block bg-gradient-to-r from-cyan-200 via-sky-300 to-blue-400 bg-clip-text text-transparent">
+      Inspiring Innovation.
     </span>
   </h2>
 
-  <div className="welcome-formation-line mt-3 h-[2px] w-28 rounded-full bg-cyan-400 sm:mt-4 sm:w-40" />
-</div>
+  <p className="mt-6 w-full text-left text-sm leading-7 text-slate-300 sm:text-base sm:leading-8 md:text-lg">
+    The Institution of Electronics and Telecommunication Engineers
+    (IETE), established in 1953, is a national professional body
+    promoting excellence in Electronics, Telecommunication and
+    Information Technology. At BIT Sindri, the IETE Students’ Forum
+    was established in 2007 to connect learning with hands-on
+    experience, collaboration and innovation.
+  </p>
+
+  <a
+    href="/about"
+    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 transition-colors hover:text-white sm:text-base"
+  >
+    Discover Our Story <span aria-hidden="true">→</span>
+  </a>
+</section>
 
 
-
-
-    <a
-      href="#about"
-      className="mt-14 flex flex-col items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-slate-500 transition-colors hover:text-blue-300"
-    >
-      <span className="flex h-10 w-6 items-start justify-center rounded-full border border-slate-600 p-1.5">
-        <span className="h-2 w-1 rounded-full bg-blue-300" />
-      </span>
-      Scroll
-    </a>
   </div>
 </section>
 
+
+{/* THE IETEVERSE */}
+
+{/* THE IETEVERSE */}
+<section
+  id="ieteverse"
+  className="relative w-full overflow-visible bg-transparent px-5 py-16 sm:px-8 sm:py-20 lg:px-12"
+>
+  <div className="mx-auto max-w-[1700px]">
+    <div className="mb-12 text-center sm:mb-16">
+
+<h2
+  className="text-5xl font-semibold tracking-[0.04em] text-transparent sm:text-7xl md:text-8xl lg:text-9xl"
+  style={{
+    WebkitTextStroke: "1.2px #C4D9E8",
+    textShadow: "0 0 18px rgba(103,232,249,0.22)",
+  }}
+>
+  The IETEverse
+</h2>
+
+
+      <p className="mt-4 text-sm text-slate-400 sm:text-base">
+        Ideas, experiences, and moments that bring us together.
+      </p>
+    </div>
+
+
+    {/* Horizontally scrollable event posters */}
+    <div className="overflow-x-auto overflow-y-hidden pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex w-max items-center gap-5 px-1 py-3 sm:gap-7">
+        
+{[
+  { title: "Vibe-a-thon", image: "/events/vibe-a-thon.jpg" },
+  { title: "Clue-e-minati", image: "/events/clue-e-minati.jpg" },
+  { title: "Nexus 3.0", image: "/events/nexus-3.jpg" },
+  { title: "BGMI Campus Combat", image: "/events/bgmi.jpg" },
+  { title: "Tech Talks", image: "/events/tech-talks.jpg" },
+  { title: "Codeathon", image: "/events/codeathon.jpg" },
+  { title: "Ideathon", image: "/events/ideathon.jpg" },
+  { title: "Project Expo", image: "/events/project-expo.jpg" },
+  { title: "Workshop", image: "/events/workshop.jpg" },
+  { title: "Tech Udbhav", image: "/events/tech-udbhav.jpg" },
+].map((event) => (
+          <article
+            key={event.title}
+           className="group relative h-[340px] w-[245px] shrink-0 overflow-hidden rounded-xl border border-white/10 transition-all duration-300 ease-out hover:z-10 hover:scale-105 hover:border-cyan-300/40 sm:h-[420px] sm:w-[300px]"
+          >
+            <img
+              src={event.image}
+              alt={`${event.title} event poster`}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+            />
+
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-4 pb-5 pt-16">
+              <h3 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
+                {event.title}
+              </h3>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+    {/* <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-slate-500 sm:text-xs sm:tracking-[0.4em]">
+        Technology · Innovation · Community
+      </p> */}
 
 <Footer />
     </main>
