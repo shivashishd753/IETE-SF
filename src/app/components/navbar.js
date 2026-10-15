@@ -17,9 +17,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
-    { label: "Home", href: "#home", Icon: HomeIcon },
-    { label: "About", href: "#about", Icon: Info },
-    { label: "Members", href: "#members", Icon: UsersRound },
+    { label: "Home", href: "/", Icon: HomeIcon },
+    { label: "About", href: "/about", Icon: Info },
+    { label: "Members", href: "/members", Icon: UsersRound },
     { label: "Alumni", href: "#alumni", Icon: GraduationCap },
     { label: "Events", href: "#events", Icon: CalendarDays },
     { label: "Domains", href: "#domains", Icon: Layers3 },
@@ -30,7 +30,7 @@ export default function Navbar() {
     <nav className="fixed left-1/2 top-3 z-50 mt-3 flex min-h-[88px] w-[calc(100%-32px)] max-w-[1450px] -translate-x-1/2 items-center justify-between rounded-[24px] border border-white/[0.13] bg-[#080B12]/45 px-5 py-4 shadow-[0_8px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl lg:px-8">
       {/* Logo */}
       <a
-        href="#home"
+        href="/"
         aria-label="IETE-SF Home"
         className="relative z-10 flex shrink-0 items-center"
       >
