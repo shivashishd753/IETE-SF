@@ -9,10 +9,6 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 
 
-// import IetePyramid from "./components/Ietepyramid";
-
-
-
 import {
   HomeIcon,
   Info,
@@ -44,7 +40,7 @@ useEffect(() => {
 
   return (
     <>
-  {/* <IntroLoader /> */}
+  <IntroLoader />
     <main id="home" className="min-h-screen overflow-hidden bg-[#070B18] text-white">
 
 
@@ -331,20 +327,36 @@ useEffect(() => {
 </div> */}
 
 
-    
-{/* Centerpiece 3D pyramid
-<div
-  className="w-full max-w-[min(76vw,520px)]"
-  style={{
-    opacity: logoOpacity,
-    transform: `translateY(${(1 - logoOpacity) * -24}px)`,
-    transition: "opacity 80ms linear",
-    willChange: "opacity, transform",
-  }}
->
-  <IetePyramid />
-</div> */}
 
+    {/* Centerpiece logo */}
+    <div
+      className="w-full max-w-[min(76vw,520px)]"
+      style={{
+        opacity: logoOpacity,
+        transform: `translateY(${(1 - logoOpacity) * -24}px)`,
+        transition: "opacity 80ms linear",
+        willChange: "opacity, transform",
+      }}
+    >
+      <img
+        src="/iete-3D.svg"
+        alt="IETE-SF three-dimensional emblem"
+        className="h-auto w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.55)]"
+        fetchPriority="high"
+      />
+    </div>
+
+    <div className="mt-9 sm:mt-12">
+      <p className="text-sm font-medium tracking-[0.32em] text-slate-200 sm:text-base">
+        LEARN <span className="mx-2 text-blue-400">/</span>
+        BUILD <span className="mx-2 text-blue-400">/</span>
+        GROW
+      </p>
+
+      <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-slate-500 sm:text-xs sm:tracking-[0.4em]">
+        Technology · Innovation · Community
+      </p>
+    </div>
 
     
 
