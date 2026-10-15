@@ -59,7 +59,7 @@ useEffect(() => {
   <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 xl:flex 2xl:gap-7">
     {[
       { label: "Home", href: "#home", Icon: HomeIcon },
-      { label: "About", href: "#about", Icon: Info },
+      { label: "About", href: "/about", Icon: Info },
       { label: "Members", href: "#members", Icon: UsersRound },
       { label: "Alumni", href: "#alumni", Icon: GraduationCap },
       { label: "Events", href: "#events", Icon: CalendarDays },
