@@ -9,6 +9,9 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 
 
+import IetePyramid from "./components/Ietepyramid";
+
+
 import {
   HomeIcon,
   Info,
@@ -26,13 +29,21 @@ export default function Home() {
   const [logoOpacity, setLogoOpacity] = useState(1);
 useEffect(() => {
   const handleScroll = () => {
-    const fadeDistance = 500;
-    const progress = Math.min(window.scrollY / fadeDistance, 1);
+    const fadeStart = 80;
+    const fadeDistance = 400;
+
+    const progress = Math.min(
+      Math.max((window.scrollY - fadeStart) / fadeDistance, 0),
+      1
+    );
 
     setLogoOpacity(1 - progress);
   };
 
-  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener("scroll", handleScroll, {
+    passive: true,
+  });
+
   handleScroll();
 
   return () => window.removeEventListener("scroll", handleScroll);
@@ -41,7 +52,7 @@ useEffect(() => {
   return (
     <>
   <IntroLoader />
-    <main id="home" className="min-h-screen overflow-hidden bg-[#070B18] text-white">
+    <main id="home" className="min-h-screen overflow-x-clip bg-[#070B18] text-white">
 
 
 <nav className="fixed left-1/2 top-3 z-50 mt-3 flex min-h-[88px] w-[calc(100%-32px)] max-w-[1450px] -translate-x-1/2 items-center justify-between rounded-[24px] border border-white/[0.13] bg-[#080B12]/45 px-5 py-4 shadow-[0_8px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl lg:px-8">
@@ -281,11 +292,7 @@ useEffect(() => {
 
 
 
-  {/* Subtle blue light behind the logo */}
-  <div
-    className="pointer-events-none absolute left-1/2 top-[43%] -z-10 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/[0.08] blur-[100px] sm:h-[480px] sm:w-[480px]"
-    style={{ opacity: logoOpacity }}
-  />
+
 
   <div className="flex w-full max-w-5xl flex-col items-center text-center">
   
@@ -314,22 +321,34 @@ useEffect(() => {
 
 
 
-{/* Centerpiece logo */}
+{/* Fixed rotating pyramid */}
 <div
-  className="pointer-events-none fixed left-1/2 top-[45%] z-0 w-full max-w-[min(76vw,520px)] -translate-x-1/2 -translate-y-1/2"
+  className="pointer-events-none fixed left-1/2 top-[17vh] z-20
+    w-full max-w-[min(76vw,520px)] -translate-x-1/2"
   style={{
     opacity: logoOpacity,
     transition: "opacity 80ms linear",
     willChange: "opacity",
   }}
 >
-  <img
-    src="/iete-3D.svg"
-    alt="IETE-SF three-dimensional emblem"
-    className="h-auto w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.55)]"
-    fetchPriority="high"
-  />
+  <div className="relative">
+    {/* Blue glow */}
+    <div
+      className="absolute left-1/2 top-1/2 -z-10
+        h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2
+        rounded-full bg-blue-500/20 blur-[90px]
+        sm:h-[420px] sm:w-[420px]"
+    />
+
+    <IetePyramid />
+  </div>
 </div>
+{/* Keeps the original hero layout spacing */}
+<div
+  className="h-[460px] w-full max-w-[min(76vw,520px)]"
+  aria-hidden="true"
+/>
+
 
 
 
@@ -349,7 +368,7 @@ useEffect(() => {
 
 
 {/* Who We Are */}
-<section className="relative z-10 mt-[55vh] w-full px-6 pb-16 text-center sm:px-12 md:px-20 lg:px-28">
+<section className="relative z-30 -mt-3 w-full px-6 pb-16 text-center sm:-mt-5 sm:px-24 md:px-20 lg:px-28" >
   <p className="text-xs font-semibold uppercase tracking-[0.7em] text-cyan-300 sm:text-2xl">
     Who We Are
   </p>

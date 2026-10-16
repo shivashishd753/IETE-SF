@@ -92,13 +92,13 @@ function Pyramid() {
 
   // Rotate around the vertical axis without tilting.
   useFrame((_, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.4;
-    }
-  });
+  if (groupRef.current) {
+    groupRef.current.rotation.y += delta * 0.4;
+  }
+});
 
   return (
-    <group ref={groupRef}  rotation={[THREE.MathUtils.degToRad(-8), 0, 0]}>
+    <group ref={groupRef}  rotation={[THREE.MathUtils.degToRad(12), 0, 0]}>
       <mesh geometry={geometry}>
         <meshStandardMaterial
           map={logoTexture}
