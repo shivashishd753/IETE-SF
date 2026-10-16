@@ -1,6 +1,19 @@
 
 "use client";
 
+import { Orbitron, Rajdhani } from "next/font/google";
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-orbitron",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const rajdhani = Rajdhani({
+  subsets: ["latin"],
+  variable: "--font-rajdhani",
+  weight: ["400", "500", "600", "700"],
+});
+
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
@@ -58,6 +71,23 @@ const nextGen = [
   { name: "Rimisha Kumari", branch: "Information Technology", image: "/Images/rimisha.png", linkedin: "https://www.linkedin.com/in/rimisha-kumari-67a2ba334/" },
   { name: "Shashank Gupta", branch: "Mechanical Engineering", image: "/Images/shashank.jpg", linkedin: "https://www.linkedin.com/in/shashank-gupta-230489338/" },
 ];
+const nextGen2 = [
+  { name: "Angel Priya", branch: "Metallurgical Engineering", image: "/Images/angel.png", linkedin: "https://www.linkedin.com/in/angel-p-a86374372/" },
+  { name: "Ankit Kumar", branch: "Electrical Engineering", image: "/Images/ankit.png", linkedin: "https://www.linkedin.com/in/ankit-kumar-863260231/" },
+  { name: "Ayushman Parashar", branch: "Chemical Engineering", image: "/Images/ayushman.png", linkedin: "https://www.linkedin.com/in/ayushman-parashar-615524385/" },
+  { name: "Ayush Mishra", branch: "Electrical Engineering", image: "/Images/ayush.png", linkedin: "https://www.linkedin.com/in/ayush-mishra250306/" },
+  { name: "Chandrakant Mandal", branch: "Chemical Engineering", image: "/Images/chandru.png", linkedin: "https://www.linkedin.com/in/chandrakant-mandal-a09316280/" },
+  { name: "Chandan Kr Soni", branch: "Mechanical Engineering", image: "/Images/chandan.png", linkedin: "https://www.linkedin.com/in/chandan-soni-703261386/" },
+  { name: "Khushi Pandey", branch: "Chemical Engineering", image: "/Images/khushi.png", linkedin: "https://www.linkedin.com/in/khushi-pandey-4792b3398/" },
+  { name: "Kriti Kumari", branch: "Electrical Engineering", image: "/Images/kriti.png", linkedin: "https://www.linkedin.com/in/kriti-kumari-4a59bb3b8/" },
+  { name: "Prachi Priya", branch: "Information Technology", image: "/Images/prachi.png", linkedin: "https://www.linkedin.com/in/prachi-priya-383123395/" },
+  { name: "Rishav Karketta", branch: "Electrical Engineering", image: "/Images/rishav.png", linkedin: "https://www.linkedin.com/in/rishav-kerketta-95ab79350/" },
+  { name: "Rishi Kunal", branch: "Mechanical Engineering", image: "/Images/rishi.png", linkedin: "https://www.linkedin.com/in/rishi-kunal/" },
+  { name: "Siddharth Mishra", branch: "Cyber Security", image: "/Images/sid.png", linkedin: "https://www.linkedin.com/in/siddharth-mishra-a5486b317/" },
+  { name: "Shivashish Dwivedi", branch: "Electronics and Communication", image: "/Images/shiva.png", linkedin: "https://www.linkedin.com/in/shivashish-dwivedi-028723321/" },
+  { name: "Shiwani Shah", branch: "Electronics and Communication", image: "/Images/shiwani.png", linkedin: "https://www.linkedin.com/in/shiwani-shah-b31964384/" },
+  { name: "Soumya Sinha", branch: "Information Technology", image: "/Images/soumya.jpg", linkedin: "https://www.linkedin.com/in/-soumya-sinha/" }
+  ];
 
 function NetworkBackground() {
   const canvasRef = useRef(null);
@@ -271,22 +301,77 @@ function NetworkBackground() {
   );
 }
 
+
 function SectionHeading({ eyebrow, title, description }) {
+  const headingRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [typedTitle, setTypedTitle] = useState("");
+
+  useEffect(() => {
+    const element = headingRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+
+        if (!entry.isIntersecting) {
+          setTypedTitle("");
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let index = 0;
+    setTypedTitle("");
+
+    const typingTimer = setInterval(() => {
+      index++;
+      setTypedTitle(title.slice(0, index));
+
+      if (index >= title.length) {
+        clearInterval(typingTimer);
+      }
+    }, 55);
+
+    return () => clearInterval(typingTimer);
+  }, [isVisible, title]);
+
   return (
-    <div className="mb-10 text-center">
+    <div
+      ref={headingRef}
+      className="section-heading mb-10 text-center"
+    >
       {eyebrow && (
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-cyan-300">
+        <p
+          className={`section-subtitle mb-3 text-xs font-bold uppercase tracking-[0.32em] text-cyan-300 ${
+            isVisible ? "section-fade-in" : "section-hidden"
+          }`}
+        >
           {eyebrow}
         </p>
       )}
 
-      <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-        {title}
+      <h2 className="section-title text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+        <span>{typedTitle}</span>
+        <span className="typing-cursor">|</span>
         <span className="text-cyan-300">.</span>
       </h2>
 
       {description && (
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">
+        <p
+          className={`mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base ${
+            isVisible ? "section-fade-in description-delay" : "section-hidden"
+          }`}
+        >
           {description}
         </p>
       )}
@@ -294,10 +379,13 @@ function SectionHeading({ eyebrow, title, description }) {
   );
 }
 
+
+
+
 function MemberCard({ member }) {
   return (
-    <article className="member-card group relative overflow-hidden rounded-2xl border border-white/15 bg-[#0B1220]">
-      <div className="relative aspect-[4/4.5] overflow-hidden">
+    <article className="member-card group relative overflow-hidden rounded-xl border border-white/15 bg-[#0B1220]">
+      <div className="relative aspect-[4/3.8] overflow-hidden">
         <img
           src={member.image}
           alt={member.name}
@@ -308,7 +396,7 @@ function MemberCard({ member }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#050914] via-[#050914]/15 to-transparent" />
 
         {member.role && (
-          <span className="absolute left-4 top-4 rounded-full border border-cyan-300/30 bg-black/55 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-cyan-200 backdrop-blur-md">
+          <span className="absolute left-2 top-2 rounded-full border border-cyan-300/30 bg-black/55 px-2 py-1 text-[8px] font-bold uppercase tracking-wide text-cyan-200 backdrop-blur-md">
             {member.role}
           </span>
         )}
@@ -319,32 +407,33 @@ function MemberCard({ member }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Open ${member.name}'s LinkedIn profile`}
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:border-cyan-300 hover:bg-cyan-300 hover:text-black"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:border-cyan-300 hover:bg-cyan-300 hover:text-black"
           >
-            <ArrowUpRight size={20} />
+            <ArrowUpRight size={14} />
           </a>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <div className="mb-3 h-px w-10 bg-cyan-300 transition-all duration-300 group-hover:w-20" />
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <div className="mb-1.5 h-px w-7 bg-cyan-300 transition-all duration-300 group-hover:w-12" />
 
-          <h3 className="text-xl font-bold text-white sm:text-2xl">
+          <h3 className="text-base font-bold text-white sm:text-lg">
             {member.name}
           </h3>
 
-          <p className="mt-2 text-xs leading-5 text-slate-300 sm:text-sm">
+          <p className="mt-1 text-[10px] leading-4 text-slate-300 sm:text-[11px]">
             {member.branch}
           </p>
         </div>
       </div>
 
       {member.domain && (
-        <div className="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-4 sm:px-5">
-          <span className="text-xs text-slate-300 sm:text-sm">
+        <div className="flex items-center justify-between gap-2 border-t border-white/10 px-3 py-2.5">
+          <span className="text-[10px] text-slate-300 sm:text-[11px]">
             {member.domain}
           </span>
+
           <ArrowUpRight
-            size={17}
+            size={14}
             className="shrink-0 text-cyan-300 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
           />
         </div>
@@ -352,6 +441,8 @@ function MemberCard({ member }) {
     </article>
   );
 }
+
+
 
 export default function MembersPage() {
   const [search, setSearch] = useState("");
@@ -364,9 +455,12 @@ export default function MembersPage() {
   const filteredDirectors = directors.filter(matchesSearch);
   const filteredOBearers = OBearers.filter(matchesSearch);
   const filterednextGen = nextGen.filter(matchesSearch);
+  const filterednextGen2 = nextGen2.filter(matchesSearch);
 
   return (
-    <main className="relative isolate min-h-screen overflow-x-clip bg-[#050812] text-white">
+    <main
+  className={`${orbitron.variable} ${rajdhani.variable} relative isolate min-h-screen overflow-x-clip bg-[#050812] text-white`}
+>
       <Navbar />
 
       <style>{`
@@ -379,6 +473,58 @@ export default function MembersPage() {
           margin: 0;
           background: #050812;
         }
+
+
+.section-title {
+  font-family: var(--font-orbitron), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+}
+
+.section-subtitle,
+.section-heading p {
+  font-family: var(--font-rajdhani), sans-serif;
+}
+
+.section-hidden {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.section-fade-in {
+  animation: sectionFadeIn 0.7s ease-out both;
+}
+
+.description-delay {
+  animation-delay: 0.15s;
+}
+
+.typing-cursor {
+  display: inline-block;
+  margin-left: 3px;
+  color: #67e8f9;
+  animation: cursorBlink 0.7s steps(2, start) infinite;
+}
+
+@keyframes sectionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cursorBlink {
+  to {
+    visibility: hidden;
+  }
+}
+
 
         .network-background-canvas {
           position: absolute;
@@ -493,7 +639,7 @@ export default function MembersPage() {
           />
 
           {filteredDirectors.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {filteredDirectors.map((member) => (
                 <MemberCard key={member.name} member={member} />
               ))}
@@ -518,7 +664,7 @@ export default function MembersPage() {
           />
 
           {filteredOBearers.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {filteredOBearers.map((member) => (
                 <MemberCard key={member.name} member={member} />
               ))}
@@ -543,7 +689,7 @@ export default function MembersPage() {
           />
 
           {filterednextGen.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {filterednextGen.map((member) => (
                 <MemberCard key={member.name} member={member} />
               ))}
@@ -555,6 +701,31 @@ export default function MembersPage() {
           )}
         </div>
       </section>
+
+      {/* NEXT GEN - 2k25
+      <section
+        id="next-gen"
+        className="relative scroll-mt-24 border-t border-white/[0.07] bg-[#080D19] px-5 py-20 sm:px-8 md:py-28"
+      >
+        <div className="mx-auto max-w-7xl">
+          <SectionHeading
+            title="Next Gen"
+            description="The future of innovation"
+          />
+
+          {filterednextGen2.length > 0 ? (
+            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+              {filterednextGen2.map((member) => (
+                <MemberCard key={member.name} member={member} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-10 text-center text-sm text-slate-400">
+              No next-gen members match your search.
+            </p>
+          )}
+        </div>
+      </section> */}
 
       <Footer />
     </main>
