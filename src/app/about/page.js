@@ -11,10 +11,6 @@ import {
   Layers3,
   Mail,
   LogIn,
-  Rocket,
-  Trophy,
-  BookOpen,
-  FileCheck,
   ChevronDown,
   MapPin,
   Globe,
@@ -70,6 +66,70 @@ function RevealGroup({ children, className = "", delay = 0 }) {
   );
 }
 
+function AboutSignalField() {
+  const fieldRef = useRef(null);
+
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!field) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        field.dataset.visible = entry.isIntersecting ? "true" : "false";
+      },
+      { threshold: 0.01 }
+    );
+    observer.observe(field);
+    return () => observer.disconnect();
+  }, []);
+
+  const moveLight = (event) => {
+    const field = fieldRef.current;
+    if (!field) return;
+    const bounds = field.getBoundingClientRect();
+    field.style.setProperty("--signal-x", `${event.clientX - bounds.left}px`);
+    field.style.setProperty("--signal-y", `${event.clientY - bounds.top}px`);
+  };
+
+  return (
+    <div
+      ref={fieldRef}
+      aria-hidden="true"
+      className="about-signal-field absolute inset-0 z-0 overflow-hidden"
+      onPointerMove={moveLight}
+      onPointerEnter={(event) => event.currentTarget.dataset.active = "true"}
+      onPointerLeave={(event) => event.currentTarget.dataset.active = "false"}
+    >
+      <div className="about-signal-haze" />
+      <svg className="about-signal-rings" viewBox="0 0 1200 800" fill="none" preserveAspectRatio="xMidYMid slice">
+        <g className="about-orbit about-orbit-slow">
+          <ellipse cx="600" cy="400" rx="475" ry="218" transform="rotate(-17 600 400)" stroke="url(#signal-line-a)" strokeWidth="1.6" />
+          <ellipse className="about-signal-sweep" cx="600" cy="400" rx="475" ry="218" transform="rotate(-17 600 400)" stroke="#8bdcff" strokeWidth="2.4" strokeDasharray="110 2100" />
+          <circle cx="102" cy="259" r="4" fill="#a5e2ff" />
+          <circle cx="1077" cy="526" r="3.5" fill="#75c5fa" />
+        </g>
+        <g className="about-orbit about-orbit-reverse">
+          <ellipse cx="600" cy="400" rx="390" ry="300" transform="rotate(28 600 400)" stroke="url(#signal-line-b)" strokeWidth="1.35" />
+          <circle cx="863" cy="124" r="3.5" fill="#7bd6ef" />
+        </g>
+        <ellipse className="about-orbit-core" cx="600" cy="400" rx="290" ry="148" transform="rotate(-8 600 400)" stroke="url(#signal-line-b)" />
+        <defs>
+          <linearGradient id="signal-line-a" x1="90" y1="400" x2="1100" y2="400" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#3789d4" stopOpacity="0" />
+            <stop offset=".48" stopColor="#72c8ef" stopOpacity=".72" />
+            <stop offset="1" stopColor="#3789d4" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="signal-line-b" x1="280" y1="120" x2="930" y2="700" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#54a5e8" stopOpacity="0" />
+            <stop offset=".52" stopColor="#73d2e7" stopOpacity=".52" />
+            <stop offset="1" stopColor="#54a5e8" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="about-signal-lens" />
+    </div>
+  );
+}
+
 /* ────────────────────────────────────────────
    Animated counter for stats
    ──────────────────────────────────────────── */
@@ -79,18 +139,26 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
 
   useEffect(() => {
     if (!visible) return;
-    let start = 0;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
+    let frame = 0;
+    let startedAt = 0;
+    let lastUpdate = 0;
+
+    const tick = (time) => {
+      if (!startedAt) startedAt = time;
+      const elapsed = time - startedAt;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Updating at 30fps keeps the count animated without rerendering on every frame.
+      if (time - lastUpdate >= 33 || progress === 1) {
+        setCount(Math.floor(target * progress));
+        lastUpdate = time;
       }
-    }, 16);
-    return () => clearInterval(timer);
+
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
   }, [visible, target, duration]);
 
   return (
@@ -673,7 +741,7 @@ function NationalBodyInfoCard() {
 /* ────────────────────────────────────────────
    Objective card — matches stat card language
    ──────────────────────────────────────────── */
-function ObjectiveCard({ Icon, title, desc, index }) {
+function ObjectiveCard({ icon, title, desc, index }) {
   const cardRef = useRef(null);
   const [style, setStyle] = useState({
     rotateX: 0,
@@ -729,22 +797,14 @@ function ObjectiveCard({ Icon, title, desc, index }) {
           aria-hidden="true"
         />
 
-        <span className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t border-white/15 transition-colors duration-300 group-hover:border-cyan-300/55" />
-        <span className="pointer-events-none absolute bottom-3 right-3 h-2 w-2 border-b border-r border-white/15 transition-colors duration-300 group-hover:border-cyan-300/55" />
-
-        <div className="relative z-10 flex items-start justify-between gap-4">
-          <span className="font-mono text-[11px] tracking-[0.22em] text-slate-500 transition-colors duration-300 group-hover:text-cyan-300/85">
-            0{index + 1} // GOAL
-          </span>
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] text-cyan-300/80 transition-all duration-500 group-hover:-translate-y-0.5 group-hover:border-cyan-400/35 group-hover:bg-cyan-400/[0.08] group-hover:text-cyan-200 group-hover:shadow-[0_0_20px_-4px_rgba(34,211,238,0.45)]">
-            <Icon size={21} strokeWidth={1.75} />
-          </div>
+        <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-cyan-300/15 bg-cyan-300/[0.055] text-cyan-200/90 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-cyan-200/40 group-hover:bg-cyan-300/[0.11] group-hover:text-cyan-100 group-hover:shadow-[0_0_24px_-6px_rgba(34,211,238,0.45)]">
+          {icon}
         </div>
 
-        <h3 className="relative z-10 mt-6 text-xl font-bold tracking-wide text-white transition-colors duration-300 group-hover:text-cyan-50 sm:text-[1.35rem]">
+        <h3 className="relative z-10 mt-6 text-[1.25rem] font-semibold leading-snug tracking-[-0.02em] text-white transition-colors duration-300 group-hover:text-cyan-50 sm:text-[1.35rem]">
           {title}
         </h3>
-        <p className="relative z-10 mt-3 flex-1 text-base leading-relaxed text-slate-400 transition-colors duration-300 group-hover:text-slate-300">
+        <p className="relative z-10 mt-3 flex-1 text-[15px] leading-7 text-slate-400 transition-colors duration-300 group-hover:text-slate-300">
           {desc}
         </p>
 
@@ -762,11 +822,9 @@ function ObjectiveCard({ Icon, title, desc, index }) {
 /* ────────────────────────────────────────────
    Hand-Crafted Interactive Floating Stat Card
    ──────────────────────────────────────────── */
-function InteractiveStatCard({ Icon, target, suffix = "", label, sublabel, index }) {
+function InteractiveStatCard({ Icon, target, suffix = "", label, sublabel }) {
   const cardRef = useRef(null);
   const [style, setStyle] = useState({
-    rotateX: 0,
-    rotateY: 0,
     spotX: 50,
     spotY: 50,
     hovered: false,
@@ -776,51 +834,31 @@ function InteractiveStatCard({ Icon, target, suffix = "", label, sublabel, index
     const el = cardRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const px = (x / rect.width) * 100;
-    const py = (y / rect.height) * 100;
-
-    // Subtle 3D tilt (max 6 degrees so it feels natural and handcrafted)
-    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 6;
-    const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 6;
-
-    setStyle({ rotateX, rotateY, spotX: px, spotY: py, hovered: true });
+    setStyle({
+      spotX: ((e.clientX - rect.left) / rect.width) * 100,
+      spotY: ((e.clientY - rect.top) / rect.height) * 100,
+      hovered: true,
+    });
   };
 
   const handleMouseLeave = () => {
-    setStyle((prev) => ({
-      ...prev,
-      rotateX: 0,
-      rotateY: 0,
-      hovered: false,
-    }));
+    setStyle((prev) => ({ ...prev, hovered: false }));
   };
 
   return (
-    <div
-      style={{
-        perspective: "1000px",
-        animation: `ieteFloat ${4.2 + index * 0.7}s ease-in-out infinite`,
-        animationDelay: `${index * 0.4}s`,
-      }}
-    >
+    <div>
       <div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
-          transform: `rotateX(${style.rotateX}deg) rotateY(${style.rotateY}deg) translateY(${
-            style.hovered ? "-6px" : "0px"
-          })`,
-          transition: style.hovered
-            ? "transform 120ms ease-out, border-color 300ms ease"
-            : "transform 500ms cubic-bezier(0.22, 1, 0.36, 1), border-color 500ms ease",
+          transform: style.hovered ? "translateY(-5px)" : "translateY(0)",
+          transition: "transform 260ms ease, border-color 260ms ease, box-shadow 260ms ease",
         }}
-        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#060B16]/90 p-7 text-left shadow-[0_12px_34px_-12px_rgba(0,0,0,0.7)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-cyan-400/40 hover:shadow-[0_20px_50px_-14px_rgba(34,211,238,0.28)]"
+        className="group relative flex min-h-[230px] flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.1] bg-[#090e1c]/90 p-7 text-left shadow-[0_12px_34px_-12px_rgba(0,0,0,0.55)] transition-[border-color,box-shadow] duration-300 hover:border-blue-300/40 hover:shadow-[0_18px_42px_-18px_rgba(37,99,235,0.35)] sm:p-8"
       >
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-cyan-400 via-blue-400/60 to-transparent transition-transform duration-500 group-hover:scale-x-100"
+          className="pointer-events-none absolute inset-x-7 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-blue-300/80 via-blue-400/30 to-transparent transition-transform duration-500 group-hover:scale-x-100"
           aria-hidden="true"
         />
         {/* Cursor-following soft spotlight */}
@@ -828,43 +866,24 @@ function InteractiveStatCard({ Icon, target, suffix = "", label, sublabel, index
           className="pointer-events-none absolute inset-0 transition-opacity duration-500"
           style={{
             opacity: style.hovered ? 1 : 0,
-            background: `radial-gradient(260px circle at ${style.spotX}% ${style.spotY}%, rgba(56, 189, 248, 0.11), transparent 75%)`,
+            background: `radial-gradient(220px circle at ${style.spotX}% ${style.spotY}%, rgba(59, 130, 246, 0.11), transparent 75%)`,
           }}
         />
 
-        {/* Hand-crafted minimal corner ticks */}
-        <span className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t border-white/15 transition-colors duration-300 group-hover:border-cyan-300/60" />
-        <span className="pointer-events-none absolute bottom-3 right-3 h-2 w-2 border-b border-r border-white/15 transition-colors duration-300 group-hover:border-cyan-300/60" />
-
-        {/* Top Row: Index number + Floating Icon */}
-        <div className="relative z-10 flex items-center justify-between">
-          <span className="font-mono text-[11px] tracking-[0.25em] text-slate-500 transition-colors duration-300 group-hover:text-cyan-300/80">
-            0{index + 1} // STAT
-          </span>
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.02] text-slate-300 transition-all duration-500 group-hover:-translate-y-1 group-hover:rotate-6 group-hover:border-cyan-400/30 group-hover:bg-cyan-400/10 group-hover:text-cyan-300">
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-300/15 bg-blue-300/[0.06] text-blue-200 transition-all duration-300 group-hover:border-blue-300/40 group-hover:bg-blue-300/[0.12] group-hover:text-white">
             <Icon size={19} strokeWidth={1.7} />
           </div>
+          <p className="text-xs font-medium tracking-wide text-slate-400">{label}</p>
         </div>
 
-        {/* Middle Row: Big Clean Number */}
         <div className="relative z-10 my-6">
-          <p className="text-4xl font-black tracking-tight text-white transition-[transform,color] duration-300 group-hover:translate-x-1 group-hover:text-cyan-50 sm:text-[42px]">
+          <p className="text-4xl font-semibold tracking-[-0.04em] text-white sm:text-[42px]">
             <AnimatedCounter target={target} suffix={suffix} />
           </p>
         </div>
 
-        {/* Bottom Row: Label + Animated underline */}
-        <div className="relative z-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-            {label}
-          </p>
-          <p className="mt-1 text-[11px] text-slate-500">{sublabel}</p>
-
-          <div className="mt-4 h-[1.5px] w-full overflow-hidden rounded-full bg-white/[0.06]">
-            <div className="h-full w-8 rounded-full bg-cyan-400/60 transition-all duration-500 ease-out group-hover:w-full group-hover:bg-cyan-300" />
-          </div>
-        </div>
+        <p className="relative z-10 border-t border-white/[0.07] pt-3 text-sm leading-relaxed text-slate-400">{sublabel}</p>
       </div>
     </div>
   );
@@ -877,22 +896,43 @@ export default function AboutPage() {
   /* ── Objectives data ── */
   const objectives = [
     {
-      Icon: Rocket,
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-[23px] w-[23px]" aria-hidden="true">
+          <rect x="7" y="7" width="10" height="10" rx="2" />
+          <path d="M9 3v4m6-4v4M9 17v4m6-4v4M3 9h4m-4 6h4m10-6h4m-4 6h4" />
+          <circle cx="12" cy="12" r="1.5" />
+        </svg>
+      ),
       title: "Advancement of Technology",
       desc: "Promoting the advancement of Electronics, Telecommunications, and Information Technology sciences.",
     },
     {
-      Icon: Trophy,
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-[23px] w-[23px]" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.2" />
+          <path d="M5.5 20v-1.4a6.5 6.5 0 0 1 13 0V20M4 5.5h2.1m11.8 0H20M4 5.5v1a3 3 0 0 0 3 3m13-4v1a3 3 0 0 1-3 3" />
+        </svg>
+      ),
       title: "Leadership & Development",
       desc: "Fostering professional excellence and contributing to national development through technological leadership.",
     },
     {
-      Icon: BookOpen,
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-[23px] w-[23px]" aria-hidden="true">
+          <path d="M12 6.2C10.3 4.9 7.5 4.5 4 5.4v13c3.5-.9 6.3-.5 8 1.1m0-13.3c1.7-1.3 4.5-1.7 8-.8v13c-3.5-.9-6.3-.5-8 1.1m0-13.3v13.3" />
+          <path d="M6.8 8.7c1.3-.2 2.4-.1 3.4.3m-3.4 2.6c1.3-.2 2.4-.1 3.4.3m7.6-3.2c-1.3-.2-2.4-.1-3.4.3m3.4 2.6c-1.3-.2-2.4-.1-3.4.3" />
+        </svg>
+      ),
       title: "Knowledge Dissemination",
       desc: "Organizing conferences, publishing journals, and facilitating continuing education programs.",
     },
     {
-      Icon: FileCheck,
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-[23px] w-[23px]" aria-hidden="true">
+          <path d="M7 3.8h7l4 4V14M7 3.8A2.2 2.2 0 0 0 4.8 6v12A2.2 2.2 0 0 0 7 20.2h5" />
+          <path d="M14 4v4h4M8 11h6m-6 3h4m3.2 3.1 1.8 1.8 3.5-4" />
+        </svg>
+      ),
       title: "Professional Examinations",
       desc: "Conducting AMIETE and DIPIETE examinations to certify professional competence in the field.",
     },
@@ -1065,48 +1105,27 @@ export default function AboutPage() {
       </nav>
 
       {/* ═══ HERO SECTION ═══ */}
-      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 pb-20 pt-36">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 pb-16 pt-32">
         {/* Background layers */}
         <div
           className="pointer-events-none absolute inset-0 z-0"
           style={{
             background: `
-              radial-gradient(ellipse at 50% 43%, rgba(15, 91, 220, 0.20) 0%, rgba(12, 39, 91, 0.13) 30%, transparent 62%),
-              radial-gradient(ellipse at 50% 100%, rgba(13, 53, 115, 0.14) 0%, transparent 55%),
-              linear-gradient(135deg, #0b1020 0%, #070b17 48%, #03050b 100%)
+              radial-gradient(ellipse at 50% 48%, rgba(12, 78, 130, 0.18) 0%, rgba(7, 33, 59, 0.12) 34%, transparent 68%),
+              radial-gradient(ellipse at 50% 100%, rgba(13, 53, 115, 0.16) 0%, transparent 58%),
+              linear-gradient(135deg, #080e1b 0%, #050a14 54%, #03060c 100%)
             `,
           }}
         />
 
-        {/* Grid pattern */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(82, 137, 220, 0.035) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(82, 137, 220, 0.035) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
-            maskImage:
-              "radial-gradient(ellipse at center, black 0%, transparent 78%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 0%, transparent 78%)",
-          }}
-        />
+        <AboutSignalField />
 
         {/* Glow */}
         <div className="pointer-events-none absolute left-1/2 top-[43%] -z-10 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/[0.08] blur-[100px] sm:h-[480px] sm:w-[480px]" />
 
-        <div className="relative z-10 flex w-full max-w-5xl flex-col items-center text-center">
-          <RevealGroup delay={0}>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              <Info size={14} />
-              About Us
-            </div>
-          </RevealGroup>
-
+        <div className="relative z-10 flex w-full max-w-6xl flex-col items-center text-center">
           <RevealGroup delay={100}>
-            <h1 className="mt-4 text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-6xl md:text-7xl">
+            <h1 className="text-6xl font-extrabold uppercase leading-[0.95] tracking-[-0.045em] sm:text-8xl md:text-[8.5rem]">
               <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                 About{" "}
               </span>
@@ -1117,11 +1136,11 @@ export default function AboutPage() {
           </RevealGroup>
 
           <RevealGroup delay={200}>
-            <div className="mt-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-36" />
+            <div className="mt-7 h-px w-20 bg-blue-300/55 sm:w-28" />
           </RevealGroup>
 
           <RevealGroup delay={300}>
-            <p className="mt-7 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-lg sm:leading-relaxed">
+            <p className="mt-8 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-xl sm:leading-relaxed">
               The Institution of Electronics and Telecommunication Engineers
               (IETE) is India&apos;s leading recognised professional society
               devoted to the advancement of science and technology of
@@ -1132,7 +1151,7 @@ export default function AboutPage() {
             </p>
           </RevealGroup>
 
-          <RevealGroup delay={400}>
+          {/* <RevealGroup delay={400}>
             <a
               href="#national-body"
               className="mt-14 flex flex-col items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-slate-500 transition-colors hover:text-blue-300"
@@ -1142,7 +1161,7 @@ export default function AboutPage() {
               </span>
               Explore
             </a>
-          </RevealGroup>
+          </RevealGroup> */}
         </div>
       </section>
 
@@ -1248,7 +1267,7 @@ export default function AboutPage() {
               <RevealGroup key={obj.title} delay={280 + i * 100}>
                 <ObjectiveCard
                   index={i}
-                  Icon={obj.Icon}
+                  icon={obj.icon}
                   title={obj.title}
                   desc={obj.desc}
                 />
@@ -1259,53 +1278,53 @@ export default function AboutPage() {
       </section>
 
       {/* ═══ FACULTY / LEADERS SECTION ═══ */}
-      <section className="relative overflow-hidden px-5 py-24 sm:py-32">
-        {/* Ambient glow */}
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-violet-600/[0.04] blur-[140px]" />
+      <section className="relative overflow-hidden px-5 py-20 sm:py-28">
+        {/* Soft blue ambience keeps the section connected to the site palette. */}
+        <div className="pointer-events-none absolute left-1/2 top-8 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-blue-500/[0.07] blur-[130px]" />
 
         <div className="relative z-10 mx-auto max-w-5xl">
           <RevealGroup>
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.4em] text-violet-400/70">
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/80">
               Meet Our Leaders
             </p>
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-wide sm:text-5xl">
-              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h2 className="mt-4 text-center text-3xl font-semibold tracking-tight sm:text-5xl">
+              <span className="bg-gradient-to-r from-white via-slate-100 to-blue-100 bg-clip-text text-transparent">
                 Our Support
               </span>
             </h2>
           </RevealGroup>
 
           <RevealGroup delay={150}>
-            <div className="mx-auto mt-3 h-px w-20 bg-gradient-to-r from-transparent via-violet-400 to-transparent sm:w-28" />
+            <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_14px_rgba(59,130,246,0.35)] sm:w-28" />
           </RevealGroup>
 
           {/* Faculty cards */}
-          <div className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2">
+          <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7">
             {faculty.map((person, i) => (
               <RevealGroup key={person.name} delay={250 + i * 150}>
-                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center transition-all duration-500 hover:border-white/[0.15]">
-                  {/* Top gradient line */}
+                <div className="group relative overflow-hidden rounded-2xl border border-blue-400/25 bg-[#080d1b]/80 p-8 text-center shadow-[0_16px_48px_rgba(0,0,0,0.24)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-300/55 hover:shadow-[0_18px_52px_rgba(29,78,216,0.16)] sm:p-9">
+                  {/* Fine blue edge */}
                   <div
-                    className={`absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r ${person.gradient} opacity-60 transition-opacity group-hover:opacity-100`}
+                    className={`absolute inset-x-8 top-0 h-px bg-gradient-to-r ${person.gradient} opacity-80 transition-opacity group-hover:opacity-100`}
                   />
 
                   {/* Avatar placeholder */}
                   <div
-                    className={`mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br ${person.gradient} shadow-lg shadow-cyan-500/10`}
+                    className={`mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br ${person.gradient} shadow-[0_0_28px_rgba(37,99,235,0.32)] transition-shadow duration-300 group-hover:shadow-[0_0_38px_rgba(37,99,235,0.48)]`}
                   >
                     <Users size={36} className="text-white/90" />
                   </div>
 
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300/80">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-blue-300">
                     {person.role}
                   </p>
-                  <h3 className="mt-3 text-xl font-bold text-white sm:text-2xl">
+                  <h3 className="mt-3 text-xl font-semibold tracking-tight text-white sm:text-2xl">
                     {person.name}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">
+                  <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-400">
                     {person.desc}
                   </p>
                 </div>
@@ -1317,26 +1336,19 @@ export default function AboutPage() {
 
       {/* ═══ NATIONWIDE PRESENCE SECTION ═══ */}
       <section className="relative overflow-hidden px-5 py-24 sm:py-32">
-        <style>{`
-          @keyframes ieteFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-7px); }
-          }
-        `}</style>
-
         <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/[0.06] blur-[140px]" />
 
         <div className="relative z-10 mx-auto max-w-5xl text-center">
           <RevealGroup delay={100}>
-            <h2 className="text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-5xl md:text-6xl">
-              <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+              <span>
                 IETE is All Around India
               </span>
             </h2>
           </RevealGroup>
 
           <RevealGroup delay={180}>
-            <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-36" />
+            <div className="mx-auto mt-5 h-px w-16 bg-blue-300/60 sm:w-20" />
           </RevealGroup>
 
           <RevealGroup delay={250}>
@@ -1345,11 +1357,10 @@ export default function AboutPage() {
             </div>
           </RevealGroup>
 
-          <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-5 sm:mt-10 sm:grid-cols-3">
             {nationwideStats.map((item, i) => (
               <RevealGroup key={item.label} delay={380 + i * 110}>
                 <InteractiveStatCard
-                  index={i}
                   Icon={item.Icon}
                   target={item.target}
                   suffix={item.suffix}

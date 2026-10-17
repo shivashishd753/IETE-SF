@@ -36,6 +36,125 @@ body {
   z-index: 0;
 }
 
+.about-signal-field {
+  --signal-x: 50%;
+  --signal-y: 45%;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(20, 83, 145, 0.2), transparent 62%),
+    radial-gradient(ellipse at 50% 100%, rgba(13, 53, 115, 0.16), transparent 58%);
+}
+
+.about-signal-haze {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(50, 137, 214, 0.14), transparent 48%),
+    radial-gradient(ellipse at 50% 48%, rgba(35, 111, 185, 0.11), transparent 68%);
+  animation: aboutHazeBreath 9s ease-in-out infinite alternate;
+}
+
+.about-signal-rings {
+  position: absolute;
+  inset: -8% -10%;
+  width: 120%;
+  height: 116%;
+  overflow: visible;
+  opacity: 0.86;
+  mask-image: radial-gradient(ellipse at center, #000 8%, transparent 84%);
+}
+
+.about-orbit-slow {
+  transform-origin: 600px 400px;
+  animation: aboutOrbit 64s linear infinite;
+}
+
+.about-orbit-reverse {
+  transform-origin: 600px 400px;
+  animation: aboutOrbitReverse 78s linear infinite;
+}
+
+.about-orbit-core {
+  stroke-width: 1.5;
+  opacity: 0.82;
+  stroke-dasharray: 3 9;
+  animation: aboutSignalTravel 34s linear infinite;
+}
+
+.about-signal-sweep {
+  opacity: 0.78;
+  animation: aboutSweepTravel 42s linear infinite;
+}
+
+.about-signal-rings circle {
+  animation: aboutSignalPulse 3.4s ease-in-out infinite alternate;
+}
+
+.about-signal-field[data-visible="false"] .about-signal-haze,
+.about-signal-field[data-visible="false"] .about-orbit-slow,
+.about-signal-field[data-visible="false"] .about-orbit-reverse,
+.about-signal-field[data-visible="false"] .about-orbit-core,
+.about-signal-field[data-visible="false"] .about-signal-sweep,
+.about-signal-field[data-visible="false"] .about-signal-rings circle {
+  animation-play-state: paused;
+}
+
+.about-signal-lens {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(420px circle at var(--signal-x) var(--signal-y), rgba(47, 139, 211, 0.22), transparent 72%);
+  transition: opacity 450ms ease;
+}
+
+.about-signal-field[data-active="true"] .about-signal-lens {
+  opacity: 1;
+}
+
+@keyframes aboutOrbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes aboutOrbitReverse {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes aboutSignalTravel {
+  to { stroke-dashoffset: -1400; }
+}
+
+@keyframes aboutSweepTravel {
+  to { stroke-dashoffset: -2300; }
+}
+
+@keyframes aboutSignalPulse {
+  from { opacity: 0.45; }
+  to { opacity: 0.95; }
+}
+
+@keyframes aboutHazeBreath {
+  from { opacity: 0.5; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-signal-haze,
+  .about-orbit-slow,
+  .about-orbit-reverse,
+  .about-orbit-core,
+  .about-signal-rings circle {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-signal-rings {
+    inset: 0 -42%;
+    width: 184%;
+    height: 100%;
+    opacity: 0.48;
+  }
+}
+
 .intro-loader {
   position: fixed;
   inset: 0;
