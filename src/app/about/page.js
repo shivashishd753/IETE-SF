@@ -100,10 +100,775 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
     </span>
   );
 }
+/* ────────────────────────────────────────────
+   Official IETE Centres & Sub-Centres Coordinates
+   (Slightly nudged inland for coastal cities so dots sit cleanly inside borders)
+   ──────────────────────────────────────────── */
+const IETE_CENTRES = [
+  { id: 1, name: "Bengaluru", coords: [77.5946, 12.9716], url: "https://www.ietebangalore.org/" },
+  { id: 2, name: "Bhopal", coords: [77.4126, 23.2599], url: "https://ieteb.org/" },
+  { id: 3, name: "Chandigarh", coords: [76.7794, 30.7333], url: "http://www.ietechandigarh.org/" },
+  { id: 4, name: "Chennai", coords: [80.12, 13.0827], url: "http://ietechennai.in/" },
+  { id: 5, name: "Delhi", coords: [77.15, 28.65], url: "https://ietedelhi.com/" },
+  { id: 6, name: "Hyderabad", coords: [78.4867, 17.385], url: "https://www.ietehyd.org/" },
+  { id: 7, name: "Kolkata", coords: [88.32, 22.5726] },
+  { id: 8, name: "Mumbai", coords: [73.02, 19.12] },
+  { id: 9, name: "Noida", coords: [77.45, 28.5355], url: "http://ietenoida.org/" },
+  { id: 10, name: "Pune", coords: [73.8567, 18.5204] },
+  { id: 11, name: "Ahmedabad", coords: [72.5714, 23.0225] },
+  { id: 12, name: "Aligarh", coords: [78.088, 27.8974] },
+  { id: 13, name: "Allahabad (Prayagraj)", coords: [81.8463, 25.4358] },
+  { id: 14, name: "Amravati", coords: [77.7523, 20.932], url: "http://www.ieteamravati.org/" },
+  { id: 15, name: "Aurangabad", coords: [75.3433, 19.8762] },
+  { id: 16, name: "Bhubaneshwar", coords: [85.75, 20.2961] },
+  { id: 17, name: "Coimbatore", coords: [76.9558, 11.0168] },
+  { id: 18, name: "Dehradun", coords: [78.0322, 30.3165] },
+  { id: 19, name: "Erode", coords: [77.7172, 11.341] },
+  { id: 20, name: "Guwahati", coords: [91.7362, 26.1445] },
+  { id: 21, name: "Kalaburagi (Gulbarga)", coords: [76.8343, 17.3297], url: "http://ieteklb.org/" },
+  { id: 22, name: "Imphal", coords: [93.9063, 24.817] },
+  { id: 23, name: "Jaipur", coords: [75.7873, 26.9124] },
+  { id: 24, name: "Kanpur", coords: [80.3319, 26.4499] },
+  { id: 25, name: "Kochi", coords: [76.38, 10.02], url: "https://ietekochi.in/" },
+  { id: 26, name: "Kakinada", coords: [82.12, 17.02] },
+  { id: 27, name: "Lucknow", coords: [80.9462, 26.8467] },
+  { id: 28, name: "Mankapur", coords: [82.228, 27.037] },
+  { id: 29, name: "Mysuru", coords: [76.6394, 12.2958] },
+  { id: 30, name: "Nagpur", coords: [79.0882, 21.1458] },
+  { id: 31, name: "Navi Mumbai", coords: [73.18, 19.033] },
+  { id: 32, name: "Palakkad", coords: [76.6548, 10.7867] },
+  { id: 33, name: "Pilani", coords: [75.6033, 28.367] },
+  { id: 34, name: "Rajkot", coords: [70.8022, 22.3039], url: "http://www.ieterajkot.org/" },
+  { id: 35, name: "Ranchi", coords: [85.3096, 23.3441] },
+  { id: 36, name: "Shivamogga", coords: [75.5681, 13.9299] },
+  { id: 37, name: "Sivakasi", coords: [77.795, 9.4533], url: "http://www.mepcoeng.ac.in/" },
+  { id: 38, name: "Thiruvananthapuram", coords: [77.02, 8.62], url: "http://www.ietetvm.org/" },
+  { id: 39, name: "Tirupati", coords: [79.4192, 13.6288], url: "https://www.ietetirupati.org/" },
+  { id: 40, name: "Vadodara", coords: [73.1812, 22.3072] },
+  { id: 41, name: "Vijayawada", coords: [80.648, 16.5062] },
+  { id: 42, name: "Visakhapatnam", coords: [83.12, 17.72] },
+  { id: 43, name: "Warangal", coords: [79.5941, 17.9689] },
+  { id: 45, name: "Patna", coords: [85.1376, 25.5941], url: "http://www.ietepatna.in/" },
+  { id: 46, name: "BIT Sindri (Dhanbad)", coords: [86.4735, 23.6546], highlight: true },
+];
+
+const IETE_SUB_CENTRES = [
+  { name: "Agra", coords: [78.0081, 27.1767] },
+  { name: "Burdwan", coords: [87.8615, 23.2324] },
+  { name: "Dharwad", coords: [75.0078, 15.4589] },
+  { name: "Goa", coords: [74.02, 15.38] },
+  { name: "Gwalior", coords: [78.1828, 26.2183] },
+  { name: "Indore", coords: [75.8577, 22.7196] },
+  { name: "Jabalpur", coords: [79.9864, 23.1815] },
+  { name: "Jalandhar", coords: [75.5762, 31.326] },
+  { name: "Jammu", coords: [74.857, 32.7266] },
+  { name: "Kolhapur", coords: [74.2433, 16.705] },
+  { name: "Kozhikode", coords: [75.88, 11.2588] },
+  { name: "Mhow", coords: [75.7644, 22.5524] },
+  { name: "Nashik", coords: [73.7898, 19.9975] },
+  { name: "Shimla", coords: [77.1734, 31.1048] },
+  { name: "Surat", coords: [72.92, 21.1702] },
+  { name: "Varanasi", coords: [82.9739, 25.3176] },
+  { name: "Yavatmal", coords: [78.1204, 20.3888] },
+];
+
+function GlowingIndiaMap() {
+  const [paths, setPaths] = useState([]);
+  const [centres, setCentres] = useState([]);
+  const [subCentres, setSubCentres] = useState([]);
+  const [showSubCentres, setShowSubCentres] = useState(false);
+  const [activeHub, setActiveHub] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(
+      "https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson"
+    )
+      .then((res) => res.json())
+      .then((geo) => {
+        if (!active) return;
+
+        // Filter out island territories so mainland matches the clean reference silhouette
+        const mainland = geo.features.filter((f) => {
+          const name = (f.properties?.ST_NM || "").toLowerCase();
+          return !name.includes("andaman") && !name.includes("lakshadweep");
+        });
+
+        // Compute exact bounding box directly in lon/lat with cosine latitude aspect correction
+        let minLon = Infinity,
+          maxLon = -Infinity,
+          minLat = Infinity,
+          maxLat = -Infinity;
+
+        const scan = (ring) => {
+          for (let i = 0; i < ring.length; i++) {
+            const [lon, lat] = ring[i];
+            if (lon < minLon) minLon = lon;
+            if (lon > maxLon) maxLon = lon;
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+          }
+        };
+
+        mainland.forEach((f) => {
+          const { type, coordinates } = f.geometry;
+          if (type === "Polygon") coordinates.forEach(scan);
+          else if (type === "MultiPolygon")
+            coordinates.forEach((poly) => poly.forEach(scan));
+        });
+
+        const width = 800;
+        const height = 880;
+        const pad = 55;
+        const cosLat = Math.cos(((minLat + maxLat) / 2) * (Math.PI / 180));
+
+        const spanX = (maxLon - minLon) * cosLat;
+        const spanY = maxLat - minLat;
+
+        const scale = Math.min(
+          (width - pad * 2) / spanX,
+          (height - pad * 2) / spanY
+        );
+
+        const offsetX = (width - spanX * scale) / 2;
+        const offsetY = (height - spanY * scale) / 2;
+
+        // Single unified projection function for both state polygons and city coordinates
+        const project = ([lon, lat]) => {
+          const x = offsetX + (lon - minLon) * cosLat * scale;
+          const y = height - (offsetY + (lat - minLat) * scale);
+          return [x, y];
+        };
+
+        const ringsToSvg = (rings) =>
+          rings
+            .map(
+              (ring) =>
+                "M" +
+                ring
+                  .map((pt) => {
+                    const [x, y] = project(pt);
+                    return `${x.toFixed(1)},${y.toFixed(1)}`;
+                  })
+                  .join("L") +
+                "Z"
+            )
+            .join(" ");
+
+        setPaths(
+          mainland.map((f, idx) => {
+            const { type, coordinates } = f.geometry;
+            const d =
+              type === "Polygon"
+                ? ringsToSvg(coordinates)
+                : coordinates.map((p) => ringsToSvg(p)).join(" ");
+            return { id: idx, d };
+          })
+        );
+
+        setCentres(
+          IETE_CENTRES.map((c) => {
+            const [cx, cy] = project(c.coords);
+            return { ...c, cx, cy, type: "IETE Centre" };
+          })
+        );
+
+        setSubCentres(
+          IETE_SUB_CENTRES.map((sc) => {
+            const [cx, cy] = project(sc.coords);
+            return { ...sc, cx, cy, type: "IETE Sub-Centre" };
+          })
+        );
+      })
+      .catch(console.error);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <div className="relative mx-auto flex w-full max-w-[680px] flex-col items-center select-none">
+      {/* Subtle Toggle Pill for Centres vs Sub-Centres */}
+      <div className="mb-4 flex items-center gap-3 rounded-full border border-white/10 bg-[#050914]/90 px-4 py-1.5 text-xs text-slate-300 backdrop-blur-md">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-white shadow-[0_0_8px_#60a5fa]" />
+          44 Centres
+        </span>
+        <span className="text-white/20">|</span>
+        <button
+          type="button"
+          onClick={() => setShowSubCentres(!showSubCentres)}
+          className={`flex items-center gap-1.5 transition-colors ${
+            showSubCentres ? "text-cyan-300" : "text-slate-500 hover:text-slate-300"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              showSubCentres ? "bg-cyan-400" : "bg-slate-600"
+            }`}
+          />
+          {showSubCentres ? "Hide" : "Show"} 18 Sub-Centres
+        </button>
+      </div>
+
+      {/* SVG Map Container */}
+      <div className="relative w-full">
+        <svg
+          viewBox="0 0 800 880"
+          className="h-auto w-full overflow-visible"
+        >
+          <defs>
+            {/* Clean Outer Silhouette Glow matching reference image */}
+            <filter
+              id="india-outer-glow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feMorphology
+                operator="dilate"
+                radius="2"
+                in="SourceAlpha"
+                result="dilated"
+              />
+              <feGaussianBlur
+                stdDeviation="1.5"
+                in="dilated"
+                result="blurCore"
+              />
+              <feFlood
+                floodColor="#93c5fd"
+                floodOpacity="1"
+                result="colorCore"
+              />
+              <feComposite
+                in="colorCore"
+                in2="blurCore"
+                operator="in"
+                result="glowCore"
+              />
+
+              <feGaussianBlur
+                stdDeviation="6"
+                in="dilated"
+                result="blurMid"
+              />
+              <feFlood
+                floodColor="#3b82f6"
+                floodOpacity="0.9"
+                result="colorMid"
+              />
+              <feComposite
+                in="colorMid"
+                in2="blurMid"
+                operator="in"
+                result="glowMid"
+              />
+
+              <feGaussianBlur
+                stdDeviation="15"
+                in="dilated"
+                result="blurWide"
+              />
+              <feFlood
+                floodColor="#1d4ed8"
+                floodOpacity="0.7"
+                result="colorWide"
+              />
+              <feComposite
+                in="colorWide"
+                in2="blurWide"
+                operator="in"
+                result="glowWide"
+              />
+
+              <feMerge>
+                <feMergeNode in="glowWide" />
+                <feMergeNode in="glowMid" />
+                <feMergeNode in="glowCore" />
+              </feMerge>
+            </filter>
+
+            {/* Radial Glow Gradient for Nodes (Cleaner & sharper than heavy blur filters) */}
+            <radialGradient id="node-halo" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="28%" stopColor="#93c5fd" stopOpacity="0.95" />
+              <stop offset="55%" stopColor="#3b82f6" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient id="subnode-halo" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.9" />
+              <stop offset="45%" stopColor="#0284c7" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          {/* LAYER 1: Outer Silhouette Neon Glow */}
+          <g filter="url(#india-outer-glow)">
+            {paths.map((p) => (
+              <path
+                key={`glow-${p.id}`}
+                d={p.d}
+                fill="#040d1f"
+                stroke="#60a5fa"
+                strokeWidth="2.2"
+                strokeLinejoin="round"
+              />
+            ))}
+          </g>
+
+          {/* LAYER 2: Inner State Polygons & Crisp Subtle Borders */}
+          <g>
+            {paths.map((p) => (
+              <path
+                key={`state-${p.id}`}
+                d={p.d}
+                fill="#040d1f"
+                stroke="#153866"
+                strokeWidth="0.9"
+                strokeLinejoin="round"
+                className="transition-colors duration-300 hover:fill-[#071936]"
+              />
+            ))}
+          </g>
+
+          {/* LAYER 3: Optional Sub-Centres (18 Nodes) */}
+          {showSubCentres && (
+            <g>
+              {subCentres.map((sc) => (
+                <g
+                  key={`sub-${sc.name}`}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setActiveHub(sc)}
+                  onMouseLeave={() => setActiveHub(null)}
+                >
+                  <circle
+                    cx={sc.cx}
+                    cy={sc.cy}
+                    r={7.5}
+                    fill="url(#subnode-halo)"
+                  />
+                  <circle cx={sc.cx} cy={sc.cy} r={1.8} fill="#a5f3fc" />
+                </g>
+              ))}
+            </g>
+          )}
+
+          {/* LAYER 4: Main IETE Centres (44 Nodes + BIT Sindri) */}
+          <g>
+            {centres.map((hub) => (
+              <g
+                key={`centre-${hub.name}`}
+                className="cursor-pointer"
+                onMouseEnter={() => setActiveHub(hub)}
+                onMouseLeave={() => setActiveHub(null)}
+                onClick={() => {
+                  if (hub.url) window.open(hub.url, "_blank", "noopener");
+                }}
+              >
+                {/* Radial soft glow */}
+                <circle
+                  cx={hub.cx}
+                  cy={hub.cy}
+                  r={hub.highlight ? 15 : 10.5}
+                  fill="url(#node-halo)"
+                />
+                {/* Crisp white star center */}
+                <circle
+                  cx={hub.cx}
+                  cy={hub.cy}
+                  r={hub.highlight ? 3.2 : 2.3}
+                  fill="#ffffff"
+                />
+              </g>
+            ))}
+          </g>
+        </svg>
+
+        {/* Minimal Floating Tooltip on Hover */}
+        {activeHub && (
+          <div
+            className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-400/30 bg-[#050b18]/95 px-3 py-1.5 text-center shadow-lg backdrop-blur-md"
+            style={{
+              left: `${(activeHub.cx / 800) * 100}%`,
+              top: `${(activeHub.cy / 880) * 100 - 1.5}%`,
+            }}
+          >
+            <p className="whitespace-nowrap text-xs font-bold tracking-wide text-white">
+              {activeHub.name}
+            </p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-300/80">
+              {activeHub.type} {activeHub.url ? "• Click to visit ↗" : ""}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+/* ────────────────────────────────────────────
+   IETE National Body — parent org highlight
+   ──────────────────────────────────────────── */
+function SparkleIcon({ className = "h-3 w-3" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z" />
+    </svg>
+  );
+}
+
+function NationalBodyPulseLine({ draw }) {
+  const path = "M 24 22 H 168 L 188 34 H 212 L 232 22 H 376";
+
+  return (
+    <svg
+      viewBox="0 0 400 44"
+      className="mx-auto mt-10 h-9 w-full max-w-md sm:max-w-lg"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="nb-pulse-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#1e40af" stopOpacity="0.15" />
+          <stop offset="35%" stopColor="#60a5fa" stopOpacity="0.85" />
+          <stop offset="50%" stopColor="#22d3ee" stopOpacity="1" />
+          <stop offset="65%" stopColor="#60a5fa" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#1e40af" stopOpacity="0.15" />
+        </linearGradient>
+        <filter id="nb-pulse-glow" x="-20%" y="-80%" width="140%" height="260%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <path
+        d={path}
+        stroke="url(#nb-pulse-grad)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        pathLength="1"
+        filter="url(#nb-pulse-glow)"
+        style={{
+          strokeDasharray: 1,
+          strokeDashoffset: draw ? 0 : 1,
+          transition: "stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      />
+
+      {[
+        { cx: 128, cy: 22, delay: "0s" },
+        { cx: 200, cy: 34, delay: "0.35s" },
+        { cx: 232, cy: 22, delay: "0.7s" },
+      ].map(({ cx, cy, delay }) => (
+        <g key={`${cx}-${cy}`} opacity={draw ? 1 : 0} style={{ transition: "opacity 0.6s ease", transitionDelay: delay }}>
+          <circle cx={cx} cy={cy} r="5" fill="#3b82f6" opacity="0.25">
+            <animate attributeName="r" values="5;8;5" dur="2.8s" repeatCount="indefinite" begin={delay} />
+            <animate attributeName="opacity" values="0.25;0;0.25" dur="2.8s" repeatCount="indefinite" begin={delay} />
+          </circle>
+          <circle cx={cx} cy={cy} r="2.5" fill="#93c5fd">
+            <animate attributeName="opacity" values="0.65;1;0.65" dur="2.8s" repeatCount="indefinite" begin={delay} />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function NationalBodyInfoCard() {
+  const cardRef = useRef(null);
+  const [ref, visible] = useReveal(0.14);
+  const [spot, setSpot] = useState({ x: 50, y: 40, active: false });
+
+  const handlePointerMove = (e) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setSpot({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+      active: true,
+    });
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`mx-auto mt-10 max-w-4xl transition-all duration-700 ease-out sm:mt-12 ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+      }`}
+    >
+      <div
+        ref={cardRef}
+        onMouseMove={handlePointerMove}
+        onMouseLeave={() => setSpot((s) => ({ ...s, active: false }))}
+        className="group relative rounded-[1.35rem] p-[1px] transition-transform duration-500 ease-out hover:-translate-y-1.5 sm:rounded-[1.65rem]"
+      >
+        {/* Soft outer halo — matches reference glow */}
+        <div
+          className="pointer-events-none absolute -inset-3 rounded-[1.75rem] bg-blue-500/20 opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-80 sm:-inset-4"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -inset-[1px] rounded-[1.35rem] bg-gradient-to-b from-blue-400/35 via-cyan-400/15 to-blue-600/30 opacity-70 transition-opacity duration-500 group-hover:opacity-100 sm:rounded-[1.65rem]"
+          aria-hidden="true"
+        />
+
+        <div className="relative overflow-hidden rounded-[1.32rem] border border-white/[0.07] bg-[#080c18]/95 px-7 py-9 shadow-[0_24px_60px_-28px_rgba(15,80,200,0.45)] backdrop-blur-xl sm:rounded-[1.62rem] sm:px-11 sm:py-12">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background: spot.active
+                ? `radial-gradient(420px circle at ${spot.x}% ${spot.y}%, rgba(56, 189, 248, 0.09), transparent 72%)`
+                : "radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.06), transparent 55%)",
+            }}
+          />
+
+          <p className="relative z-10 text-center text-lg leading-relaxed text-slate-300 sm:text-xl sm:leading-relaxed">
+            The Institution of Electronics and Telecommunication Engineers
+            (IETE) stands as the{" "}
+            <span className="font-semibold text-cyan-300 transition-colors duration-300 group-hover:text-cyan-200">
+              National Apex Professional Body
+            </span>{" "}
+            for electronics, telecommunication, and information technology
+            professionals in India.
+          </p>
+
+          <p className="relative z-10 mt-8 text-center text-lg leading-relaxed text-slate-300 sm:mt-9 sm:text-xl sm:leading-relaxed">
+            With a prestigious legacy spanning seven decades, IETE has grown to
+            encompass a thriving community of{" "}
+            <span className="font-semibold text-cyan-300 transition-colors duration-300 group-hover:text-cyan-200">
+              over 1,25,000 members
+            </span>{" "}
+            across{" "}
+            <span className="font-semibold text-cyan-300 transition-colors duration-300 group-hover:text-cyan-200">
+              64 centres
+            </span>{" "}
+            in India and abroad, driving technological advancement and
+            professional excellence.
+          </p>
+
+          <NationalBodyPulseLine draw={visible} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ════════════════════════════════════════════
    ABOUT PAGE
    ════════════════════════════════════════════ */
+/* ────────────────────────────────────────────
+   Objective card — matches stat card language
+   ──────────────────────────────────────────── */
+function ObjectiveCard({ Icon, title, desc, index }) {
+  const cardRef = useRef(null);
+  const [style, setStyle] = useState({
+    rotateX: 0,
+    rotateY: 0,
+    spotX: 50,
+    spotY: 50,
+    hovered: false,
+  });
+
+  const handleMouseMove = (e) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = (x / rect.width) * 100;
+    const py = (y / rect.height) * 100;
+    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 5;
+    const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 5;
+    setStyle({ rotateX, rotateY, spotX: px, spotY: py, hovered: true });
+  };
+
+  const handleMouseLeave = () => {
+    setStyle((prev) => ({ ...prev, rotateX: 0, rotateY: 0, hovered: false }));
+  };
+
+  return (
+    <div style={{ perspective: "1000px" }}>
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: `rotateX(${style.rotateX}deg) rotateY(${style.rotateY}deg) translateY(${
+            style.hovered ? "-5px" : "0px"
+          })`,
+          transition: style.hovered
+            ? "transform 120ms ease-out"
+            : "transform 450ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#060B16]/90 p-8 text-left shadow-[0_12px_34px_-12px_rgba(0,0,0,0.65)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-cyan-400/30 hover:shadow-[0_16px_48px_-12px_rgba(34,211,238,0.22)]"
+      >
+        <div
+          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+          style={{
+            opacity: style.hovered ? 1 : 0,
+            background: `radial-gradient(280px circle at ${style.spotX}% ${style.spotY}%, rgba(56, 189, 248, 0.1), transparent 72%)`,
+          }}
+        />
+
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-cyan-400/80 via-blue-400/50 to-transparent transition-transform duration-500 group-hover:scale-x-100"
+          aria-hidden="true"
+        />
+
+        <span className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t border-white/15 transition-colors duration-300 group-hover:border-cyan-300/55" />
+        <span className="pointer-events-none absolute bottom-3 right-3 h-2 w-2 border-b border-r border-white/15 transition-colors duration-300 group-hover:border-cyan-300/55" />
+
+        <div className="relative z-10 flex items-start justify-between gap-4">
+          <span className="font-mono text-[11px] tracking-[0.22em] text-slate-500 transition-colors duration-300 group-hover:text-cyan-300/85">
+            0{index + 1} // GOAL
+          </span>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] text-cyan-300/80 transition-all duration-500 group-hover:-translate-y-0.5 group-hover:border-cyan-400/35 group-hover:bg-cyan-400/[0.08] group-hover:text-cyan-200 group-hover:shadow-[0_0_20px_-4px_rgba(34,211,238,0.45)]">
+            <Icon size={21} strokeWidth={1.75} />
+          </div>
+        </div>
+
+        <h3 className="relative z-10 mt-6 text-xl font-bold tracking-wide text-white transition-colors duration-300 group-hover:text-cyan-50 sm:text-[1.35rem]">
+          {title}
+        </h3>
+        <p className="relative z-10 mt-3 flex-1 text-base leading-relaxed text-slate-400 transition-colors duration-300 group-hover:text-slate-300">
+          {desc}
+        </p>
+
+        <div className="relative z-10 mt-6 h-[1.5px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+          <div
+            className="h-full w-8 rounded-full bg-cyan-400/55 transition-all duration-700 ease-out group-hover:w-full group-hover:bg-cyan-300/75"
+            style={{ transitionDelay: `${index * 40}ms` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────
+   Hand-Crafted Interactive Floating Stat Card
+   ──────────────────────────────────────────── */
+function InteractiveStatCard({ Icon, target, suffix = "", label, sublabel, index }) {
+  const cardRef = useRef(null);
+  const [style, setStyle] = useState({
+    rotateX: 0,
+    rotateY: 0,
+    spotX: 50,
+    spotY: 50,
+    hovered: false,
+  });
+
+  const handleMouseMove = (e) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = (x / rect.width) * 100;
+    const py = (y / rect.height) * 100;
+
+    // Subtle 3D tilt (max 6 degrees so it feels natural and handcrafted)
+    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 6;
+    const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 6;
+
+    setStyle({ rotateX, rotateY, spotX: px, spotY: py, hovered: true });
+  };
+
+  const handleMouseLeave = () => {
+    setStyle((prev) => ({
+      ...prev,
+      rotateX: 0,
+      rotateY: 0,
+      hovered: false,
+    }));
+  };
+
+  return (
+    <div
+      style={{
+        perspective: "1000px",
+        animation: `ieteFloat ${4.2 + index * 0.7}s ease-in-out infinite`,
+        animationDelay: `${index * 0.4}s`,
+      }}
+    >
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: `rotateX(${style.rotateX}deg) rotateY(${style.rotateY}deg) translateY(${
+            style.hovered ? "-6px" : "0px"
+          })`,
+          transition: style.hovered
+            ? "transform 120ms ease-out, border-color 300ms ease"
+            : "transform 500ms cubic-bezier(0.22, 1, 0.36, 1), border-color 500ms ease",
+        }}
+        className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-[#060B16]/90 p-7 text-left shadow-[0_12px_34px_-12px_rgba(0,0,0,0.7)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-cyan-400/40 hover:shadow-[0_20px_50px_-14px_rgba(34,211,238,0.28)]"
+      >
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-cyan-400 via-blue-400/60 to-transparent transition-transform duration-500 group-hover:scale-x-100"
+          aria-hidden="true"
+        />
+        {/* Cursor-following soft spotlight */}
+        <div
+          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+          style={{
+            opacity: style.hovered ? 1 : 0,
+            background: `radial-gradient(260px circle at ${style.spotX}% ${style.spotY}%, rgba(56, 189, 248, 0.11), transparent 75%)`,
+          }}
+        />
+
+        {/* Hand-crafted minimal corner ticks */}
+        <span className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t border-white/15 transition-colors duration-300 group-hover:border-cyan-300/60" />
+        <span className="pointer-events-none absolute bottom-3 right-3 h-2 w-2 border-b border-r border-white/15 transition-colors duration-300 group-hover:border-cyan-300/60" />
+
+        {/* Top Row: Index number + Floating Icon */}
+        <div className="relative z-10 flex items-center justify-between">
+          <span className="font-mono text-[11px] tracking-[0.25em] text-slate-500 transition-colors duration-300 group-hover:text-cyan-300/80">
+            0{index + 1} // STAT
+          </span>
+
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.02] text-slate-300 transition-all duration-500 group-hover:-translate-y-1 group-hover:rotate-6 group-hover:border-cyan-400/30 group-hover:bg-cyan-400/10 group-hover:text-cyan-300">
+            <Icon size={19} strokeWidth={1.7} />
+          </div>
+        </div>
+
+        {/* Middle Row: Big Clean Number */}
+        <div className="relative z-10 my-6">
+          <p className="text-4xl font-black tracking-tight text-white transition-[transform,color] duration-300 group-hover:translate-x-1 group-hover:text-cyan-50 sm:text-[42px]">
+            <AnimatedCounter target={target} suffix={suffix} />
+          </p>
+        </div>
+
+        {/* Bottom Row: Label + Animated underline */}
+        <div className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+            {label}
+          </p>
+          <p className="mt-1 text-[11px] text-slate-500">{sublabel}</p>
+
+          <div className="mt-4 h-[1.5px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="h-full w-8 rounded-full bg-cyan-400/60 transition-all duration-500 ease-out group-hover:w-full group-hover:bg-cyan-300" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 export default function AboutPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [flyingSocial, setFlyingSocial] = useState(null);
@@ -115,33 +880,46 @@ export default function AboutPage() {
       Icon: Rocket,
       title: "Advancement of Technology",
       desc: "Promoting the advancement of Electronics, Telecommunications, and Information Technology sciences.",
-      gradient: "from-cyan-500 to-blue-600",
     },
     {
       Icon: Trophy,
       title: "Leadership & Development",
       desc: "Fostering professional excellence and contributing to national development through technological leadership.",
-      gradient: "from-violet-500 to-indigo-600",
     },
     {
       Icon: BookOpen,
       title: "Knowledge Dissemination",
       desc: "Organizing conferences, publishing journals, and facilitating continuing education programs.",
-      gradient: "from-emerald-500 to-teal-600",
     },
     {
       Icon: FileCheck,
       title: "Professional Examinations",
       desc: "Conducting AMIETE and DIPIETE examinations to certify professional competence in the field.",
-      gradient: "from-amber-500 to-orange-600",
     },
   ];
 
-  /* ── Stats ── */
-  const stats = [
-    { value: 70, suffix: "+", label: "Years of Legacy" },
-    { value: 125000, suffix: "+", label: "Members" },
-    { value: 64, suffix: "", label: "Centres in India & Abroad" },
+  const nationwideStats = [
+    {
+      Icon: Globe,
+      target: 64,
+      suffix: "+",
+      label: "Centres Across India",
+      sublabel: "Active chapters & sub-centres",
+    },
+    {
+      Icon: Users,
+      target: 125000,
+      suffix: "+",
+      label: "Members Nationwide",
+      sublabel: "Students, researchers & engineers",
+    },
+    {
+      Icon: Award,
+      target: 70,
+      suffix: "+",
+      label: "Years of Excellence",
+      sublabel: "Established legacy since 1953",
+    },
   ];
 
   /* ── Faculty ── */
@@ -371,138 +1149,109 @@ export default function AboutPage() {
       {/* ═══ NATIONAL BODY SECTION ═══ */}
       <section
         id="national-body"
-        className="relative overflow-hidden px-5 py-24 sm:py-32"
+        className="relative overflow-hidden px-5 py-24 sm:py-36"
       >
-        {/* Ambient glow */}
-        <div className="pointer-events-none absolute -left-40 top-20 h-[500px] w-[500px] rounded-full bg-blue-600/[0.06] blur-[120px]" />
-        <div className="pointer-events-none absolute -right-40 bottom-20 h-[400px] w-[400px] rounded-full bg-cyan-500/[0.05] blur-[100px]" />
+        <style>{`
+          @keyframes parentBadgeGlow {
+            0%, 100% { opacity: 0.55; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.04); }
+          }
+        `}</style>
+
+        <div className="pointer-events-none absolute -left-40 top-16 h-[480px] w-[480px] rounded-full bg-blue-600/[0.07] blur-[120px]" />
+        <div className="pointer-events-none absolute -right-32 bottom-10 h-[380px] w-[380px] rounded-full bg-cyan-500/[0.05] blur-[100px]" />
+        <div className="pointer-events-none absolute left-1/2 top-[38%] h-[280px] w-[min(92vw,720px)] -translate-x-1/2 rounded-full bg-blue-500/[0.06] blur-[90px]" />
 
         <div className="relative z-10 mx-auto max-w-6xl">
           <RevealGroup>
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300/70">
-              Our Parent Body
-            </p>
+            <div className="relative flex justify-center">
+              <div
+                className="pointer-events-none absolute h-14 w-48 rounded-full bg-cyan-400/25 blur-2xl"
+                style={{ animation: "parentBadgeGlow 4s ease-in-out infinite" }}
+                aria-hidden="true"
+              />
+              <span className="relative inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
+                <SparkleIcon className="h-3.5 w-3.5 shrink-0" />
+                Our Parent Body
+                <SparkleIcon className="h-3.5 w-3.5 shrink-0" />
+              </span>
+            </div>
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-wide sm:text-5xl">
-              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h2 className="mt-6 text-center text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:mt-7 sm:text-5xl md:text-6xl">
+              <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                 IETE National Body
               </span>
             </h2>
           </RevealGroup>
 
-          <RevealGroup delay={150}>
-            <div className="mx-auto mt-3 h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-28" />
+          <RevealGroup delay={160}>
+            <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-36" />
           </RevealGroup>
 
-          <RevealGroup delay={200}>
-            <p className="mx-auto mt-8 max-w-4xl text-center text-base leading-relaxed text-slate-400 sm:text-lg sm:leading-relaxed">
-              The Institution of Electronics and Telecommunication Engineers
-              (IETE) stands as the{" "}
-              <span className="font-semibold text-white">
-                National Apex Professional Body
-              </span>{" "}
-              for electronics, telecommunication, and information technology
-              professionals in India. With a prestigious legacy spanning{" "}
-              <span className="font-semibold text-cyan-300">
-                seven decades
-              </span>
-              , IETE has grown to encompass a thriving community driving
-              technological advancement and professional excellence.
-            </p>
-          </RevealGroup>
-
-          {/* Stats row */}
-          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {stats.map((stat, i) => (
-              <RevealGroup key={stat.label} delay={300 + i * 100}>
-                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center transition-all duration-500 hover:border-cyan-300/20 hover:bg-white/[0.04]">
-                  {/* Hover glow */}
-                  <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                    <div className="absolute left-1/2 top-0 h-px w-3/4 -translate-x-1/2 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
-                  </div>
-                  <p className="text-4xl font-black text-cyan-300 sm:text-5xl">
-                    <AnimatedCounter
-                      target={stat.value}
-                      suffix={stat.suffix}
-                    />
-                  </p>
-                  <p className="mt-3 text-sm font-medium uppercase tracking-[0.2em] text-slate-400">
-                    {stat.label}
-                  </p>
-                </div>
-              </RevealGroup>
-            ))}
-          </div>
+          <NationalBodyInfoCard />
         </div>
       </section>
 
       {/* ═══ OBJECTIVES SECTION ═══ */}
       <section className="relative overflow-hidden px-5 py-24 sm:py-32">
-        {/* Grid background */}
+        <div className="pointer-events-none absolute -left-32 top-1/4 h-[420px] w-[420px] rounded-full bg-blue-600/[0.05] blur-[110px]" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-[360px] w-[360px] rounded-full bg-cyan-500/[0.04] blur-[100px]" />
+
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(82, 137, 220, 0.025) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(82, 137, 220, 0.025) 1px, transparent 1px)
+              linear-gradient(rgba(82, 137, 220, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(82, 137, 220, 0.03) 1px, transparent 1px)
             `,
-            backgroundSize: "48px 48px",
+            backgroundSize: "56px 56px",
             maskImage:
-              "radial-gradient(ellipse at center, black 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, black 0%, transparent 72%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, black 0%, transparent 72%)",
           }}
         />
 
         <div className="relative z-10 mx-auto max-w-6xl">
           <RevealGroup>
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.4em] text-blue-400/70">
-              Our Mission
-            </p>
+            <div className="flex justify-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
+                <Layers3 size={14} />
+                Our Mission
+              </span>
+            </div>
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-4 text-center text-3xl font-black uppercase tracking-wide sm:text-5xl">
-              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h2 className="mt-6 text-center text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-5xl md:text-6xl">
+              <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                 Objective of IETE
               </span>
             </h2>
           </RevealGroup>
 
-          <RevealGroup delay={150}>
-            <p className="mx-auto mt-4 max-w-xl text-center text-sm text-slate-500">
-              Driving excellence in electronics and telecommunications
+          <RevealGroup delay={160}>
+            <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed text-slate-400 sm:text-xl">
+              Driving excellence in electronics, telecommunications, and IT
+              across the country.
             </p>
           </RevealGroup>
 
           <RevealGroup delay={200}>
-            <div className="mx-auto mt-2 h-px w-20 bg-gradient-to-r from-transparent via-blue-400 to-transparent sm:w-28" />
+            <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-36" />
           </RevealGroup>
 
-          {/* Objectives grid */}
-          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="mt-14 grid grid-cols-1 gap-7 sm:grid-cols-2">
             {objectives.map((obj, i) => (
-              <RevealGroup key={obj.title} delay={300 + i * 120}>
-                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-8 transition-all duration-500 hover:border-white/[0.15] hover:shadow-[0_0_40px_rgba(0,0,0,0.3)]">
-                  {/* Top border glow on hover */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                  {/* Icon */}
-                  <div
-                    className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${obj.gradient} shadow-lg`}
-                  >
-                    <obj.Icon size={24} className="text-white" strokeWidth={2} />
-                  </div>
-
-                  <h3 className="text-lg font-bold tracking-wide text-white sm:text-xl">
-                    {obj.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">
-                    {obj.desc}
-                  </p>
-                </div>
+              <RevealGroup key={obj.title} delay={280 + i * 100}>
+                <ObjectiveCard
+                  index={i}
+                  Icon={obj.Icon}
+                  title={obj.title}
+                  desc={obj.desc}
+                />
               </RevealGroup>
             ))}
           </div>
@@ -568,158 +1317,50 @@ export default function AboutPage() {
 
       {/* ═══ NATIONWIDE PRESENCE SECTION ═══ */}
       <section className="relative overflow-hidden px-5 py-24 sm:py-32">
-        <div className="pointer-events-none absolute right-0 top-0 h-[400px] w-[400px] rounded-full bg-blue-600/[0.05] blur-[120px]" />
+        <style>{`
+          @keyframes ieteFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+          }
+        `}</style>
+
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/[0.06] blur-[140px]" />
 
         <div className="relative z-10 mx-auto max-w-5xl text-center">
-          <RevealGroup>
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300/70">
-              Nationwide Presence
-            </p>
-          </RevealGroup>
-
           <RevealGroup delay={100}>
-            <h2 className="mt-4 text-3xl font-black uppercase tracking-wide sm:text-5xl">
-              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-5xl md:text-6xl">
+              <span className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                 IETE is All Around India
               </span>
             </h2>
           </RevealGroup>
 
-          <RevealGroup delay={150}>
-            <div className="mx-auto mt-3 h-px w-20 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-28" />
+          <RevealGroup delay={180}>
+            <div className="mx-auto mt-5 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-36" />
           </RevealGroup>
 
           <RevealGroup delay={250}>
-            <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-3">
-              {[
-                {
-                  Icon: Globe,
-                  value: "64+",
-                  label: "Centres Across India & Abroad",
-                },
-                {
-                  Icon: Users,
-                  value: "1,25,000+",
-                  label: "Members Nationwide",
-                },
-                {
-                  Icon: Award,
-                  value: "70+",
-                  label: "Years of Excellence",
-                },
-              ].map((item, i) => (
-                <RevealGroup key={item.label} delay={350 + i * 100}>
-                  <div className="group flex flex-col items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 transition-all duration-500 hover:border-cyan-300/20 hover:bg-white/[0.04]">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] transition-colors duration-300 group-hover:border-cyan-300/40 group-hover:bg-cyan-300/[0.12]">
-                      <item.Icon
-                        size={26}
-                        className="text-cyan-300"
-                        strokeWidth={1.8}
-                      />
-                    </div>
-                    <p className="text-3xl font-black text-white">
-                      {item.value}
-                    </p>
-                    <p className="text-xs font-medium uppercase tracking-[0.15em] text-slate-400">
-                      {item.label}
-                    </p>
-                  </div>
-                </RevealGroup>
-              ))}
+            <div className="mt-8 sm:mt-12">
+              <GlowingIndiaMap />
             </div>
           </RevealGroup>
 
-          {/* India map illustration — styled SVG outline */}
-          <RevealGroup delay={500}>
-            <div className="relative mx-auto mt-16 max-w-2xl">
-              <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-b from-white/[0.02] to-transparent p-10 sm:p-14">
-                {/* Decorative map dots */}
-                <div className="relative mx-auto aspect-[4/5] w-full max-w-md">
-                  {/* Stylized India outline using positioned dots */}
-                  {[
-                    { top: "8%", left: "35%" },
-                    { top: "8%", left: "50%" },
-                    { top: "8%", left: "65%" },
-                    { top: "15%", left: "25%" },
-                    { top: "15%", left: "40%" },
-                    { top: "15%", left: "55%" },
-                    { top: "15%", left: "70%" },
-                    { top: "22%", left: "20%" },
-                    { top: "22%", left: "35%" },
-                    { top: "22%", left: "50%" },
-                    { top: "22%", left: "65%" },
-                    { top: "22%", left: "80%" },
-                    { top: "30%", left: "18%" },
-                    { top: "30%", left: "33%" },
-                    { top: "30%", left: "48%" },
-                    { top: "30%", left: "63%" },
-                    { top: "30%", left: "78%" },
-                    { top: "38%", left: "15%" },
-                    { top: "38%", left: "30%" },
-                    { top: "38%", left: "45%" },
-                    { top: "38%", left: "60%" },
-                    { top: "38%", left: "75%" },
-                    { top: "38%", left: "85%" },
-                    { top: "46%", left: "18%" },
-                    { top: "46%", left: "33%" },
-                    { top: "46%", left: "48%" },
-                    { top: "46%", left: "63%" },
-                    { top: "46%", left: "78%" },
-                    { top: "54%", left: "20%" },
-                    { top: "54%", left: "35%" },
-                    { top: "54%", left: "50%" },
-                    { top: "54%", left: "65%" },
-                    { top: "54%", left: "75%" },
-                    { top: "62%", left: "25%" },
-                    { top: "62%", left: "40%" },
-                    { top: "62%", left: "55%" },
-                    { top: "62%", left: "68%" },
-                    { top: "70%", left: "30%" },
-                    { top: "70%", left: "45%" },
-                    { top: "70%", left: "58%" },
-                    { top: "78%", left: "35%" },
-                    { top: "78%", left: "48%" },
-                    { top: "85%", left: "42%" },
-                  ].map((pos, i) => (
-                    <div
-                      key={i}
-                      className="absolute h-2 w-2 rounded-full bg-cyan-400/30 transition-all duration-700 hover:scale-150 hover:bg-cyan-300"
-                      style={{
-                        top: pos.top,
-                        left: pos.left,
-                        animationDelay: `${i * 50}ms`,
-                      }}
-                    />
-                  ))}
-
-                  {/* BIT Sindri highlight */}
-                  <div
-                    className="absolute flex items-center gap-2"
-                    style={{ top: "35%", left: "62%" }}
-                  >
-                    <div className="relative">
-                      <div className="h-3 w-3 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]" />
-                      <div className="absolute inset-0 animate-ping rounded-full bg-cyan-400/40" />
-                    </div>
-                    <span className="whitespace-nowrap rounded-md bg-[#080B12]/80 px-2 py-1 text-[10px] font-bold tracking-wider text-cyan-300 backdrop-blur-sm">
-                      BIT SINDRI
-                    </span>
-                  </div>
-                </div>
-
-                {/* Map label */}
-                <div className="mt-6 flex items-center justify-center gap-3 text-slate-500">
-                  <MapPin size={16} className="text-cyan-400" />
-                  <span className="text-xs font-medium uppercase tracking-[0.3em]">
-                    BIT Sindri, Dhanbad, Jharkhand — 828123
-                  </span>
-                </div>
-              </div>
-            </div>
-          </RevealGroup>
+          <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
+            {nationwideStats.map((item, i) => (
+              <RevealGroup key={item.label} delay={380 + i * 110}>
+                <InteractiveStatCard
+                  index={i}
+                  Icon={item.Icon}
+                  target={item.target}
+                  suffix={item.suffix}
+                  label={item.label}
+                  sublabel={item.sublabel}
+                />
+              </RevealGroup>
+            ))}
+          </div>
         </div>
       </section>
-
       {/* ═══ FOOTER ═══ */}
       <footer className="iete-footer">
         <div className="iete-footer-glow" />
