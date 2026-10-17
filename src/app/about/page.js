@@ -991,11 +991,11 @@ export default function AboutPage() {
           aria-label="IETE-SF Home"
           className="relative z-10 flex shrink-0 items-center"
         >
-          <img
-            src="/logo.svg"
-            alt="IETE-SF"
-            className="h-[60px] w-[60px] object-contain"
-          />
+     <img
+  src="/logo.svg"
+  alt="IETE-SF"
+  className="h-[68px] w-[68px] object-contain drop-shadow-[0_0_10px_rgba(96,165,250,0.22)] transition-transform duration-300 hover:scale-105"
+/>
         </Link>
 
         {/* Centered desktop navigation */}
