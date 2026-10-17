@@ -61,13 +61,13 @@ export default function Navbar() {
       </div>
 
       {/* Desktop login */}
-      <a
+      {/* <a
         href="/login"
         className="relative z-10 hidden shrink-0 items-center gap-2.5 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:border-cyan-300/40 hover:bg-cyan-300/[0.07] hover:text-cyan-200 sm:flex"
       >
         <LogIn size={18} strokeWidth={1.8} />
         Login
-      </a>
+      </a> */}
 
       {/* Mobile controls */}
       <div className="relative z-10 ml-auto flex items-center gap-3 xl:hidden">
@@ -105,14 +105,14 @@ export default function Navbar() {
             </a>
           ))}
 
-          <a
+          {/* <a
             href="/login"
             onClick={() => setMenuOpen(false)}
             className="mt-2 flex items-center gap-3 rounded-xl border border-cyan-300/20 px-4 py-3.5 text-sm text-cyan-100"
           >
             <LogIn size={19} />
             Member Login
-          </a>
+          </a> */}
         </div>
       )}
     </nav>

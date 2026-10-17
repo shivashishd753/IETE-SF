@@ -1,0 +1,197 @@
+[1mdiff --cc src/app/page.js[m
+[1mindex 955d40f,105080c..0000000[m
+[1m--- a/src/app/page.js[m
+[1m+++ b/src/app/page.js[m
+[36m@@@ -9,10 -8,6 +9,10 @@@[m [mimport Navbar from "./components/navbar[m
+  import Footer from "./components/footer";[m
+  [m
+  [m
+[31m- import IetePyramid from "./components/Ietepyramid";[m
+[32m++// import IetePyramid from "./components/Ietepyramid";[m
+[32m +[m
+[32m +[m
+[32m +[m
+  import {[m
+    HomeIcon,[m
+    Info,[m
+[36m@@@ -332,89 -224,139 +332,119 @@@[m [museEffect(() => [m
+  [m
+  [m
+  [m
+[31m-     [m
+[31m- {/* Centerpiece 3D pyramid */}[m
+[31m -[m
+[31m -[m
+[32m+ {/* Centerpiece logo */}[m
+  <div[m
+[31m-   className="w-full max-w-[min(76vw,520px)]"[m
+[32m+   className="pointer-events-none fixed left-1/2 top-[45%] z-0 w-full max-w-[min(76vw,520px)] -translate-x-1/2 -translate-y-1/2"[m
+    style={{[m
+      opacity: logoOpacity,[m
+[31m-     transform: `translateY(${(1 - logoOpacity) * -24}px)`,[m
+      transition: "opacity 80ms linear",[m
+[31m-     willChange: "opacity, transform",[m
+[32m+     willChange: "opacity",[m
+    }}[m
+  >[m
+[31m-   <IetePyramid />[m
+[32m+   <img[m
+[32m+     src="/iete-3D.svg"[m
+[32m+     alt="IETE-SF three-dimensional emblem"[m
+[32m+     className="h-auto w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.55)]"[m
+[32m+     fetchPriority="high"[m
+[32m+   />[m
+  </div>[m
+  [m
+  [m
+[31m-     [m
+[31m- [m
+  [m
+[31m- {/* Falling-letter welcome animation */}[m
+[31m- <div className="welcome-formation mt-5 flex w-full flex-col items-center sm:mt-7">[m
+[31m-   <h2 className="flex flex-col items-center gap-1 text-center font-black uppercase">[m
+[31m-     <span className="welcome-word flex justify-center text-sm tracking-[0.45em] text-cyan-200 sm:text-lg">[m
+[31m-       {"WELCOME".split("").map((letter, i) => ([m
+[31m-         <span[m
+[31m-           key={`welcome-${i}`}[m
+[31m-           className="fall-letter"[m
+[31m-           style={{[m
+[31m-             "--i": i,[m
+[31m-             "--x": `${((i * 37) % 7 - 3) * 65}px`,[m
+[31m-             "--y": `${((i * 23) % 5 - 2) * 70}px`,[m
+[31m-           }}[m
+[31m-         >[m
+[31m-           {letter}[m
+[31m-         </span>[m
+[31m-       ))}[m
+[31m-     </span>[m
+[31m -    {/* <div className="relative z-10 mt-7 sm:mt-10">[m
+[31m -      <p className="text-sm font-medium tracking-[0.32em] text-slate-200 sm:text-base">[m
+[31m -        LEARN <span className="mx-2 text-blue-400">/</span>[m
+[31m -        BUILD <span className="mx-2 text-blue-400">/</span>[m
+[31m -        GROW[m
+[31m -      </p>[m
+[31m -[m
+[31m -      <p className="mt-4 text-[10px] uppercase tracking-[0.25em] text-slate-500 sm:text-xs sm:tracking-[0.4em]">[m
+[31m -        Technology · Innovation · Community[m
+[31m -      </p>[m
+[31m -    </div> */}[m
+[31m -[m
+[31m -[m
+[31m -[m
+  [m
+[31m-     <span className="flex flex-wrap justify-center gap-x-3 text-4xl leading-tight sm:gap-x-4 sm:text-6xl md:text-7xl">[m
+[31m-       {"BATCH".split("").map((letter, i) => ([m
+[31m-         <span[m
+[31m-           key={`batch-${i}`}[m
+[31m-           className="fall-letter text-white"[m
+[31m-           style={{[m
+[31m-             "--i": i + 7,[m
+[31m-             "--x": `${((i * 41) % 7 - 3) * 75}px`,[m
+[31m-             "--y": `${((i * 29) % 5 - 2) * 75}px`,[m
+[31m-           }}[m
+[31m-         >[m
+[31m-           {letter}[m
+[31m-         </span>[m
+[31m-       ))}[m
+[32m+ {/* Who We Are */}[m
+[32m+ <section className="relative z-10 mt-[55vh] w-full px-6 pb-16 text-center sm:px-12 md:px-20 lg:px-28">[m
+[32m+   <p className="text-xs font-semibold uppercase tracking-[0.7em] text-cyan-300 sm:text-2xl">[m
+[32m+     Who We Are[m
+[32m+   </p>[m
+  [m
+[31m-       {"2K26".split("").map((letter, i) => ([m
+[31m-         <span[m
+[31m-           key={`year-${i}`}[m
+[31m-           className="fall-letter bg-gradient-to-b from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent"[m
+[31m-           style={{[m
+[31m-             "--i": i + 12,[m
+[31m-             "--x": `${((i * 31) % 7 - 3) * 80}px`,[m
+[31m-             "--y": `${((i * 19) % 5 - 2) * 85}px`,[m
+[31m-           }}[m
+[31m-         >[m
+[31m-           {letter}[m
+[31m-         </span>[m
+[31m-       ))}[m
+[32m+   <h2 className="mt-4 font-serif text-3xl font-semibold leading-tight text-white sm:text-4xl md:text-5xl">[m
+[32m+     Advancing Technology.[m
+[32m+     <span className="mt-2 block bg-gradient-to-r from-cyan-200 via-sky-300 to-blue-400 bg-clip-text text-transparent">[m
+[32m+       Inspiring Innovation.[m
+      </span>[m
+    </h2>[m
+  [m
+[31m-   <div className="welcome-formation-line mt-3 h-[2px] w-28 rounded-full bg-cyan-400 sm:mt-4 sm:w-40" />[m
+[31m- </div>[m
+[32m+   <p className="mt-6 w-full text-left text-sm leading-7 text-slate-300 sm:text-base sm:leading-8 md:text-lg">[m
+[32m+     The Institution of Electronics and Telecommunication Engineers[m
+[32m+     (IETE), established in 1953, is a national professional body[m
+[32m+     promoting excellence in Electronics, Telecommunication and[m
+[32m+     Information Technology. At BIT Sindri, the IETE Students’ Forum[m
+[32m+     was established in 2007 to connect learning with hands-on[m
+[32m+     experience, collaboration and innovation.[m
+[32m+   </p>[m
+  [m
+[32m+   <a[m
+[32m+     href="/about"[m
+[32m+     className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 transition-colors hover:text-white sm:text-base"[m
+[32m+   >[m
+[32m+     Discover Our Story <span aria-hidden="true">→</span>[m
+[32m+   </a>[m
+[32m+ </section>[m
+  [m
+  [m
+[31m -  </div>[m
+[31m -</section>[m
+[31m -[m
+[31m -[m
+[32m+ {/* THE IETEVERSE */}[m
+  [m
+[31m-     <a[m
+[31m-       href="/about"[m
+[31m-       className="mt-14 flex flex-col items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-slate-500 transition-colors hover:text-blue-300"[m
+[31m-     >[m
+[31m-       <span className="flex h-10 w-6 items-start justify-center rounded-full border border-slate-600 p-1.5">[m
+[31m-         <span className="h-2 w-1 rounded-full bg-blue-300" />[m
+[31m-       </span>[m
+[31m-       Scroll[m
+[31m-     </a>[m
+[32m+ {/* THE IETEVERSE */}[m
+[32m+ <section[m
+[32m+   id="ieteverse"[m
+[32m+   className="relative w-full overflow-visible bg-transparent px-5 py-16 sm:px-8 sm:py-20 lg:px-12"[m
+[32m+ >[m
+[32m+   <div className="mx-auto max-w-[1700px]">[m
+[32m+     <div className="mb-12 text-center sm:mb-16">[m
+[32m+ [m
+[32m+ <h2[m
+[32m+   className="text-5xl font-semibold tracking-[0.04em] text-transparent sm:text-7xl md:text-8xl lg:text-9xl"[m
+[32m+   style={{[m
+[32m+     WebkitTextStroke: "1.2px #C4D9E8",[m
+[32m+     textShadow: "0 0 18px rgba(103,232,249,0.22)",[m
+[32m+   }}[m
+[32m+ >[m
+[32m+   The IETEverse[m
+[32m+ </h2>[m
+[32m+ [m
+[32m+ [m
+[32m+       <p className="mt-4 text-sm text-slate-400 sm:text-base">[m
+[32m+         Ideas, experiences, and moments that bring us together.[m
+[32m+       </p>[m
+[32m+     </div>[m
+[32m+ [m
+[32m+ [m
+[32m+     {/* Horizontally scrollable event posters */}[m
+[32m+     <div className="overflow-x-auto overflow-y-hidden pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">[m
+[32m+       <div className="flex w-max items-center gap-5 px-1 py-3 sm:gap-7">[m
+[32m+         [m
+[32m+ {[[m
+[32m+   { title: "Vibe-a-thon", image: "/events/vibe-a-thon.jpg" },[m
+[32m+   { title: "Clue-e-minati", image: "/events/clue-e-minati.jpg" },[m
+[32m+   { title: "Nexus 3.0", image: "/events/nexus-3.jpg" },[m
+[32m+   { title: "BGMI Campus Combat", image: "/events/bgmi.jpg" },[m
+[32m+   { title: "Tech Talks", image: "/events/tech-talks.jpg" },[m
+[32m+   { title: "Codeathon", image: "/events/codeathon.jpg" },[m
+[32m+   { title: "Ideathon", image: "/events/ideathon.jpg" },[m
+[32m+   { title: "Project Expo", image: "/events/project-expo.jpg" },[m
+[32m+   { title: "Workshop", image: "/events/workshop.jpg" },[m
+[32m+   { title: "Tech Ud

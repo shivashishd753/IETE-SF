@@ -10,7 +10,10 @@ import {
   CalendarDays,
   Layers3,
   Mail,
-  LogIn,
+  Rocket,
+  Trophy,
+  BookOpen,
+  FileCheck,
   ChevronDown,
   MapPin,
   Globe,
@@ -1037,34 +1040,20 @@ export default function AboutPage() {
         </div>
 
         {/* Login */}
-        <Link
-          href="/login"
-          className="relative z-10 hidden shrink-0 items-center gap-2.5 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-semibold tracking-wide text-white transition-all duration-300 hover:border-cyan-300/40 hover:bg-cyan-300/[0.07] hover:text-cyan-200 sm:flex"
-        >
-          <LogIn size={18} strokeWidth={1.8} />
-          Login
-        </Link>
 
-        {/* Mobile menu toggle */}
-        <div className="relative z-10 ml-auto flex items-center gap-3 xl:hidden">
-          <Link
-            href="/login"
-            aria-label="Member Login"
-            className="rounded-xl border border-white/15 p-3 text-slate-200 transition hover:border-cyan-300/40 hover:text-cyan-300 sm:hidden"
-          >
-            <LogIn size={20} />
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation"
-            aria-expanded={menuOpen}
-            className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-lg text-white transition hover:border-cyan-300/40 hover:text-cyan-300"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
-        </div>
+{/* Mobile menu toggle */}
+<div className="relative z-10 ml-auto flex items-center gap-3 lg:hidden">
+  <button
+    type="button"
+    onClick={() => setMenuOpen(!menuOpen)}
+    aria-label="Toggle navigation"
+    aria-expanded={menuOpen}
+    className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-lg text-white transition hover:border-cyan-300/40 hover:text-cyan-300"
+  >
+    {menuOpen ? "✕" : "☰"}
+  </button>
+</div>
+        
 
         {menuOpen && (
           <div className="absolute left-0 right-0 top-[calc(100%+10px)] rounded-2xl border border-white/10 bg-[#080B12]/95 p-3 shadow-2xl backdrop-blur-2xl xl:hidden">
@@ -1092,14 +1081,14 @@ export default function AboutPage() {
               </Link>
             ))}
 
-            <Link
+            {/* <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
               className="mt-2 flex items-center gap-3 rounded-xl border border-cyan-300/20 px-4 py-3.5 text-sm text-cyan-100"
             >
               <LogIn size={19} />
               Member Login
-            </Link>
+            </Link> */}
           </div>
         )}
       </nav>
