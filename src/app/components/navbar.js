@@ -311,10 +311,10 @@ export default function Navbar() {
     { label: "Home", href: "/", Icon: HomeIcon },
     { label: "About", href: "/about", Icon: Info },
     { label: "Members", href: "/members", Icon: UsersRound },
-    { label: "Alumni", href: "/#alumni", Icon: GraduationCap },
-    { label: "Events", href: "/#events", Icon: CalendarDays },
-    { label: "Domains", href: "/domains", Icon: Layers3 },
-    { label: "Contact", href: "/#contact", Icon: Mail },
+      { label: "Alumni", href: "#alumni", Icon: GraduationCap },
+      { label: "Events", href: "/events", Icon: CalendarDays },
+      { label: "Domains", href: "#domains", Icon: Layers3 },
+      { label: "Contact", href: "#contact", Icon: Mail },
   ];
 
  
