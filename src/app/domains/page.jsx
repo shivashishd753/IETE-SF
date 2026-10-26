@@ -1,539 +1,722 @@
- "use client";
+"use client";
 
-import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowDownRight, MoveDown } from "lucide-react";
-import "./domains.css";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 
-gsap.registerPlugin(ScrollTrigger);
-
-const domains = [
+const DOMAINS = [
   {
     number: "01",
-    name: "Competitive",
-    secondLine: "Programming",
-    kicker: "THE ART OF LOGIC",
+    name: "Competitive Programming",
+    headline: "THE ART OF LOGIC",
     description:
-      "Turn complex problems into elegant solutions. Build algorithmic thinking, sharpen problem-solving skills, and learn to perform under pressure.",
-    category: "LOGIC / ALGORITHMS / PRECISION",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=2400&q=90",
-    alt: "Programming code on a computer screen",
-    theme: "cp",
-    display: "01 — THINK",
+      "Train your mind to break down complex problems, develop efficient algorithms, and turn logical thinking into elegant solutions.",
+    tags: ["LOGIC", "ALGORITHMS", "PRECISION"],
+    video: "/videos/cp.mp4",
   },
   {
     number: "02",
-    name: "IoT &",
-    secondLine: "Robotics",
-    kicker: "IDEAS THAT MOVE",
+    name: "IoT & Robotics",
+    headline: "IDEAS THAT MOVE",
     description:
-      "Bring the digital and physical worlds together through sensors, embedded systems, automation, and intelligent machines.",
-    category: "ROBOTICS / HARDWARE / AUTOMATION",
-    image:
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=2400&q=90",
-    alt: "Humanoid robot in a futuristic setting",
-    theme: "robotics",
-    display: "02 — MAKE",
+      "Explore the connection between the physical and digital worlds through sensors, embedded systems, intelligent devices, and automation.",
+    tags: ["ROBOTICS", "HARDWARE", "AUTOMATION"],
+    video: "/videos/robotics.mp4",
   },
   {
     number: "03",
-    name: "AI",
-    secondLine: "& ML",
-    kicker: "BEYOND THE OBVIOUS",
+    name: "AI & ML",
+    headline: "BEYOND THE OBVIOUS",
     description:
-      "Explore machine learning, intelligent systems, and data-driven ideas that help technology learn, adapt, and create.",
-    category: "AI / MACHINE LEARNING / DATA",
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=2400&q=90",
-    alt: "Abstract artificial intelligence visual",
-    theme: "ai",
-    display: "03 — IMAGINE",
+      "Discover intelligent systems, learn from data, recognise patterns, and explore how machine learning can solve real-world problems.",
+    tags: ["AI", "MACHINE LEARNING", "DATA"],
+    video: "/videos/ai.mp4",
   },
   {
     number: "04",
-    name: "Video",
-    secondLine: "Editing",
-    kicker: "EVERY FRAME HAS A FEELING",
+    name: "Video Editing",
+    headline: "EVERY FRAME HAS A FEELING",
     description:
-      "Shape raw footage into powerful stories using rhythm, transitions, colour, sound, and motion that make every frame matter.",
-    category: "MOTION / STORYTELLING / FILM",
-    image:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=2400&q=90",
-    alt: "Cinema screen in a dark movie theatre",
-    theme: "video",
-    display: "04 — CREATE",
+      "Transform raw footage into compelling visual stories through rhythm, transitions, sound, motion, and creative storytelling.",
+    tags: ["MOTION", "STORYTELLING", "FILM"],
+    video: "/videos/video-editing.mp4",
   },
   {
     number: "05",
-    name: "Graphic",
-    secondLine: "Designing",
-    kicker: "MAKE IDEAS VISIBLE",
+    name: "Graphic Designing",
+    headline: "MAKE IDEAS VISIBLE",
     description:
-      "Combine typography, colour, composition, and visual storytelling to build identities and designs that communicate at a glance.",
-    category: "VISUALS / BRANDING / COMPOSITION",
-    image:
-      "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=2400&q=90",
-    alt: "Creative design workspace with visual inspiration",
-    theme: "graphic",
-    display: "05 — DESIGN",
+      "Bring ideas to life through typography, colour, composition, visual identity, and creative design that communicates with purpose.",
+    tags: ["VISUALS", "BRANDING", "COMPOSITION"],
+    video: "/videos/graphic-design.mp4",
   },
   {
     number: "06",
-    name: "Web",
-    secondLine: "Development",
-    kicker: "DESIGN THE NEXT INTERNET",
+    name: "Web Development",
+    headline: "DESIGN THE NEXT INTERNET",
     description:
-      "Turn ideas into interactive digital experiences with thoughtful interfaces, modern web technologies, and purposeful engineering.",
-    category: "DESIGN / CODE / INTERACTION",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=90",
-    alt: "Developer workspace with code on a screen",
-    theme: "web",
-    display: "06 — BUILD",
+      "Create meaningful digital experiences by combining modern web technologies, thoughtful interfaces, and interactive design.",
+    tags: ["DESIGN", "CODE", "INTERACTION"],
+    video: "/videos/web-dev.mp4",
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/*  TUNING — values measured from the reference recording              */
+/* ------------------------------------------------------------------ */
+const TOTAL = DOMAINS.length;
+const FOV = 32; // camera field of view
+const STEP = Math.PI / 3; // angle between card centres (60deg)
+const GAP = 0.085; // angular gap between cards (rad)
+const CARD_ANGLE = STEP - GAP; // arc covered by one card
+const CARD_ASPECT = 1.9; // card width / height
+const CENTER_WIDTH = 0.85; // centre card width as share of viewport width (bigger = larger carousel)
+const MAX_HEIGHT = 0.74; // centre card height will never exceed this share of viewport height
+const CENTER_WIDTH_MOBILE = 0.92;
+const LIFT = -0.03; // moves the carousel up (share of viewport height) to leave room for the loader
+const DAMP = 6.5; // follow speed of the carousel
+const DAMP_DRAG = 16; // follow speed while dragging
+const WHEEL_SPEED = 0.0016; // cards per wheel pixel
+const CHROMA = 0.032; // RGB split strength per card of lag
+const TILT = 0.035; // subtle pointer tilt (set 0 to disable)
+const SHOW_TEXT = true; // draw the domain text on each card
+
+function wrap(value, length) {
+  return ((value % length) + length) % length;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Card overlay (text + shade) drawn to a canvas texture              */
+/* ------------------------------------------------------------------ */
+function wrapLines(ctx, text, maxWidth) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function setSpacing(ctx, px) {
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${px}px`;
+}
+
+function drawOverlay(domain) {
+  const W = 1800;
+  const H = Math.round(W / CARD_ASPECT);
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, W, H);
+
+  // bottom shade
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, "rgba(0,0,0,0.05)");
+  g.addColorStop(0.38, "rgba(0,0,0,0.15)");
+  g.addColorStop(1, "rgba(0,0,0,0.8)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  if (!SHOW_TEXT) return canvas;
+
+  const font = `"Inter", "Helvetica Neue", Arial, sans-serif`;
+  const pad = 78;
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+
+  // number, top-left
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.font = `500 20px ${font}`;
+  setSpacing(ctx, 3.5);
+  ctx.fillText(`${domain.number} / ${String(TOTAL).padStart(2, "0")}`, pad, 72);
+
+  // build from the bottom up
+  let y = H - pad;
+
+  // tags
+  ctx.font = `500 16px ${font}`;
+  setSpacing(ctx, 2.4);
+  let x = pad;
+  const tagH = 40;
+  domain.tags.forEach((tag) => {
+    const w = ctx.measureText(tag).width + 28;
+    ctx.strokeStyle = "rgba(255,255,255,0.4)";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x + 0.75, y - tagH + 0.75, w - 1.5, tagH - 1.5);
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fillText(tag, x + 14, y - 14);
+    x += w + 12;
+  });
+  y -= tagH + 34;
+
+  // description
+  ctx.font = `400 23px ${font}`;
+  setSpacing(ctx, 0);
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  const descLines = wrapLines(ctx, domain.description, 900);
+  const lh = 40;
+  for (let i = descLines.length - 1; i >= 0; i--) {
+    ctx.fillText(descLines[i], pad, y);
+    y -= lh;
+  }
+  y -= 22;
+
+  // title
+  ctx.font = `500 104px ${font}`;
+  setSpacing(ctx, -5);
+  ctx.fillStyle = "#fff";
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 30;
+  const titleLines = wrapLines(ctx, domain.name, W - pad * 2 - 160);
+  for (let i = titleLines.length - 1; i >= 0; i--) {
+    ctx.fillText(titleLines[i], pad, y);
+    y -= 104;
+  }
+  ctx.shadowBlur = 0;
+  y -= 6;
+
+  // eyebrow
+  ctx.font = `600 17px ${font}`;
+  setSpacing(ctx, 4);
+  ctx.fillStyle = "rgba(255,255,255,0.78)";
+  ctx.fillText(domain.headline, pad, y);
+
+  return canvas;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shader — video + overlay with horizontal RGB split                 */
+/* ------------------------------------------------------------------ */
+const VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const FRAG = /* glsl */ `
+  precision highp float;
+  varying vec2 vUv;
+  uniform sampler2D tVideo;
+  uniform sampler2D tText;
+  uniform float uShift;
+  uniform float uCardAspect;
+  uniform float uVideoAspect;
+  uniform float uHasVideo;
+
+  vec2 cover(vec2 uv) {
+    float r = uCardAspect / uVideoAspect;
+    vec2 s = vec2(r < 1.0 ? r : 1.0, r > 1.0 ? 1.0 / r : 1.0);
+    return (uv - 0.5) * s + 0.5;
+  }
+
+  float channel(vec2 uv, int c) {
+    float base = 0.07 + 0.05 * uv.y;
+    float v = base;
+    if (uHasVideo > 0.5) {
+      vec3 vid = texture2D(tVideo, cover(uv)).rgb;
+      v = c == 0 ? vid.r : (c == 1 ? vid.g : vid.b);
+    }
+    vec4 t = texture2D(tText, uv);
+    float tc = c == 0 ? t.r : (c == 1 ? t.g : t.b);
+    return mix(v, tc, t.a);
+  }
+
+  void main() {
+    vec2 o = vec2(uShift, 0.0);
+    float r = channel(vUv + o, 0);
+    float g = channel(vUv, 1);
+    float b = channel(vUv - o, 2);
+    gl_FragColor = vec4(r, g, b, 1.0);
+  }
+`;
+
 export default function DomainsPage() {
-  const rootRef = useRef(null);
-  const introRef = useRef(null);
-  const progressRef = useRef(null);
-  const countRef = useRef(null);
-  const introCanvasRef = useRef(null);
+  const stageRef = useRef(null);
+  const nameRef = useRef(null);
+  const fillRef = useRef(null);
 
-  const handleIntroPointerMove = (event) => {
-    if (!introRef.current) return;
-    const rect = introRef.current.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    introRef.current.style.setProperty("--pointer-x", `${x}%`);
-    introRef.current.style.setProperty("--pointer-y", `${y}%`);
-  };
+  useEffect(() => {
+    const container = stageRef.current;
+    const nameHost = nameRef.current;
+    const fillPath = fillRef.current;
+    if (!container || !nameHost || !fillPath) return;
 
-  useLayoutEffect(() => {
-    const section = introRef.current;
-    const canvas = introCanvasRef.current;
-    if (!section || !canvas) return;
+    /* ---------- renderer / scene ---------- */
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.domElement.style.cssText =
+      "position:absolute;inset:0;width:100%;height:100%;display:block;";
+    container.appendChild(renderer.domElement);
 
-    const context = canvas.getContext("2d");
-    if (!context) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 60);
+    const raycaster = new THREE.Raycaster();
 
-    let animationFrame = 0;
-    let width = 0;
-    let height = 0;
-    let time = 0;
-    let pointer = { x: -1000, y: -1000 };
-    let targetPointer = { x: -1000, y: -1000 };
-    let isPointerInside = false;
-    // Respect reduced-motion preferences without breaking the canvas renderer.
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const tilt = new THREE.Group();
+    scene.add(tilt);
 
-    const resizeCanvas = () => {
-      const rect = section.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.15);
-      width = rect.width;
-      height = rect.height;
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+    const chord = 2 * Math.sin(CARD_ANGLE / 2);
+    const cardHeight = chord / CARD_ASPECT;
+    const geometry = new THREE.CylinderGeometry(
+      1,
+      1,
+      cardHeight,
+      72,
+      1,
+      true,
+      -CARD_ANGLE / 2,
+      CARD_ANGLE
+    );
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
-    const handleMove = (event) => {
-      const rect = section.getBoundingClientRect();
-      targetPointer = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-      isPointerInside = true;
-    };
+    /* hidden host for <video> elements (helps autoplay on iOS) */
+    const videoHost = document.createElement("div");
+    videoHost.style.cssText =
+      "position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;";
+    container.appendChild(videoHost);
 
-    const handleLeave = () => {
-      isPointerInside = false;
-      targetPointer = { x: -1000, y: -1000 };
-    };
+    const cards = DOMAINS.map((domain, index) => {
+      const video = document.createElement("video");
+      video.src = domain.video;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.setAttribute("muted", "");
+      video.preload = "auto";
+      video.crossOrigin = "anonymous";
+      videoHost.appendChild(video);
 
-    const draw = () => {
-      context.clearRect(0, 0, width, height);
-      time += reduceMotion ? 0 : 0.006;
-      pointer.x += (targetPointer.x - pointer.x) * 0.20;
-      pointer.y += (targetPointer.y - pointer.y) * 0.20;
+      const videoTexture = new THREE.VideoTexture(video);
+      videoTexture.minFilter = THREE.LinearFilter;
+      videoTexture.magFilter = THREE.LinearFilter;
+      videoTexture.generateMipmaps = false;
 
-      // Oversized orbital field enters from the right edge, like a cropped planet.
-      // The center remains visible while the outer orbit paths extend beyond the viewport.
-      const compact = width < 700;
-      const cx = width * (compact ? 0.92 : 0.91);
-      const cy = height * (compact ? 0.42 : 0.48);
-      const rx = width * (compact ? 0.57 : 0.47);
-      const ry = height * (compact ? 0.43 : 0.48);
-      const pointerActive = isPointerInside && pointer.x > -500;
-      const dx = pointer.x - cx;
-      const dy = pointer.y - cy;
-      const cursorDistance = Math.hypot(dx, dy);
-      const cursorInfluence = pointerActive ? Math.max(0, 1 - cursorDistance / (Math.max(rx, ry) * 1.65)) : 0;
+      const textTexture = new THREE.CanvasTexture(drawOverlay(domain));
+      textTexture.anisotropy = maxAniso;
 
-      // Soft central glow.
-      // Keep the orbital field nearly dormant until the cursor approaches it.
-      if (pointerActive && cursorDistance < Math.max(rx, ry) * 1.15) {
-        const reveal = Math.max(0, 1 - cursorDistance / (Math.max(rx, ry) * 1.15));
-        const coreGlow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 210);
-        coreGlow.addColorStop(0, `rgba(27, 104, 205, ${reveal * 0.075})`);
-        coreGlow.addColorStop(1, "rgba(20, 89, 190, 0)");
-        context.fillStyle = coreGlow;
-        context.fillRect(pointer.x - 210, pointer.y - 210, 420, 420);
-      }
-
-      // Three elegant elliptical paths, slowly revolving in different directions.
-      const orbits = [
-        { rx: rx, ry: ry * 0.46, rotation: -0.32, speed: 0.22, phase: 0.1, alpha: 0.16 },
-        { rx: rx * 0.78, ry: ry * 0.92, rotation: 0.68, speed: -0.16, phase: 2.1, alpha: 0.12 },
-        { rx: rx * 0.98, ry: ry * 0.68, rotation: -0.85, speed: 0.12, phase: 4.2, alpha: 0.10 },
-      ];
-
-      orbits.forEach((orbit, index) => {
-        context.save();
-        context.translate(cx, cy);
-        context.rotate(orbit.rotation);
-        context.beginPath();
-        context.ellipse(0, 0, orbit.rx, orbit.ry, 0, 0, Math.PI * 2);
-        context.strokeStyle = `rgba(68, 155, 255, ${orbit.alpha + cursorInfluence * 0.10})`;
-        context.lineWidth = 1;
-        context.stroke();
-        context.restore();
-
-        const count = index === 0 ? 5 : 4;
-        for (let i = 0; i < count; i += 1) {
-          const angle = time * orbit.speed + orbit.phase + (Math.PI * 2 * i) / count;
-          const cosR = Math.cos(angle) * orbit.rx;
-          const sinR = Math.sin(angle) * orbit.ry;
-          const px = cx + cosR * Math.cos(orbit.rotation) - sinR * Math.sin(orbit.rotation);
-          const py = cy + cosR * Math.sin(orbit.rotation) + sinR * Math.cos(orbit.rotation);
-          const distanceToCursor = pointerActive ? Math.hypot(px - pointer.x, py - pointer.y) : 9999;
-          const nearCursor = pointerActive ? Math.max(0, 1 - distanceToCursor / 165) : 0;
-          const pulse = 1 + Math.sin(time * 2 + i * 1.7) * 0.16;
-          const radius = (3.1 + nearCursor * 3.2) * pulse;
-
-          const nodeGlow = context.createRadialGradient(px, py, 0, px, py, radius * 4.5);
-          nodeGlow.addColorStop(0, `rgba(100, 225, 255, ${0.035 + nearCursor * 0.85})`);
-          nodeGlow.addColorStop(1, "rgba(40, 145, 255, 0)");
-          context.fillStyle = nodeGlow;
-          context.beginPath();
-          context.arc(px, py, radius * 4.5, 0, Math.PI * 2);
-          context.fill();
-          context.beginPath();
-          context.arc(px, py, radius, 0, Math.PI * 2);
-          context.fillStyle = nearCursor > 0.1 ? "#b7f5ff" : "rgba(82, 158, 225, 0.88)";
-          context.fill();
-        }
-      });
-
-      // The central orb: understated, luminous, and consistent with the site palette.
-      const coreRadius = Math.max(compact ? 23 : 25, Math.min(compact ? 38 : 54, width * (compact ? 0.065 : 0.038)));
-      const core = context.createRadialGradient(cx - coreRadius * 0.35, cy - coreRadius * 0.4, 1, cx, cy, coreRadius * 1.6);
-      core.addColorStop(0, "#37658c");
-      core.addColorStop(0.25, "#174a80");
-      core.addColorStop(0.68, "#0b2b59");
-      core.addColorStop(1, "rgba(5, 20, 48, 0.05)");
-      context.beginPath();
-      context.arc(cx, cy, coreRadius * (1 + Math.sin(time * 1.5) * 0.035), 0, Math.PI * 2);
-      context.fillStyle = core;
-      context.fill();
-      context.strokeStyle = "rgba(83, 145, 198, 0.34)";
-      context.lineWidth = 1;
-      context.stroke();
-
-      // Custom cursor: a small luminous circle, shown while the pointer is inside the intro.
-      if (pointerActive) {
-        context.save();
-        context.beginPath();
-        context.arc(pointer.x, pointer.y, 5, 0, Math.PI * 2);
-        context.fillStyle = "rgba(150, 225, 255, 0.95)";
-        context.fill();
-        context.beginPath();
-        context.arc(pointer.x, pointer.y, 10, 0, Math.PI * 2);
-        context.strokeStyle = "rgba(74, 188, 255, 0.42)";
-        context.lineWidth = 1;
-        context.stroke();
-        context.restore();
-      }
-
-      animationFrame = window.requestAnimationFrame(draw);
-    };
-
-    resizeCanvas();
-    section.addEventListener("pointermove", handleMove);
-    section.addEventListener("pointerleave", handleLeave);
-    window.addEventListener("resize", resizeCanvas);
-    animationFrame = window.requestAnimationFrame(draw);
-
-    return () => {
-      window.cancelAnimationFrame(animationFrame);
-      section.removeEventListener("pointermove", handleMove);
-      section.removeEventListener("pointerleave", handleLeave);
-      window.removeEventListener("resize", resizeCanvas);
-    };
-  }, []);
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const ctx = gsap.context(() => {
-      const panels = gsap.utils.toArray(".film-panel", root);
-
-      panels.forEach((panel, index) => {
-        const image = panel.querySelector(".film-image");
-        const shade = panel.querySelector(".film-shade");
-        const eyebrow = panel.querySelector(".film-kicker");
-        const titleLines = panel.querySelectorAll(".film-title-line");
-        const description = panel.querySelector(".film-description");
-        const meta = panel.querySelector(".film-meta");
-        const number = panel.querySelector(".film-number");
-        const nextHint = panel.querySelector(".film-next");
-
-        gsap.set(image, { scale: 1.18 });
-        // Keep all text readable even before the scroll animation catches up.
-        gsap.set([eyebrow, titleLines, description, meta, number], {
-          opacity: 1,
-          y: 22,
-        });
-        gsap.set(shade, { opacity: 0.45 });
-
-        const enter = gsap.timeline({
-          scrollTrigger: {
-            trigger: panel,
-            start: "top 78%",
-            end: "top 12%",
-            scrub: 0.8,
-          },
-        });
-
-        enter
-          .to(image, { scale: 1, ease: "none" }, 0)
-          .to(shade, { opacity: 0.7, ease: "none" }, 0)
-          .to(eyebrow, { y: 0, ease: "none" }, 0.08)
-          .to(
-            titleLines,
-            { y: 0, stagger: 0.12, ease: "none" },
-            0.12
-          )
-          .to(description, { y: 0, ease: "none" }, 0.35)
-          .to(meta, { y: 0, ease: "none" }, 0.42)
-          .to(number, { y: 0, ease: "none" }, 0.25);
-
-        gsap.to(image, {
-          scale: 1.12,
-          yPercent: -5,
-          ease: "none",
-          scrollTrigger: {
-            trigger: panel,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.8,
-          },
-        });
-
-        gsap.to(panel.querySelector(".film-copy"), {
-          yPercent: -8,
-          opacity: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: panel,
-            start: "center center",
-            end: "bottom top",
-            scrub: 0.7,
-          },
-        });
-
-        if (nextHint && index === 0) {
-          gsap.to(nextHint, {
-            y: 10,
-            opacity: 0.35,
-            repeat: -1,
-            yoyo: true,
-            duration: 1,
-            ease: "sine.inOut",
-          });
-        }
-      });
-
-      ScrollTrigger.create({
-        trigger: root,
-        start: "top top",
-        end: "bottom bottom",
-        onUpdate: (self) => {
-          if (progressRef.current) {
-            progressRef.current.style.transform = `scaleX(${self.progress})`;
-          }
-
-          const current = Math.min(
-            domains.length,
-            Math.max(1, Math.floor(self.progress * domains.length) + 1)
-          );
-
-          if (countRef.current) {
-            countRef.current.textContent = String(current).padStart(2, "0");
-          }
+      const material = new THREE.ShaderMaterial({
+        vertexShader: VERT,
+        fragmentShader: FRAG,
+        side: THREE.FrontSide,
+        uniforms: {
+          tVideo: { value: videoTexture },
+          tText: { value: textTexture },
+          uShift: { value: 0 },
+          uCardAspect: { value: CARD_ASPECT },
+          uVideoAspect: { value: 16 / 9 },
+          uHasVideo: { value: 0 },
         },
       });
 
-      gsap.fromTo(
-        ".film-intro-label",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.9, delay: 0.2 }
-      );
-
-      gsap.fromTo(
-        ".film-intro-title",
-        { clipPath: "inset(0 0 100% 0)", y: 30 },
-        {
-          clipPath: "inset(0 0 0% 0)",
-          y: 0,
-          duration: 1.15,
-          ease: "power4.out",
-          delay: 0.3,
+      const onReady = () => {
+        if (video.videoWidth && video.videoHeight) {
+          material.uniforms.uVideoAspect.value =
+            video.videoWidth / video.videoHeight;
+          material.uniforms.uHasVideo.value = 1;
         }
+      };
+      video.addEventListener("loadeddata", onReady);
+      video.addEventListener("error", () => {
+        material.uniforms.uHasVideo.value = 0;
+      });
+      video.play().catch(() => {});
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.userData.index = index;
+      tilt.add(mesh);
+
+      return { mesh, material, video, videoTexture, textTexture, onReady };
+    });
+
+    // resume playback if the browser blocked autoplay
+    const resumeVideos = () => cards.forEach((c) => c.video.play().catch(() => {}));
+    window.addEventListener("pointerdown", resumeVideos, { once: true });
+
+    /* ---------- sizing ---------- */
+    const resize = () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      renderer.setSize(w, h, false);
+      const aspect = w / h;
+      camera.aspect = aspect;
+
+      const fraction =
+        aspect < 0.9
+          ? CENTER_WIDTH_MOBILE
+          : Math.min(CENTER_WIDTH, (MAX_HEIGHT * CARD_ASPECT) / aspect);
+      const tanH = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+      const distance = chord / (2 * tanH * aspect * fraction);
+      camera.position.set(0, 0, 1 + distance);
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+
+      tilt.position.y = LIFT * 2 * distance * tanH;
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    /* ---------- state ---------- */
+    let pos = 0;
+    let target = 0;
+    let shift = 0;
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartTarget = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let velX = 0;
+    let moved = 0;
+    let snapTimer = null;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const pxPerCard = () => Math.max(320, container.clientWidth * 0.55);
+
+    const scheduleSnap = (delay = 140) => {
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        target = Math.round(target);
+      }, delay);
+    };
+
+    /* ---------- name roll in the loader (scrubbed with the slide) ---------- */
+    const makeName = () => {
+      const span = document.createElement("span");
+      span.className = "domain-loader-name-item";
+      nameHost.appendChild(span);
+      return span;
+    };
+    nameHost.innerHTML = "";
+    const nameA = makeName();
+    const nameB = makeName();
+    let shownA = -1;
+    let shownB = -1;
+    let fillShown = 0;
+
+    /* ---------- input ---------- */
+    const onWheel = (e) => {
+      e.preventDefault();
+      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(d) < 0.5) return;
+      const mult = e.deltaMode === 1 ? 32 : 1;
+      target += THREE.MathUtils.clamp(d * mult * WHEEL_SPEED, -0.6, 0.6);
+      scheduleSnap(150);
+    };
+
+    const onPointerDown = (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      dragging = true;
+      moved = 0;
+      dragStartX = lastX = e.clientX;
+      dragStartTarget = target;
+      lastT = performance.now();
+      velX = 0;
+      clearTimeout(snapTimer);
+      container.classList.add("is-dragging");
+      container.setPointerCapture?.(e.pointerId);
+    };
+
+    const onPointerMove = (e) => {
+      const rect = container.getBoundingClientRect();
+      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+      if (!dragging) return;
+      const now = performance.now();
+      const dx = e.clientX - lastX;
+      const dt = Math.max(1, now - lastT);
+      velX = velX * 0.7 + (dx / dt) * 0.3;
+      lastX = e.clientX;
+      lastT = now;
+      moved = Math.max(moved, Math.abs(e.clientX - dragStartX));
+      target = dragStartTarget - (e.clientX - dragStartX) / pxPerCard();
+    };
+
+    const endDrag = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      container.classList.remove("is-dragging");
+
+      if (moved < 6 && e && e.clientX !== undefined) {
+        // treat as a click: jump to the card that was clicked
+        const rect = container.getBoundingClientRect();
+        const ndc = new THREE.Vector2(
+          ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          -(((e.clientY - rect.top) / rect.height) * 2 - 1)
+        );
+        raycaster.setFromCamera(ndc, camera);
+        const hit = raycaster.intersectObjects(
+          cards.map((c) => c.mesh).filter((m) => m.visible)
+        )[0];
+        if (hit) {
+          const i = hit.object.userData.index;
+          const delta = wrap(i - pos + TOTAL / 2, TOTAL) - TOTAL / 2;
+          target = Math.round(pos + delta);
+        } else {
+          target = Math.round(target);
+        }
+        return;
+      }
+
+      const flick = THREE.MathUtils.clamp(
+        (-velX * 220) / pxPerCard(),
+        -1.4,
+        1.4
+      );
+      target = Math.round(target + flick);
+    };
+
+    const onKey = (e) => {
+      if (e.key === "ArrowRight") target = Math.round(target) + 1;
+      if (e.key === "ArrowLeft") target = Math.round(target) - 1;
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", endDrag);
+    container.addEventListener("pointercancel", endDrag);
+    window.addEventListener("keydown", onKey);
+
+    /* ---------- render loop ---------- */
+    let raf = 0;
+    let last = performance.now();
+
+    const tick = (now) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+
+      const diff = target - pos;
+      pos += diff * (1 - Math.exp(-dt * (dragging ? DAMP_DRAG : DAMP)));
+
+      // RGB split follows how far the slide still has to travel
+      const wanted = THREE.MathUtils.clamp(diff * CHROMA, -0.07, 0.07);
+      shift += (wanted - shift) * (1 - Math.exp(-dt * 14));
+
+      cards.forEach((card, i) => {
+        const a = wrap(i - pos + TOTAL / 2, TOTAL) - TOTAL / 2;
+        const angle = a * STEP;
+        card.mesh.rotation.y = angle;
+        card.mesh.visible = Math.abs(angle) < 1.75;
+        card.material.uniforms.uShift.value = shift;
+      });
+
+      // subtle pointer tilt
+      tilt.rotation.x += (mouseY * TILT - tilt.rotation.x) * 0.06;
+      tilt.rotation.y += (-mouseX * TILT - tilt.rotation.y) * 0.06;
+
+      const p = wrap(pos, TOTAL);
+      const i0 = Math.floor(p) % TOTAL;
+      const frac = p - Math.floor(p);
+      const i1 = (i0 + 1) % TOTAL;
+
+      // loading arc: fills from the left as you move through the slides
+      const fillTarget = Math.min(p, TOTAL - 1) / (TOTAL - 1);
+      if (fillTarget >= fillShown) {
+        fillShown = fillTarget;
+      } else {
+        // wrapping from the last slide back to the first: drain smoothly
+        fillShown += (fillTarget - fillShown) * (1 - Math.exp(-dt * 5));
+      }
+      fillPath.setAttribute(
+        "stroke-dasharray",
+        `${Math.max(fillShown * 100, 0.01)} 100`
       );
 
-      gsap.fromTo(
-        ".film-intro-bottom",
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 0.8, delay: 0.8 }
-      );
+      // name: old name rolls up, next one rises from below
+      if (shownA !== i0) {
+        nameA.textContent = DOMAINS[i0].name;
+        shownA = i0;
+      }
+      if (shownB !== i1) {
+        nameB.textContent = DOMAINS[i1].name;
+        shownB = i1;
+      }
+      nameA.style.transform = `translateY(${-frac * 100}%)`;
+      nameA.style.opacity = String(1 - 0.65 * frac);
+      nameB.style.transform = `translateY(${(1 - frac) * 100}%)`;
+      nameB.style.opacity = String(0.35 + 0.65 * frac);
 
-      ScrollTrigger.refresh();
-    }, root);
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
 
-    return () => ctx.revert();
+    /* ---------- cleanup ---------- */
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(snapTimer);
+      ro.disconnect();
+      container.removeEventListener("wheel", onWheel);
+      container.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerup", endDrag);
+      container.removeEventListener("pointercancel", endDrag);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", resumeVideos);
+
+      cards.forEach((c) => {
+        c.video.pause();
+        c.video.removeAttribute("src");
+        c.video.load();
+        c.videoTexture.dispose();
+        c.textTexture.dispose();
+        c.material.dispose();
+      });
+      geometry.dispose();
+      renderer.dispose();
+      container.removeChild(renderer.domElement);
+      container.removeChild(videoHost);
+    };
   }, []);
 
-
   return (
-    <main className="film-experience" ref={rootRef}>
+    <>
       <Navbar />
 
-      <div className="film-progress" aria-hidden="true">
-        <div className="film-progress-track">
-          <div className="film-progress-fill" ref={progressRef} />
-        </div>
-        <div className="film-progress-label">
-          <span ref={countRef}>01</span>
-          <span>/ 06</span>
-        </div>
-      </div>
+      <main className="domains-page">
+        <style jsx global>{`
+          @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap");
 
-      <section
-        ref={introRef}
-        className="film-intro film-intro-interactive"
-        onPointerMove={handleIntroPointerMove}
-      >
-        <canvas ref={introCanvasRef} className="intro-cursor-canvas" aria-hidden="true" />
-        <div className="intro-grid" aria-hidden="true" />
-        <div className="intro-orb intro-orb-one" aria-hidden="true" />
-        <div className="intro-orb intro-orb-two" aria-hidden="true" />
-        <div className="intro-cursor-glow" aria-hidden="true" />
+          html,
+          body {
+            margin: 0;
+            background: #080808;
+          }
 
-        
+          .domains-page {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            min-height: 600px;
+            overflow: hidden;
+            background: #080808;
+            color: #fff;
+          }
 
-        <div className="film-intro-content">
-          
+          .domain-stage {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: grab;
+          }
 
-          <h1 className="film-intro-title intro-reveal intro-reveal-two">
-            YOUR CURIOSITY.
-            <br />
-            <em>OUR DOMAINS</em>
-          </h1>
+          .domain-stage.is-dragging {
+            cursor: grabbing;
+          }
 
-          <p className="film-intro-subtitle intro-reveal intro-reveal-three">
-           
-            <br />
-           
-            <br className="intro-desktop-break" />
-           
-          </p>
+          /* ---------- loader ---------- */
+          .domain-loader {
+            position: absolute;
+            z-index: 10;
+            left: 50%;
+            bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateX(-50%);
+            pointer-events: none;
+          }
 
-          <a
-            href="#domain-0"
-            className="intro-explore intro-reveal intro-reveal-four"
+          .domain-loader-arc {
+            display: block;
+            width: 104px;
+            height: 16px;
+            overflow: visible;
+          }
+
+          .domain-loader-pill {
+            position: relative;
+            width: 300px;
+            height: 24px;
+            margin-top: 12px;
+            overflow: hidden;
+            border-radius: 5px;
+            background: transparent;
+          }
+
+          .domain-loader-name {
+            position: absolute;
+            inset: 0;
+          }
+
+          .domain-loader-name-item {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0 8px 1px;
+            line-height: 1.1;
+            color: rgba(255, 255, 255, 0.92);
+            font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+            font-size: 17px;
+            font-weight: 400;
+            will-change: transform, opacity;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+          }
+
+          @media (max-width: 700px) {
+            .domain-loader-pill {
+              width: 200px;
+              height: 24px;
+            }
+          }
+        `}</style>
+
+        <div ref={stageRef} className="domain-stage" />
+
+        <div className="domain-loader" aria-live="polite">
+          <svg
+            viewBox="0 0 104 16"
+            className="domain-loader-arc"
+            aria-hidden="true"
           >
-            <span>EXPLORE DOMAINS</span>
-            <span className="intro-explore-arrow">↓</span>
-          </a>
-        </div>
-
-        <div className="film-intro-bottom">
-          <span className="intro-scroll-label">
-            <span className="intro-scroll-line" />
-           
-          </span>
-          <span className="intro-bottom-caption">
-            TECH / CREATIVITY / IMPACT
-          </span>
-          <MoveDown size={17} />
-        </div>
-      </section>
-
-      {domains.map((domain, index) => (
-        <section
-          key={domain.number}
-          className={`film-panel film-${domain.theme}`}
-          id={index === 0 ? "domain-0" : undefined}
-          aria-label={`${domain.name} ${domain.secondLine}`}
-        >
-          <div className="film-image-wrap">
-            <div
-              className="film-image"
-              role="img"
-              aria-label={domain.alt}
-              style={{ backgroundImage: `url("${domain.image}")` }}
+            <path
+              d="M 2 15 A 100 100 0 0 1 102 15"
+              fill="none"
+              stroke="rgba(255,255,255,0.35)"
+              strokeWidth="1.6"
+              pathLength="100"
             />
+            <path
+              ref={fillRef}
+              d="M 2 15 A 100 100 0 0 1 102 15"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              pathLength="100"
+              strokeDasharray="0.01 100"
+            />
+          </svg>
+
+          <div className="domain-loader-pill">
+            <div ref={nameRef} className="domain-loader-name" />
           </div>
-          <div className="film-shade" />
-
-          <div className="film-panel-top">
-           
-            <span>{domain.display}</span>
-          </div>
-
-          <div className="film-copy">
-            <p className="film-kicker">
-              <span className="film-kicker-line" />
-              {domain.kicker}
-            </p>
-
-            <div className="film-number">{domain.number}</div>
-
-            <h2 className="film-title">
-              <span className="film-title-line">{domain.name}</span>
-              <span className="film-title-line film-title-second">
-                {domain.secondLine}<i>.</i>
-              </span>
-            </h2>
-
-            <p className="film-description">{domain.description}</p>
-
-            <div className="film-meta">
-              <span>{domain.category}</span>
-              <span></span>
-            </div>
-          </div>
-
-          {index === 0 && (
-            <div className="film-next">
-              <span>KEEP GOING</span>
-              <ArrowDownRight size={19} />
-            </div>
-          )}
-
-          <div className="film-panel-bottom">
-            <span>EXPLORE WHAT MOVES YOU</span>
-            <span>{domain.number} / 06</span>
-          </div>
-        </section>
-      ))}
+        </div>
+      </main>
 
       <Footer />
-    </main>
+    </>
   );
 }

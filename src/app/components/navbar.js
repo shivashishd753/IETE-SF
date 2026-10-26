@@ -313,8 +313,8 @@ export default function Navbar() {
     { label: "Members", href: "/members", Icon: UsersRound },
       { label: "Alumni", href: "#alumni", Icon: GraduationCap },
       { label: "Events", href: "/events", Icon: CalendarDays },
-      { label: "Domains", href: "#domains", Icon: Layers3 },
-      { label: "Contact", href: "#contact", Icon: Mail },
+      { label: "Domains", href: "/domains", Icon: Layers3 },
+      { label: "Contact", href: "/contact", Icon: Mail },
   ];
 
  

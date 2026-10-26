@@ -59,7 +59,7 @@ useEffect(() => {
 
 
   {/* Logo */}
-  <a href="#home" aria-label="IETE-SF Home"
+  <a href="/home" aria-label="IETE-SF Home"
     className="relative z-10 flex shrink-0 items-center">
     <img
       src="/logo.svg"
@@ -71,12 +71,12 @@ useEffect(() => {
   {/* Centered desktop navigation */}
   <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 xl:flex 2xl:gap-7">
     {[
-      { label: "Home", href: "#home", Icon: HomeIcon },
+      { label: "Home", href: "/home", Icon: HomeIcon },
       { label: "About", href: "/about", Icon: Info },
       { label: "Members", href: "/members", Icon: UsersRound },
-      { label: "Alumni", href: "#alumni", Icon: GraduationCap },
+      { label: "Alumni", href: "/alumni", Icon: GraduationCap },
       { label: "Events", href: "/events", Icon: CalendarDays },
-      { label: "Domains", href: "#domains", Icon: Layers3 },
+      { label: "Domains", href: "/domains", Icon: Layers3 },
       { label: "Contact", href: "#contact", Icon: Mail },
     ].map(({ label, href, Icon }) => (
       <a
@@ -128,13 +128,13 @@ useEffect(() => {
   {menuOpen && (
     <div className="absolute left-0 right-0 top-[calc(100%+10px)] rounded-2xl border border-white/10 bg-[#080B12]/95 p-3 shadow-2xl backdrop-blur-2xl xl:hidden">
       {[
-        { label: "Home", href: "#home", Icon: HomeIcon },
+        { label: "Home", href: "/home", Icon: HomeIcon },
         { label: "About", href: "/about", Icon: Info },
-        { label: "Members", href: "#members", Icon: UsersRound },
-        { label: "Alumni", href: "#alumni", Icon: GraduationCap },
-        { label: "Events", href: "#events", Icon: CalendarDays },
-        { label: "Domains", href: "#domains", Icon: Layers3 },
-        { label: "Contact", href: "#contact", Icon: Mail },
+        { label: "Members", href: "/members", Icon: UsersRound },
+        { label: "Alumni", href: "/alumni", Icon: GraduationCap },
+        { label: "Events", href: "/events", Icon: CalendarDays },
+        { label: "Domains", href: "/domains", Icon: Layers3 },
+        { label: "Contact", href: "/contact", Icon: Mail },
       ].map(({ label, href, Icon }) => (
         <a
           key={label}
