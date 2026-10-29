@@ -460,7 +460,7 @@ export default function Navbar() {
     { label: "Events", href: "/events", Icon: CalendarDays },
     { label: "Domains", href: "/domains", Icon: Layers3 },
     { label: "Contact", href: "/contact", Icon: Mail },
-    { label: "Contact", href: "/contact", Icon: Mail },
+    
   ];
 
   function startHold() {
