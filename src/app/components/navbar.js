@@ -460,6 +460,7 @@ export default function Navbar() {
     { label: "Events", href: "/events", Icon: CalendarDays },
     { label: "Domains", href: "/domains", Icon: Layers3 },
     { label: "Contact", href: "/contact", Icon: Mail },
+    { label: "Contact", href: "/contact", Icon: Mail },
   ];
 
   function startHold() {
@@ -566,4 +567,8 @@ className="h-[68px] w-[68px] select-none object-contain drop-shadow-[0_0_10px_rg
     </nav>
   );
 }
+
+
+
+
 
