@@ -410,13 +410,27 @@ export default function DomainsPage() {
 
     /* ---------- input ---------- */
     const onWheel = (e) => {
-      e.preventDefault();
-      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if (Math.abs(d) < 0.5) return;
-      const mult = e.deltaMode === 1 ? 32 : 1;
-      target += THREE.MathUtils.clamp(d * mult * WHEEL_SPEED, -0.6, 0.6);
-      scheduleSnap(150);
-    };
+  // Only rotate the carousel when scrolling horizontally.
+  // Vertical scrolling should work normally.
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) {
+    return;
+  }
+
+  e.preventDefault();
+
+  const mult = e.deltaMode === 1 ? 32 : 1;
+  const d = e.deltaX;
+
+  if (Math.abs(d) < 0.5) return;
+
+  target += THREE.MathUtils.clamp(
+    d * mult * WHEEL_SPEED,
+    -0.6,
+    0.6
+  );
+
+  scheduleSnap(150);
+};
 
     const onPointerDown = (e) => {
       if (e.button !== undefined && e.button !== 0) return;
