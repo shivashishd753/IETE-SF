@@ -96,7 +96,7 @@
 
 
 
-
+import { sql } from "@/lib/db";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -104,7 +104,6 @@ import {
   LayoutDashboard,
   CalendarDays,
   Plus,
-  Image,
   Settings,
 } from "lucide-react";
 
@@ -115,7 +114,6 @@ const navigation = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "Manage Events", href: "/dashboard/events", icon: CalendarDays },
   { label: "Add Event", href: "/dashboard/events/new", icon: Plus },
-  { label: "Media", href: "/dashboard/media", icon: Image },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -131,6 +129,22 @@ async function DashboardContent() {
   const member = await getCurrentMember();
 
   if (!member) redirect("/login");
+
+  const statsResult = await sql`
+  SELECT
+    COUNT(*) AS total,
+    COUNT(*) FILTER (WHERE status = 'upcoming') AS upcoming,
+    COUNT(*) FILTER (WHERE status = 'live') AS live,
+    COUNT(*) FILTER (WHERE status = 'past') AS past
+  FROM events
+`;
+
+const stats = {
+  total: Number(statsResult[0].total),
+  upcoming: Number(statsResult[0].upcoming),
+  live: Number(statsResult[0].live),
+  past: Number(statsResult[0].past),
+};
 
   const displayName = member.full_name || member.user_id;
 
@@ -215,32 +229,34 @@ async function DashboardContent() {
               </p>
             </section>
 
-            <section>
-              <h3 className="mb-5 text-sm font-semibold text-slate-200">
-                Event Overview
-              </h3>
+         <section>
+  <h3 className="mb-5 text-sm font-semibold text-slate-200">
+    Event Overview
+  </h3>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  "Total Events",
-                  "Upcoming Events",
-                  "Live Events",
-                  "Past Events",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-5 backdrop-blur-xl transition hover:bg-white/[0.055]"
-                  >
-                    <p className="text-sm text-slate-400">{item}</p>
-                    <p className="mt-4 text-2xl font-semibold">—</p>
-                  </div>
-                ))}
-              </div>
+  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {[
+      { label: "Total Events", value: stats.total },
+      { label: "Upcoming Events", value: stats.upcoming },
+      { label: "Live Events", value: stats.live },
+      { label: "Past Events", value: stats.past },
+    ].map((item) => (
+      <div
+        key={item.label}
+        className="rounded-xl border border-white/[0.08] bg-white/[0.035] p-5 backdrop-blur-xl transition hover:bg-white/[0.055]"
+      >
+        <p className="text-sm text-slate-400">{item.label}</p>
+        <p className="mt-4 text-2xl font-semibold text-white">
+          {item.value}
+        </p>
+      </div>
+    ))}
+  </div>
 
-              <p className="mt-3 text-xs text-slate-600">
-                Statistics will appear once connected to the events database.
-              </p>
-            </section>
+  <p className="mt-3 text-xs text-slate-600">
+    Live statistics from the IETE-SF events database.
+  </p>
+</section>
 
             <section className="mt-12">
               <h3 className="mb-5 text-sm font-semibold text-slate-200">
@@ -272,19 +288,6 @@ async function DashboardContent() {
                     </p>
                   </div>
                   <CalendarDays size={19} />
-                </Link>
-
-                <Link
-                  href="/dashboard/media"
-                  className="flex items-center justify-between gap-4 border-b border-white/[0.07] py-6 transition hover:text-cyan-300"
-                >
-                  <div>
-                    <p className="text-sm font-medium">Manage Media</p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Upload and manage event posters and videos.
-                    </p>
-                  </div>
-                  <Image size={19} />
                 </Link>
 
                 <Link
@@ -321,3 +324,4 @@ export default function DashboardPage() {
     </Suspense>
   );
 }
+
