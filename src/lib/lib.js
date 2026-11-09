@@ -37,7 +37,7 @@ export async function getCurrentMember() {
   }
 
   const rows = await sql`
-    SELECT id, user_id, email, role
+    SELECT id, full_name, user_id, email, role
     FROM members
     WHERE id = ${memberId}
       AND is_active = TRUE
