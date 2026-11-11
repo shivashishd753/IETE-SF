@@ -799,6 +799,572 @@
 // }
 
 
+// "use client";
+
+// import { useEffect, useState, useRef } from "react";
+// import Navbar from "../components/navbar";
+// import Footer from "../components/footer";
+// import {
+//   ArrowDown,
+//   ArrowUpRight,
+//   CalendarDays,
+//   Radio,
+//   ChevronLeft,
+//   ChevronRight,
+// } from "lucide-react";
+
+// const tabs = ["All", "Live Events", "Past Events"];
+
+// function SectionHeader({ eyebrow, title, description }) {
+//   return (
+//     <div className="mb-12 max-w-2xl">
+//       <p className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.35em] text-cyan-300 sm:text-xs">
+//         <span className="h-px w-7 bg-cyan-400" />
+//         {eyebrow}
+//       </p>
+
+//       <h2 className="text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl md:text-6xl">
+//         {title}
+//         <span className="text-cyan-300">.</span>
+//       </h2>
+
+//       {description && (
+//         <p className="mt-5 text-sm leading-7 text-slate-400 sm:text-base">
+//           {description}
+//         </p>
+//       )}
+//     </div>
+//   );
+// }
+
+// function EventCard({ event, variant = "default" }) {
+//   return (
+//     <article className="group relative overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0A101C] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-300/40 hover:shadow-[0_20px_60px_rgba(6,182,212,0.10)]">
+//       <div className="relative aspect-[4/5] overflow-hidden">
+//         {event.image ? (
+//           <img
+//             src={event.image}
+//             alt={event.title}
+//             loading="lazy"
+//             className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+//               variant === "past" ? "grayscale-[15%]" : ""
+//             }`}
+//           />
+//         ) : (
+//           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#101B2C] to-[#050812]">
+//             <CalendarDays className="h-12 w-12 text-cyan-300/40" />
+//           </div>
+//         )}
+
+//         <div className="absolute inset-0 bg-gradient-to-t from-[#050812] via-[#050812]/10 to-transparent" />
+
+//         <span className="absolute left-4 top-4 rounded-full border border-cyan-300/20 bg-[#050812]/75 px-3 py-1.5 text-[9px] font-bold tracking-[0.2em] text-cyan-200 backdrop-blur-lg">
+//           {event.category}
+//         </span>
+
+//         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+//           <div className="mb-3 h-px w-8 bg-cyan-300 transition-all duration-500 group-hover:w-16" />
+
+//           <h3 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+//             {event.title}
+//           </h3>
+
+//           <p className="mt-3 max-h-0 overflow-hidden text-sm leading-6 text-slate-300 opacity-0 transition-all duration-500 group-hover:max-h-32 group-hover:opacity-100">
+//             {event.description}
+//           </p>
+//         </div>
+//       </div>
+//     </article>
+//   );
+// }
+
+// function EmptyState({ icon: Icon, title, description }) {
+//   return (
+//     <div className="flex min-h-52 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.015] px-6 text-center">
+//       <Icon className="mb-4 h-7 w-7 text-cyan-300/70" />
+
+//       <h3 className="text-lg font-medium text-white">{title}</h3>
+
+//       <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+//         {description}
+//       </p>
+//     </div>
+//   );
+// }
+
+// export default function EventsPage() {
+//   const [activeTab, setActiveTab] = useState("All");
+//   const [events, setEvents] = useState([]);
+//   const [activeSlide, setActiveSlide] = useState(0);
+//   const [isPaused, setIsPaused] = useState(false);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
+
+//   // TOUCH SWIPE REFERENCES
+//   const touchStartX = useRef(0);
+//   const touchStartY = useRef(0);
+
+//   // FETCH PUBLISHED EVENTS
+//   useEffect(() => {
+//     let cancelled = false;
+
+//     async function loadEvents() {
+//       try {
+//         const response = await fetch("/api/events/public", {
+//           method: "GET",
+//           cache: "no-store",
+//         });
+
+//         const data = await response.json();
+
+//         if (!response.ok || !data.success) {
+//           throw new Error(data.message || "Unable to load events.");
+//         }
+
+//         if (!cancelled) {
+//           setEvents(data.events || []);
+//           setError("");
+//         }
+//       } catch (err) {
+//         if (!cancelled) {
+//           setError(err.message || "Unable to load events.");
+//         }
+//       } finally {
+//         if (!cancelled) {
+//           setLoading(false);
+//         }
+//       }
+//     }
+
+//     loadEvents();
+
+//     return () => {
+//       cancelled = true;
+//     };
+//   }, []);
+
+//   // THE PUBLIC API ALREADY FILTERS PUBLISHED EVENTS
+//   const publishedEvents = events;
+
+//   // LIVE EVENTS FOR HERO CAROUSEL
+//   const liveEvents = publishedEvents
+//     .filter((event) => event.status === "live")
+//     .sort((a, b) => {
+//       const orderDifference =
+//         Number(a.sort_order || 0) - Number(b.sort_order || 0);
+
+//       if (orderDifference !== 0) return orderDifference;
+
+//       return Number(b.id) - Number(a.id);
+//     });
+
+//   // UPCOMING AND PAST EVENTS
+//   const upcomingEvents = publishedEvents.filter(
+//     (event) => event.status === "upcoming"
+//   );
+
+//   const pastEvents = publishedEvents.filter(
+//     (event) => event.status === "past"
+//   );
+
+//   // KEEP ACTIVE SLIDE WITHIN VALID RANGE
+//   useEffect(() => {
+//     setActiveSlide((current) =>
+//       liveEvents.length > 0
+//         ? Math.min(current, liveEvents.length - 1)
+//         : 0
+//     );
+//   }, [liveEvents.length]);
+
+//   // CURRENT HERO EVENT
+//   const currentSlide = liveEvents[activeSlide] || null;
+
+//   // MANUAL NAVIGATION
+//   const goToPreviousSlide = () => {
+//     if (liveEvents.length <= 1) return;
+
+//     setActiveSlide(
+//       (current) =>
+//         (current - 1 + liveEvents.length) % liveEvents.length
+//     );
+//   };
+
+//   const goToNextSlide = () => {
+//     if (liveEvents.length <= 1) return;
+
+//     setActiveSlide(
+//       (current) => (current + 1) % liveEvents.length
+//     );
+//   };
+
+//   // TOUCH START
+//   const handleTouchStart = (event) => {
+//     touchStartX.current = event.changedTouches[0].clientX;
+//     touchStartY.current = event.changedTouches[0].clientY;
+//   };
+
+//   // TOUCH END: HORIZONTAL SWIPE
+//   const handleTouchEnd = (event) => {
+//     if (liveEvents.length <= 1) return;
+
+//     const endX = event.changedTouches[0].clientX;
+//     const endY = event.changedTouches[0].clientY;
+
+//     const deltaX = endX - touchStartX.current;
+//     const deltaY = endY - touchStartY.current;
+
+//     // Ignore small movements and vertical scrolling
+//     if (
+//       Math.abs(deltaX) < 50 ||
+//       Math.abs(deltaX) <= Math.abs(deltaY)
+//     ) {
+//       return;
+//     }
+
+//     if (deltaX < 0) {
+//       goToNextSlide();
+//     } else {
+//       goToPreviousSlide();
+//     }
+//   };
+
+//   // AUTOMATIC SLIDING
+//   useEffect(() => {
+//     if (liveEvents.length <= 1 || isPaused) return;
+
+//     const interval = setInterval(() => {
+//       setActiveSlide(
+//         (current) => (current + 1) % liveEvents.length
+//       );
+//     }, 6000);
+
+//     return () => clearInterval(interval);
+//   }, [liveEvents.length, isPaused]);
+
+//   // ALL EVENTS FOR CARDS
+//   const allEvents = [
+//     ...liveEvents,
+//     ...upcomingEvents,
+//     ...pastEvents,
+//   ].map((event) => ({
+//     ...event,
+//     image: event.poster_url,
+//     variant: event.status === "past" ? "past" : "default",
+//   }));
+
+//   // TAB FILTERING
+//   const visibleEvents =
+//     activeTab === "All"
+//       ? allEvents
+//       : activeTab === "Live Events"
+//         ? liveEvents.map((event) => ({
+//             ...event,
+//             image: event.poster_url,
+//           }))
+//         : pastEvents.map((event) => ({
+//             ...event,
+//             image: event.poster_url,
+//             variant: "past",
+//           }));
+
+//   return (
+//     <main className="min-h-screen overflow-x-clip bg-[#05070D] text-white">
+//       <Navbar />
+
+//       {/* FEATURED LIVE EVENTS CAROUSEL */}
+//       <section
+//         id="featured-live"
+//         className="relative flex min-h-[100svh] items-end overflow-hidden border-b border-white/[0.08]"
+//         onMouseEnter={() => setIsPaused(true)}
+//         onMouseLeave={() => setIsPaused(false)}
+//         onTouchStart={handleTouchStart}
+//         onTouchEnd={handleTouchEnd}
+//       >
+//         {/* BACKGROUND VIDEO */}
+//         <video
+//           key={currentSlide?.id || "default-background"}
+//           className="absolute inset-0 h-full w-full object-cover"
+//           src={currentSlide?.video_url || "/videos/cp.mp4"}
+//           autoPlay
+//           muted
+//           loop
+//           playsInline
+//           preload="metadata"
+//           aria-hidden="true"
+//         />
+
+//         <div className="absolute inset-0 bg-[#030711]/45" />
+//         <div className="absolute inset-0 bg-gradient-to-r from-[#030711]/95 via-[#030711]/55 to-transparent" />
+//         <div className="absolute inset-0 bg-gradient-to-t from-[#030711] via-transparent to-[#030711]/35" />
+
+//         {/* HERO CONTENT */}
+//         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-28 pt-40 sm:px-10 md:pb-32">
+//           <div className="max-w-3xl">
+//             {loading ? (
+//               <div className="animate-pulse">
+//                 <div className="mb-8 h-9 w-36 rounded-full bg-white/10" />
+//                 <div className="h-5 w-52 rounded bg-white/10" />
+//                 <div className="mt-7 h-20 w-3/4 rounded bg-white/10" />
+//               </div>
+//             ) : error ? (
+//               <>
+//                 <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300">
+//                   IETE-SF
+//                 </p>
+
+//                 <h1 className="text-5xl font-black sm:text-7xl">
+//                   Events
+//                 </h1>
+
+//                 <p className="mt-5 text-slate-300">
+//                   Unable to retrieve the latest events.
+//                 </p>
+//               </>
+//             ) : currentSlide ? (
+//               <>
+//                 {/* LIVE BADGE */}
+//                 <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-red-400/30 bg-red-500/10 px-4 py-2 backdrop-blur-md">
+//                   <span className="relative flex h-2 w-2">
+//                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+//                     <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
+//                   </span>
+
+//                   <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-red-200">
+//                     LIVE NOW
+//                   </span>
+//                 </div>
+
+//                 <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300 sm:text-sm">
+//                   IETE-SF PRESENTS
+//                 </p>
+
+//                 <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] sm:text-7xl md:text-8xl">
+//                   {currentSlide.title}
+//                 </h1>
+
+//                 <p className="mt-7 text-lg font-medium text-white sm:text-xl">
+//                   {currentSlide.category}
+//                 </p>
+
+//                 <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+//                   {currentSlide.description}
+//                 </p>
+
+// <div className="mt-9 flex flex-wrap items-center gap-3">
+//   {currentSlide.registration_url ? (
+//     <a
+//       href={currentSlide.registration_url}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
+//     >
+//       Register Now
+//       <ArrowUpRight size={18} />
+//     </a>
+//   ) : (
+//     <a
+//       href="#events"
+//       className="inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
+//     >
+//       Explore Events
+//       <ArrowUpRight size={18} />
+//     </a>
+//   )}
+
+//   {currentSlide.rule_book_url && (
+//     <a
+//       href={currentSlide.rule_book_url}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
+//     >
+//       Rule Book
+//       <ArrowUpRight size={18} />
+//     </a>
+//   )}
+// </div>
+//               </>
+//             ) : (
+//               <>
+//                 <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 backdrop-blur-md">
+//                   <span className="h-2 w-2 rounded-full bg-cyan-300" />
+
+//                   <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-200">
+//                     Event Update
+//                   </span>
+//                 </div>
+
+//                 <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300 sm:text-sm">
+//                   IETE-SF PRESENTS
+//                 </p>
+
+//                 <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] sm:text-7xl md:text-8xl">
+//                   No Live Events
+//                   <br />
+//                   <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+//                     Right Now.
+//                   </span>
+//                 </h1>
+
+//                 <p className="mt-7 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+//                   There are currently no live events happening. Stay tuned
+//                   for upcoming events and updates from IETE-SF.
+//                 </p>
+
+//                 <a
+//                   href="#events"
+//                   className="mt-9 inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
+//                 >
+//                   Explore Events
+//                   <ArrowUpRight size={18} />
+//                 </a>
+//               </>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* CAROUSEL ARROWS */}
+//         {!loading && !error && liveEvents.length > 1 && (
+//           <>
+//             <button
+//               type="button"
+//               onClick={goToPreviousSlide}
+//               aria-label="Previous live event"
+//               className="absolute left-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#050812]/60 text-white backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-[#050812] sm:left-8"
+//             >
+//               <ChevronLeft size={24} />
+//             </button>
+
+//             <button
+//               type="button"
+//               onClick={goToNextSlide}
+//               aria-label="Next live event"
+//               className="absolute right-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#050812]/60 text-white backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-[#050812] sm:right-8"
+//             >
+//               <ChevronRight size={24} />
+//             </button>
+
+//             {/* SLIDE DOTS */}
+//             <div className="absolute bottom-20 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3">
+//               {liveEvents.map((event, index) => (
+//                 <button
+//                   key={event.id}
+//                   type="button"
+//                   onClick={() => setActiveSlide(index)}
+//                   aria-label={`Go to live event ${index + 1}`}
+//                   aria-current={
+//                     activeSlide === index ? "true" : undefined
+//                   }
+//                   className={`h-2 rounded-full transition-all duration-300 ${
+//                     activeSlide === index
+//                       ? "w-9 bg-cyan-300"
+//                       : "w-2 bg-white/40 hover:bg-white"
+//                   }`}
+//                 />
+//               ))}
+//             </div>
+//           </>
+//         )}
+
+//         {/* SCROLL INDICATOR */}
+//         <a
+//           href="#events"
+//           aria-label="Scroll to events"
+//           className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-slate-400 transition hover:text-cyan-300"
+//         >
+//           Scroll to explore
+//           <ArrowDown className="h-4 w-4 animate-bounce" />
+//         </a>
+//       </section>
+
+//       {/* EVENTS SECTION */}
+//       <section
+//         id="events"
+//         className="scroll-mt-20 px-5 py-24 sm:px-8 md:py-32"
+//       >
+//         <div className="mx-auto max-w-7xl">
+//           <SectionHeader
+//             eyebrow="Explore the experience"
+//             title="Our Events"
+//             description="Discover what's happening, what's coming next, and the memories we've created together."
+//           />
+
+//           {/* TABS */}
+//           <div className="mb-14 flex justify-center">
+//             <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-[#0A101C] p-2">
+//               {tabs.map((tab) => {
+//                 const isActive = activeTab === tab;
+
+//                 return (
+//                   <button
+//                     key={tab}
+//                     type="button"
+//                     onClick={() => setActiveTab(tab)}
+//                     aria-pressed={isActive}
+//                     className={`rounded-xl px-5 py-3 text-xs font-semibold transition-all duration-300 sm:px-8 sm:text-sm ${
+//                       isActive
+//                         ? "border border-cyan-300/30 bg-cyan-300 text-[#050812]"
+//                         : "border border-transparent text-slate-400 hover:bg-white/[0.06] hover:text-white"
+//                     }`}
+//                   >
+//                     {tab}
+//                   </button>
+//                 );
+//               })}
+//             </div>
+//           </div>
+
+//           {/* EVENT CARDS */}
+//           <div key={activeTab}>
+//             {loading ? (
+//               <EmptyState
+//                 icon={CalendarDays}
+//                 title="Loading events"
+//                 description="Please wait while we retrieve the latest events."
+//               />
+//             ) : error ? (
+//               <EmptyState
+//                 icon={CalendarDays}
+//                 title="Unable to load events"
+//                 description={error}
+//               />
+//             ) : visibleEvents.length > 0 ? (
+//               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+//                 {visibleEvents.map((event) => (
+//                   <EventCard
+//                     key={event.id}
+//                     event={event}
+//                     variant={event.variant || "default"}
+//                   />
+//                 ))}
+//               </div>
+//             ) : (
+//               <EmptyState
+//                 icon={
+//                   activeTab === "Live Events" ? Radio : CalendarDays
+//                 }
+//                 title={
+//                   activeTab === "Live Events"
+//                     ? "No live events right now"
+//                     : "Something exciting is on its way"
+//                 }
+//                 description={
+//                   activeTab === "Live Events"
+//                     ? "Live events will appear here when announced."
+//                     : "Events will appear here as soon as they are published."
+//                 }
+//               />
+//             )}
+//           </div>
+//         </div>
+//       </section>
+
+//       <Footer />
+//     </main>
+//   );
+// }
+
+
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -815,21 +1381,25 @@ import {
 
 const tabs = ["All", "Live Events", "Past Events"];
 
+/* --------------------------------------------------
+   SECTION HEADER
+-------------------------------------------------- */
+
 function SectionHeader({ eyebrow, title, description }) {
   return (
     <div className="mb-12 max-w-2xl">
-      <p className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.35em] text-cyan-300 sm:text-xs">
-        <span className="h-px w-7 bg-cyan-400" />
+      <p className="mb-4 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#8998B1] sm:text-xs">
+        <span className="h-px w-8 bg-[#71819C]" />
         {eyebrow}
       </p>
 
-      <h2 className="text-4xl font-semibold tracking-[-0.05em] text-white sm:text-5xl md:text-6xl">
+      <h2 className="text-4xl font-semibold tracking-[-0.045em] text-[#F1F2F4] sm:text-5xl md:text-6xl">
         {title}
-        <span className="text-cyan-300">.</span>
+        <span className="text-[#8192AF]">.</span>
       </h2>
 
       {description && (
-        <p className="mt-5 text-sm leading-7 text-slate-400 sm:text-base">
+        <p className="mt-5 max-w-xl text-sm leading-7 text-[#9299A5] sm:text-base">
           {description}
         </p>
       )}
@@ -837,60 +1407,79 @@ function SectionHeader({ eyebrow, title, description }) {
   );
 }
 
+/* --------------------------------------------------
+   EVENT CARD
+-------------------------------------------------- */
+
 function EventCard({ event, variant = "default" }) {
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0A101C] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-300/40 hover:shadow-[0_20px_60px_rgba(6,182,212,0.10)]">
-      <div className="relative aspect-[4/5] overflow-hidden">
+    <article className="group overflow-hidden rounded-2xl border border-[#292E38] bg-[#11141A] transition-all duration-300 hover:-translate-y-1 hover:border-[#53617A]">
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#171B23]">
         {event.image ? (
           <img
             src={event.image}
             alt={event.title}
             loading="lazy"
-            className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] ${
               variant === "past" ? "grayscale-[15%]" : ""
             }`}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#101B2C] to-[#050812]">
-            <CalendarDays className="h-12 w-12 text-cyan-300/40" />
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1B202A] to-[#101319]">
+            <CalendarDays className="h-12 w-12 text-[#8192AF]/50" />
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050812] via-[#050812]/10 to-transparent" />
+        {/* IMAGE OVERLAY */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#080A0F]/95 via-[#080A0F]/20 to-transparent" />
 
-        <span className="absolute left-4 top-4 rounded-full border border-cyan-300/20 bg-[#050812]/75 px-3 py-1.5 text-[9px] font-bold tracking-[0.2em] text-cyan-200 backdrop-blur-lg">
+        {/* CATEGORY */}
+        <span className="absolute left-4 top-4 rounded-lg border border-white/10 bg-[#0B0E14]/80 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#C0C9D8] backdrop-blur-sm">
           {event.category}
         </span>
 
+        {/* EVENT INFORMATION */}
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-          <div className="mb-3 h-px w-8 bg-cyan-300 transition-all duration-500 group-hover:w-16" />
+          <div className="mb-4 h-px w-8 bg-[#8192AF] transition-all duration-300 group-hover:w-12" />
 
           <h3 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             {event.title}
           </h3>
 
-          <p className="mt-3 max-h-0 overflow-hidden text-sm leading-6 text-slate-300 opacity-0 transition-all duration-500 group-hover:max-h-32 group-hover:opacity-100">
-            {event.description}
-          </p>
+          {event.description && (
+            <p className="mt-3 max-h-20 overflow-hidden text-sm leading-6 text-[#C0C4CC]">
+              {event.description}
+            </p>
+          )}
         </div>
       </div>
     </article>
   );
 }
 
+/* --------------------------------------------------
+   EMPTY STATE
+-------------------------------------------------- */
+
 function EmptyState({ icon: Icon, title, description }) {
   return (
-    <div className="flex min-h-52 flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.015] px-6 text-center">
-      <Icon className="mb-4 h-7 w-7 text-cyan-300/70" />
+    <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-[#343B48] bg-[#11141A] px-6 text-center">
+      <Icon className="mb-4 h-7 w-7 text-[#8192AF]" />
 
-      <h3 className="text-lg font-medium text-white">{title}</h3>
+      <h3 className="text-lg font-medium text-[#E7E9ED]">
+        {title}
+      </h3>
 
-      <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+      <p className="mt-2 max-w-sm text-sm leading-6 text-[#9299A5]">
         {description}
       </p>
     </div>
   );
 }
+
+/* --------------------------------------------------
+   EVENTS PAGE
+-------------------------------------------------- */
 
 export default function EventsPage() {
   const [activeTab, setActiveTab] = useState("All");
@@ -904,7 +1493,10 @@ export default function EventsPage() {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
-  // FETCH PUBLISHED EVENTS
+  /* --------------------------------------------------
+     FETCH PUBLISHED EVENTS
+  -------------------------------------------------- */
+
   useEffect(() => {
     let cancelled = false;
 
@@ -936,17 +1528,23 @@ export default function EventsPage() {
       }
     }
 
-    loadEvents();
+loadEvents();
 
-    return () => {
-      cancelled = true;
-    };
+const refreshInterval = setInterval(loadEvents, 30000);
+
+return () => {
+  cancelled = true;
+  clearInterval(refreshInterval);
+};
   }, []);
 
   // THE PUBLIC API ALREADY FILTERS PUBLISHED EVENTS
   const publishedEvents = events;
 
-  // LIVE EVENTS FOR HERO CAROUSEL
+  /* --------------------------------------------------
+     LIVE EVENTS FOR HERO CAROUSEL
+  -------------------------------------------------- */
+
   const liveEvents = publishedEvents
     .filter((event) => event.status === "live")
     .sort((a, b) => {
@@ -958,7 +1556,10 @@ export default function EventsPage() {
       return Number(b.id) - Number(a.id);
     });
 
-  // UPCOMING AND PAST EVENTS
+  /* --------------------------------------------------
+     UPCOMING AND PAST EVENTS
+  -------------------------------------------------- */
+
   const upcomingEvents = publishedEvents.filter(
     (event) => event.status === "upcoming"
   );
@@ -967,7 +1568,10 @@ export default function EventsPage() {
     (event) => event.status === "past"
   );
 
-  // KEEP ACTIVE SLIDE WITHIN VALID RANGE
+  /* --------------------------------------------------
+     KEEP ACTIVE SLIDE WITHIN VALID RANGE
+  -------------------------------------------------- */
+
   useEffect(() => {
     setActiveSlide((current) =>
       liveEvents.length > 0
@@ -979,7 +1583,10 @@ export default function EventsPage() {
   // CURRENT HERO EVENT
   const currentSlide = liveEvents[activeSlide] || null;
 
-  // MANUAL NAVIGATION
+  /* --------------------------------------------------
+     MANUAL CAROUSEL NAVIGATION
+  -------------------------------------------------- */
+
   const goToPreviousSlide = () => {
     if (liveEvents.length <= 1) return;
 
@@ -997,13 +1604,19 @@ export default function EventsPage() {
     );
   };
 
-  // TOUCH START
+  /* --------------------------------------------------
+     TOUCH START
+  -------------------------------------------------- */
+
   const handleTouchStart = (event) => {
     touchStartX.current = event.changedTouches[0].clientX;
     touchStartY.current = event.changedTouches[0].clientY;
   };
 
-  // TOUCH END: HORIZONTAL SWIPE
+  /* --------------------------------------------------
+     TOUCH END: HORIZONTAL SWIPE
+  -------------------------------------------------- */
+
   const handleTouchEnd = (event) => {
     if (liveEvents.length <= 1) return;
 
@@ -1013,7 +1626,7 @@ export default function EventsPage() {
     const deltaX = endX - touchStartX.current;
     const deltaY = endY - touchStartY.current;
 
-    // Ignore small movements and vertical scrolling
+    // IGNORE SMALL MOVEMENTS AND VERTICAL SCROLLING
     if (
       Math.abs(deltaX) < 50 ||
       Math.abs(deltaX) <= Math.abs(deltaY)
@@ -1028,7 +1641,10 @@ export default function EventsPage() {
     }
   };
 
-  // AUTOMATIC SLIDING
+  /* --------------------------------------------------
+     AUTOMATIC SLIDING
+  -------------------------------------------------- */
+
   useEffect(() => {
     if (liveEvents.length <= 1 || isPaused) return;
 
@@ -1041,7 +1657,10 @@ export default function EventsPage() {
     return () => clearInterval(interval);
   }, [liveEvents.length, isPaused]);
 
-  // ALL EVENTS FOR CARDS
+  /* --------------------------------------------------
+     ALL EVENTS FOR CARDS
+  -------------------------------------------------- */
+
   const allEvents = [
     ...liveEvents,
     ...upcomingEvents,
@@ -1052,7 +1671,10 @@ export default function EventsPage() {
     variant: event.status === "past" ? "past" : "default",
   }));
 
-  // TAB FILTERING
+  /* --------------------------------------------------
+     TAB FILTERING
+  -------------------------------------------------- */
+
   const visibleEvents =
     activeTab === "All"
       ? allEvents
@@ -1067,11 +1689,25 @@ export default function EventsPage() {
             variant: "past",
           }));
 
+  /* --------------------------------------------------
+     HERO BUTTON STYLE
+  -------------------------------------------------- */
+
+  const heroButtonClass =
+    "inline-flex items-center justify-center gap-3 rounded-lg border border-[#46536A] bg-[#151B25] px-6 py-4 text-sm font-semibold text-[#C3CDDE] transition-colors duration-300 hover:border-[#687895] hover:bg-[#202A39] hover:text-white";
+
+  /* --------------------------------------------------
+     PAGE UI
+  -------------------------------------------------- */
+
   return (
-    <main className="min-h-screen overflow-x-clip bg-[#05070D] text-white">
+    <main className="min-h-screen overflow-x-clip bg-[linear-gradient(135deg,#090B10_0%,#111722_48%,#090B10_100%)] text-white">
       <Navbar />
 
-      {/* FEATURED LIVE EVENTS CAROUSEL */}
+      {/* ==============================================
+          FEATURED LIVE EVENTS CAROUSEL
+      ============================================== */}
+
       <section
         id="featured-live"
         className="relative flex min-h-[100svh] items-end overflow-hidden border-b border-white/[0.08]"
@@ -1093,9 +1729,15 @@ export default function EventsPage() {
           aria-hidden="true"
         />
 
-        <div className="absolute inset-0 bg-[#030711]/45" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#030711]/95 via-[#030711]/55 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030711] via-transparent to-[#030711]/35" />
+        {/* DARKENED VIDEO LAYERS */}
+        <div className="absolute inset-0 bg-[#090B10]/50" />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-[#090B10]/95 via-[#090B10]/65 to-transparent" />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-[#090B10] via-transparent to-[#090B10]/40" />
+
+        {/* SUBTLE NAVY TONE */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#172131]/15 via-transparent to-transparent" />
 
         {/* HERO CONTENT */}
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-28 pt-40 sm:px-10 md:pb-32">
@@ -1108,98 +1750,113 @@ export default function EventsPage() {
               </div>
             ) : error ? (
               <>
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300">
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-[#A2B0C6]">
                   IETE-SF
                 </p>
 
-                <h1 className="text-5xl font-black sm:text-7xl">
+                <h1 className="text-5xl font-black tracking-tight sm:text-7xl">
                   Events
                 </h1>
 
-                <p className="mt-5 text-slate-300">
+                <p className="mt-5 text-[#BEC3CC]">
                   Unable to retrieve the latest events.
                 </p>
               </>
             ) : currentSlide ? (
               <>
                 {/* LIVE BADGE */}
-                <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-red-400/30 bg-red-500/10 px-4 py-2 backdrop-blur-md">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
-                  </span>
+                <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-red-400/25 bg-[#171114]/75 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-red-400" />
 
                   <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-red-200">
                     LIVE NOW
                   </span>
                 </div>
 
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300 sm:text-sm">
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-[#A2B0C6] sm:text-sm">
                   IETE-SF PRESENTS
                 </p>
 
-                <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] sm:text-7xl md:text-8xl">
+                <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] text-[#F4F5F7] sm:text-7xl md:text-8xl">
                   {currentSlide.title}
                 </h1>
 
-                <p className="mt-7 text-lg font-medium text-white sm:text-xl">
+                <p className="mt-7 text-lg font-medium text-[#D4D9E1] sm:text-xl">
                   {currentSlide.category}
                 </p>
 
-                <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                <p className="mt-4 max-w-xl text-sm leading-7 text-[#C1C6D0] sm:text-base">
                   {currentSlide.description}
                 </p>
 
-                {currentSlide.registration_url ? (
-                  <a
-                    href={currentSlide.registration_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-9 inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
-                  >
-                    Register Now
-                    <ArrowUpRight size={18} />
-                  </a>
-                ) : (
-                  <a
-                    href="#events"
-                    className="mt-9 inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
-                  >
-                    Explore Events
-                    <ArrowUpRight size={18} />
-                  </a>
-                )}
+                {/* HERO ACTIONS */}
+                <div className="mt-9 flex flex-wrap items-center gap-3">
+                  {currentSlide.registration_url ? (
+                    <a
+                      href={currentSlide.registration_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={heroButtonClass}
+                    >
+                      Register Now
+                      <ArrowUpRight size={18} />
+                    </a>
+                  ) : (
+                    <a
+                      href="#events"
+                      className={heroButtonClass}
+                    >
+                      Explore Events
+                      <ArrowUpRight size={18} />
+                    </a>
+                  )}
+
+                  {/* RULE BOOK: SHOW ONLY WHEN AVAILABLE */}
+                  {currentSlide.rule_book_url && (
+                    <a
+                      href={currentSlide.rule_book_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={heroButtonClass}
+                    >
+                      Rule Book
+                      <ArrowUpRight size={18} />
+                    </a>
+                  )}
+                </div>
               </>
             ) : (
               <>
-                <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 backdrop-blur-md">
-                  <span className="h-2 w-2 rounded-full bg-cyan-300" />
+                {/* NO LIVE EVENT BADGE */}
+                <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-[#53617A]/40 bg-[#151B25]/80 px-4 py-2 backdrop-blur-sm">
+                  <span className="h-2 w-2 rounded-full bg-[#8192AF]" />
 
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-200">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C0C9D8]">
                     Event Update
                   </span>
                 </div>
 
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300 sm:text-sm">
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.4em] text-[#A2B0C6] sm:text-sm">
                   IETE-SF PRESENTS
                 </p>
 
-                <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] sm:text-7xl md:text-8xl">
+                <h1 className="text-5xl font-black leading-[0.98] tracking-[-0.06em] text-[#F4F5F7] sm:text-7xl md:text-8xl">
                   No Live Events
                   <br />
-                  <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="text-[#A2B0C6]">
                     Right Now.
                   </span>
                 </h1>
 
-                <p className="mt-7 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
-                  There are currently no live events happening. Stay tuned
-                  for upcoming events and updates from IETE-SF.
+                <p className="mt-7 max-w-xl text-sm leading-7 text-[#C1C6D0] sm:text-base">
+                  There are currently no live events happening.
+                  Stay tuned for upcoming events and updates from
+                  IETE-SF.
                 </p>
 
                 <a
                   href="#events"
-                  className="mt-9 inline-flex items-center gap-3 rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-6 py-4 text-sm font-semibold text-cyan-100 backdrop-blur-md transition-all duration-300 hover:bg-cyan-300 hover:text-[#050812]"
+                  className={`mt-9 ${heroButtonClass}`}
                 >
                   Explore Events
                   <ArrowUpRight size={18} />
@@ -1209,14 +1866,17 @@ export default function EventsPage() {
           </div>
         </div>
 
-        {/* CAROUSEL ARROWS */}
+        {/* ==============================================
+            CAROUSEL ARROWS
+        ============================================== */}
+
         {!loading && !error && liveEvents.length > 1 && (
           <>
             <button
               type="button"
               onClick={goToPreviousSlide}
               aria-label="Previous live event"
-              className="absolute left-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#050812]/60 text-white backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-[#050812] sm:left-8"
+              className="absolute left-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#0A0D13]/70 text-white backdrop-blur-md transition-colors duration-300 hover:border-[#687895] hover:bg-[#202A39] sm:left-8"
             >
               <ChevronLeft size={24} />
             </button>
@@ -1225,7 +1885,7 @@ export default function EventsPage() {
               type="button"
               onClick={goToNextSlide}
               aria-label="Next live event"
-              className="absolute right-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#050812]/60 text-white backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/50 hover:bg-cyan-300 hover:text-[#050812] sm:right-8"
+              className="absolute right-5 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#0A0D13]/70 text-white backdrop-blur-md transition-colors duration-300 hover:border-[#687895] hover:bg-[#202A39] sm:right-8"
             >
               <ChevronRight size={24} />
             </button>
@@ -1243,8 +1903,8 @@ export default function EventsPage() {
                   }
                   className={`h-2 rounded-full transition-all duration-300 ${
                     activeSlide === index
-                      ? "w-9 bg-cyan-300"
-                      : "w-2 bg-white/40 hover:bg-white"
+                      ? "w-9 bg-[#A1AEC3]"
+                      : "w-2 bg-white/40 hover:bg-white/70"
                   }`}
                 />
               ))}
@@ -1256,28 +1916,34 @@ export default function EventsPage() {
         <a
           href="#events"
           aria-label="Scroll to events"
-          className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-slate-400 transition hover:text-cyan-300"
+          className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-[#A0A7B3] transition-colors hover:text-[#C2CCDD]"
         >
           Scroll to explore
           <ArrowDown className="h-4 w-4 animate-bounce" />
         </a>
       </section>
 
-      {/* EVENTS SECTION */}
+      {/* ==============================================
+          EVENTS SECTION
+      ============================================== */}
+
       <section
         id="events"
         className="scroll-mt-20 px-5 py-24 sm:px-8 md:py-32"
       >
         <div className="mx-auto max-w-7xl">
           <SectionHeader
-            eyebrow="Explore the experience"
+            eyebrow="Explore our events"
             title="Our Events"
             description="Discover what's happening, what's coming next, and the memories we've created together."
           />
 
-          {/* TABS */}
+          {/* ==========================================
+              TABS
+          ========================================== */}
+
           <div className="mb-14 flex justify-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/[0.08] bg-[#0A101C] p-2">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-xl border border-[#292F3A] bg-[#11141A] p-2">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab;
 
@@ -1287,10 +1953,10 @@ export default function EventsPage() {
                     type="button"
                     onClick={() => setActiveTab(tab)}
                     aria-pressed={isActive}
-                    className={`rounded-xl px-5 py-3 text-xs font-semibold transition-all duration-300 sm:px-8 sm:text-sm ${
+                    className={`rounded-lg border px-5 py-3 text-xs font-semibold transition-colors duration-300 sm:px-8 sm:text-sm ${
                       isActive
-                        ? "border border-cyan-300/30 bg-cyan-300 text-[#050812]"
-                        : "border border-transparent text-slate-400 hover:bg-white/[0.06] hover:text-white"
+                        ? "border-[#52617B]/50 bg-[#202A39] text-[#DCE3EE]"
+                        : "border-transparent text-[#9299A5] hover:bg-white/[0.04] hover:text-white"
                     }`}
                   >
                     {tab}
@@ -1300,7 +1966,10 @@ export default function EventsPage() {
             </div>
           </div>
 
-          {/* EVENT CARDS */}
+          {/* ==========================================
+              EVENT CARDS
+          ========================================== */}
+
           <div key={activeTab}>
             {loading ? (
               <EmptyState
@@ -1349,5 +2018,3 @@ export default function EventsPage() {
     </main>
   );
 }
-
-

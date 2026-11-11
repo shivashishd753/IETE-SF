@@ -2,6 +2,11 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getCurrentMember } from "@/lib/lib";
+import {
+  getEffectiveEventStatus,
+  validateEventTimes,
+  syncEventStatuses,
+} from "@/lib/event-status";
 
 const allowedStatuses = ["upcoming", "live", "past"];
 
@@ -41,6 +46,9 @@ export async function GET(request, { params }) {
         { status: 400 }
       );
     }
+
+    // Synchronize scheduled event statuses.
+    await syncEventStatuses();
 
     const rows = await sql`
       SELECT *
@@ -92,6 +100,9 @@ export async function PATCH(request, { params }) {
       );
     }
 
+    // Synchronize existing scheduled statuses first.
+    await syncEventStatuses();
+
     const body = await request.json();
 
     const existingRows = await sql`
@@ -137,13 +148,22 @@ export async function PATCH(request, { params }) {
       );
     }
 
+    // Resolve the updated values.
     const title = Object.hasOwn(body, "title")
       ? body.title
       : existing.title;
 
-    const status = Object.hasOwn(body, "status")
+    const requestedStatus = Object.hasOwn(body, "status")
       ? body.status
       : existing.status;
+
+    const startsAt = Object.hasOwn(body, "starts_at")
+      ? body.starts_at || null
+      : existing.starts_at;
+
+    const endsAt = Object.hasOwn(body, "ends_at")
+      ? body.ends_at || null
+      : existing.ends_at;
 
     const isFeatured = Object.hasOwn(body, "is_featured")
       ? body.is_featured
@@ -157,6 +177,7 @@ export async function PATCH(request, { params }) {
       ? body.sort_order
       : existing.sort_order;
 
+    // Validate title.
     if (typeof title !== "string" || !title.trim()) {
       return NextResponse.json(
         { success: false, message: "A valid title is required" },
@@ -164,13 +185,38 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    if (!allowedStatuses.includes(status)) {
+    // Validate requested status.
+    if (!allowedStatuses.includes(requestedStatus)) {
       return NextResponse.json(
         { success: false, message: "Invalid event status" },
         { status: 400 }
       );
     }
 
+    // Validate schedule when date fields are being changed.
+    const scheduleChanged =
+      Object.hasOwn(body, "starts_at") ||
+      Object.hasOwn(body, "ends_at");
+
+    if (scheduleChanged) {
+      const scheduleError = validateEventTimes(startsAt, endsAt);
+
+      if (scheduleError) {
+        return NextResponse.json(
+          { success: false, message: scheduleError },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Calculate the effective status from the schedule.
+    const effectiveStatus = getEffectiveEventStatus({
+      status: requestedStatus,
+      starts_at: startsAt,
+      ends_at: endsAt,
+    });
+
+    // Validate publishing settings.
     if (
       typeof isFeatured !== "boolean" ||
       typeof isPublished !== "boolean"
@@ -188,7 +234,8 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    if (isFeatured && status !== "live") {
+    // Only currently live events can be featured.
+    if (isFeatured && effectiveStatus !== "live") {
       return NextResponse.json(
         { success: false, message: "Only live events can be featured" },
         { status: 400 }
@@ -201,7 +248,7 @@ export async function PATCH(request, { params }) {
         : createSlug(title);
 
     // Clear the previous featured event before featuring this one.
-    if (isFeatured) {
+    if (isFeatured && effectiveStatus === "live") {
       await sql`
         UPDATE events
         SET is_featured = FALSE
@@ -210,22 +257,49 @@ export async function PATCH(request, { params }) {
       `;
     }
 
+    // Update the event.
     const result = await sql`
       UPDATE events
       SET
         title = ${title.trim()},
         slug = ${slug},
-        description = ${Object.hasOwn(body, "description") ? body.description : existing.description},
-        category = ${Object.hasOwn(body, "category") ? body.category : existing.category},
-        status = ${status},
-        starts_at = ${Object.hasOwn(body, "starts_at") ? body.starts_at : existing.starts_at},
-        ends_at = ${Object.hasOwn(body, "ends_at") ? body.ends_at : existing.ends_at},
-        location = ${Object.hasOwn(body, "location") ? body.location : existing.location},
-        registration_url = ${Object.hasOwn(body, "registration_url") ? body.registration_url : existing.registration_url},
-        poster_url = ${Object.hasOwn(body, "poster_url") ? body.poster_url : existing.poster_url},
-        video_url = ${Object.hasOwn(body, "video_url") ? body.video_url : existing.video_url},
+        description = ${
+          Object.hasOwn(body, "description")
+            ? body.description
+            : existing.description
+        },
+        category = ${
+          Object.hasOwn(body, "category")
+            ? body.category
+            : existing.category
+        },
+        status = ${effectiveStatus},
+        starts_at = ${startsAt},
+        ends_at = ${endsAt},
+        location = ${
+          Object.hasOwn(body, "location")
+            ? body.location
+            : existing.location
+        },
+        registration_url = ${
+          Object.hasOwn(body, "registration_url")
+            ? body.registration_url
+            : existing.registration_url
+        },
+        poster_url = ${
+          Object.hasOwn(body, "poster_url")
+            ? body.poster_url
+            : existing.poster_url
+        },
+        video_url = ${
+          Object.hasOwn(body, "video_url")
+            ? body.video_url
+            : existing.video_url
+        },
         is_published = ${isPublished},
-        is_featured = ${status === "live" ? isFeatured : false},
+        is_featured = ${
+          effectiveStatus === "live" ? isFeatured : false
+        },
         sort_order = ${sortOrder},
         updated_at = NOW()
       WHERE id = ${id}

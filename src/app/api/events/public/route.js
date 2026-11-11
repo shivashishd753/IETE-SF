@@ -1,9 +1,13 @@
 
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { syncEventStatuses } from "@/lib/event-status";
 
 export async function GET() {
   try {
+    // Update scheduled event statuses before retrieving them.
+    await syncEventStatuses();
+
     const events = await sql`
       SELECT
         id,
@@ -17,6 +21,7 @@ export async function GET() {
         location,
         registration_url,
         poster_url,
+        rule_book_url,
         video_url,
         sort_order
       FROM events

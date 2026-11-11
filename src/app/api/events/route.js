@@ -2,6 +2,11 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getCurrentMember } from "@/lib/lib";
+import {
+  getEffectiveEventStatus,
+  validateEventTimes,
+  syncEventStatuses,
+} from "@/lib/event-status";
 
 const allowedStatuses = ["upcoming", "live", "past"];
 
@@ -26,6 +31,9 @@ export async function GET() {
         { status: 401 }
       );
     }
+
+    // Synchronize scheduled event statuses first.
+    await syncEventStatuses();
 
     const events = await sql`
       SELECT *
@@ -77,6 +85,7 @@ export async function POST(request) {
       sort_order = 0,
     } = body;
 
+    // Validate title.
     if (!title || typeof title !== "string" || !title.trim()) {
       return NextResponse.json(
         { success: false, message: "Event title is required" },
@@ -84,6 +93,7 @@ export async function POST(request) {
       );
     }
 
+    // Validate manually requested status.
     if (!allowedStatuses.includes(status)) {
       return NextResponse.json(
         { success: false, message: "Invalid event status" },
@@ -91,15 +101,40 @@ export async function POST(request) {
       );
     }
 
-    if (typeof is_published !== "boolean" ||
-        typeof is_featured !== "boolean") {
+    // Validate publishing settings.
+    if (
+      typeof is_published !== "boolean" ||
+      typeof is_featured !== "boolean"
+    ) {
       return NextResponse.json(
         { success: false, message: "Invalid publishing settings" },
         { status: 400 }
       );
     }
 
-    if (is_featured && status !== "live") {
+    // Normalize event dates.
+    const startsAt = starts_at || null;
+    const endsAt = ends_at || null;
+
+    // Validate the event schedule.
+    const scheduleError = validateEventTimes(startsAt, endsAt);
+
+    if (scheduleError) {
+      return NextResponse.json(
+        { success: false, message: scheduleError },
+        { status: 400 }
+      );
+    }
+
+    // Calculate the actual status from the schedule.
+    const effectiveStatus = getEffectiveEventStatus({
+      status,
+      starts_at: startsAt,
+      ends_at: endsAt,
+    });
+
+    // Only currently live events can be featured.
+    if (is_featured && effectiveStatus !== "live") {
       return NextResponse.json(
         { success: false, message: "Only live events can be featured" },
         { status: 400 }
@@ -131,9 +166,9 @@ export async function POST(request) {
         ${slug},
         ${description},
         ${category},
-        ${status},
-        ${starts_at},
-        ${ends_at},
+        ${effectiveStatus},
+        ${startsAt},
+        ${endsAt},
         ${location},
         ${registration_url},
         ${poster_url},
@@ -159,7 +194,10 @@ export async function POST(request) {
 
     if (error.code === "23505") {
       return NextResponse.json(
-        { success: false, message: "An event with this unique value already exists" },
+        {
+          success: false,
+          message: "An event with this unique value already exists",
+        },
         { status: 409 }
       );
     }
