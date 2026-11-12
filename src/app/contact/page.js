@@ -1,26 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, Copy, Check, ArrowUpRight } from "lucide-react";
+import { Send, ArrowUpRight, Mail, Phone, UsersRound, MapPin } from "lucide-react";
 import { gsap } from "gsap";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 
-/* ─────── Copy-to-clipboard ─────── */
-function CopyButton({ text }) {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
-    try { await navigator.clipboard.writeText(text); }
-    catch { const el = document.createElement("textarea"); el.value = text; document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el); }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <button type="button" onClick={handleCopy} aria-label={copied ? "Copied" : `Copy ${text}`} className="ct-copy">
-      {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} strokeWidth={2} />}
-    </button>
-  );
-}
+const WATERMARK_PARTICLE_POSITIONS = [
+  [19, 10], [23, 56], [27, 128], [30, -8], [33, 92], [36, 34], [39, 142],
+  [42, 8], [45, 112], [48, 44], [51, 136], [54, -4], [57, 76], [60, 126],
+  [63, 20], [66, 98], [69, 4], [72, 140], [75, 52], [78, 112], [81, 18],
+  [84, 86], [25, 24], [35, 68], [47, 2], [59, 60], [71, 34], [82, 134],
+];
 
 /* ─────── Cute SVG Bot — smooth continuous border crawl ─────── */
 function BorderBot({ containerRef }) {
@@ -255,10 +246,49 @@ export default function ContactPage() {
   const formCardRef = useRef(null);
   const heroRef = useRef(null);
   const titleRef = useRef(null);
+  const contactCardRefs = useRef([]);
+  const watermarkDotsRef = useRef([]);
 
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
   const [hoveredCard, setHoveredCard] = useState(null);
+
+  const animateWatermark = (event) => {
+    event.currentTarget.classList.add("is-hovered");
+    updateWatermarkPointer(event);
+  };
+
+  const updateWatermarkPointer = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--pointer-x", `${event.clientX - bounds.left}px`);
+    event.currentTarget.style.setProperty("--pointer-y", `${event.clientY - bounds.top}px`);
+  };
+
+  const resetWatermark = (event) => {
+    event.currentTarget.classList.remove("is-hovered");
+  };
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const dots = watermarkDotsRef.current.filter(Boolean);
+    dots.forEach((dot) => {
+      gsap.to(dot, {
+        x: () => gsap.utils.random(-28, 28),
+        y: () => gsap.utils.random(-22, 22),
+        opacity: () => gsap.utils.random(.2, .58),
+        scale: () => gsap.utils.random(.85, 1.5),
+        duration: () => gsap.utils.random(2.2, 5.6),
+        delay: () => gsap.utils.random(0, 2.8),
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+        repeatRefresh: true,
+      });
+    });
+
+    return () => dots.forEach((dot) => gsap.killTweensOf(dot));
+  }, []);
 
   const animateTitleTiles = () => {
     const letters = titleRef.current?.querySelectorAll(".ct-title-letter");
@@ -279,16 +309,38 @@ export default function ContactPage() {
     });
   };
 
+  const animateContactCard = (index, active) => {
+    const card = contactCardRefs.current[index];
+    if (!card) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.killTweensOf(card);
+    gsap.to(card, {
+      y: active && !reduced ? -6 : 0,
+      scale: active && !reduced ? 1.025 : 1,
+      rotateX: active && !reduced ? 2 : 0,
+      rotateY: active && !reduced ? (index % 2 ? -1.5 : 1.5) : 0,
+      zIndex: active ? 60 : 0,
+      duration: reduced ? 0.12 : active ? 0.38 : 0.3,
+      ease: active ? "power3.out" : "power2.out",
+      boxShadow: active ? "0 24px 52px rgba(0,0,0,.55), 0 8px 24px rgba(51,91,159,.12)" : "0 0 0 rgba(0,0,0,0)",
+    });
+  };
+
   /* ── GSAP entrance ── */
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     const ctx = gsap.context(() => {
+      // Clear transforms from a prior hot reload before positioning the watermark in normal flow.
+      gsap.set(".ct-watermark", { clearProps: "transform" });
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      // Watermark text fade
-      tl.from(".ct-watermark", { opacity: 0, scale: 1.05, duration: 1.8, ease: "power2.out" }, 0);
-
-      // Badge
-      tl.from(".ct-badge", { y: 15, opacity: 0, duration: 0.6 }, 0.3);
+      // Reveal the oversized watermark as the first visual on route entry.
+      tl.fromTo(".ct-watermark",
+        { opacity: 0, filter: "blur(12px)", clipPath: "inset(0 100% 0 0)" },
+        { opacity: 1, filter: "blur(0px)", clipPath: "inset(0 0% 0 0)", duration: 1.45, ease: "power3.out", onComplete: () => gsap.set(".ct-watermark", { clearProps: "transform" }) },
+        0
+      );
 
       // Title
       tl.from(".ct-title", { y: 40, opacity: 0, duration: 0.9 }, 0.4);
@@ -336,55 +388,13 @@ export default function ContactPage() {
   };
 
   const contacts = [
-    {
-      icon: (
-        <svg viewBox="0 0 20 20" fill="none" className="ct-card-icon">
-          <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="1.3"/>
-          <path d="M2 6l8 5 8-5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-        </svg>
-      ),
-      label: "Email us",
-      value: "contact@ietebits.com",
-      href: "mailto:contact@ietebits.com",
-      copyText: "contact@ietebits.com",
-      detailLabel: "GENERAL ENQUIRIES",
-      description: "For questions about IETE-SF, events, and collaborations.",
-      action: "Send an email",
-    },
-    {
-      icon: (
-        <svg viewBox="0 0 20 20" fill="none" className="ct-card-icon">
-          <path d="M5.5 2h3l1.5 4-2 1.5a10 10 0 004.5 4.5L14 10l4 1.5v3a2 2 0 01-2 2C8.5 16.5 3.5 11.5 3.5 4a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
-        </svg>
-      ),
-      label: "Call us",
-      value: "+91 9142040068",
-      href: "tel:+919142040068",
-      copyText: "+919142040068",
-      detailLabel: "DIRECT LINE",
-      description: "Speak with the IETE-SF BIT Sindri team by phone.",
-      action: "Call now",
-    },
-    {
-      icon: (
-        <svg viewBox="0 0 20 20" fill="none" className="ct-card-icon">
-          <path d="M10 11a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" strokeWidth="1.3"/>
-          <path d="M10 18s-6-4.35-6-9A6 6 0 0116 9c0 4.65-6 9-6 9z" stroke="currentColor" strokeWidth="1.3"/>
-        </svg>
-      ),
-      label: "Our location",
-      value: "BIT Sindri, Dhanbad, Jharkhand",
-      href: "https://maps.google.com/?q=BIT+Sindri+Dhanbad",
-      copyText: "BIT Sindri, Dhanbad, Jharkhand 828122",
-      external: true,
-      detailLabel: "VISIT THE FORUM",
-      description: "BIT Sindri, Dhanbad, Jharkhand 828122.",
-      action: "Get directions",
-    },
+    { kind: "general", icon: <Mail className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "GENERAL QUERIES", email: "contact@ietebits.com", phone: "+91 9142040066" },
+    { kind: "support", icon: <UsersRound className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "INDUCTIONS & SUPPORT", people: [{ name: "Aditya Raj", phone: "+91 9142040066" }, { name: "Amit Kumar Gupta", phone: "+91 6200983787" }] },
+    { kind: "location", icon: <MapPin className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "OUR LOCATION", location: "BIT Sindri, Dhanbad, Jharkhand, India — 828122", href: "https://maps.google.com/?q=BIT+Sindri+Dhanbad" },
   ];
 
   return (
-    <main className={`ct-page${hoveredCard !== null ? " ct-has-expanded-contact" : ""}`}>
+    <main className={`ct-page${hoveredCard !== null ? " ct-card-focus" : ""}`}>
       <style>{`
         /* ══════════ RESET & BASE ══════════ */
         .ct-page {
@@ -412,10 +422,9 @@ export default function ContactPage() {
         /* ══════════ HERO ══════════ */
         .ct-hero {
           position: relative;
-          display: flex;
-          align-items: center;
-          min-height: 100svh;
-          padding: 120px 7vw 80px;
+          box-sizing: border-box;
+          min-height: 118svh;
+          padding: 135px 7vw clamp(100px, 12vh, 136px);
           overflow: hidden;
         }
 
@@ -423,22 +432,22 @@ export default function ContactPage() {
           position: absolute;
           inset: 0;
           z-index: 40;
-          background: rgba(2, 4, 10, .74);
-          backdrop-filter: blur(4px);
+          background: rgba(2, 4, 10, .24);
+          backdrop-filter: blur(5px);
           opacity: 0;
           pointer-events: none;
           transition: opacity .32s ease;
         }
-        .ct-page.ct-has-expanded-contact .ct-focus-backdrop { opacity: 1; }
-        .ct-page.ct-has-expanded-contact .ct-grid { z-index: 51; }
-        .ct-page.ct-has-expanded-contact .ct-left > :not(.ct-cards),
-        .ct-page.ct-has-expanded-contact .ct-card:not(.is-expanded),
-        .ct-page.ct-has-expanded-contact .ct-form-wrap,
-        .ct-page.ct-has-expanded-contact > nav,
-        .ct-page.ct-has-expanded-contact > .iete-footer {
-          filter: blur(3px);
-          opacity: .24;
-          transition: filter .2s ease, opacity .2s ease;
+        .ct-page.ct-card-focus .ct-focus-backdrop { opacity: 1; }
+        .ct-page.ct-card-focus .ct-grid { z-index: 51; }
+        .ct-page.ct-card-focus > nav,
+        .ct-page.ct-card-focus .ct-left > :not(.ct-cards),
+        .ct-page.ct-card-focus .ct-card:not(.is-focused),
+        .ct-page.ct-card-focus .ct-form-wrap,
+        .ct-page.ct-card-focus > .iete-footer {
+          filter: blur(4px);
+          opacity: .2;
+          transition: filter .24s ease, opacity .24s ease;
         }
 
         /* Background glow — top center, very subtle */
@@ -457,25 +466,72 @@ export default function ContactPage() {
 
         /* Watermark */
         .ct-watermark {
-          position: absolute;
-          top: 8%;
-          right: 3%;
-          font-family: Georgia, 'Times New Roman', serif;
-          font-size: clamp(100px, 14vw, 220px);
-          font-weight: 700;
-          letter-spacing: -.04em;
-          color: transparent;
-          background: linear-gradient(120deg, rgba(139,176,242,.16), rgba(87,125,200,.045));
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          -webkit-text-stroke: 1px rgba(139,176,242,.19);
-          filter: drop-shadow(0 0 42px rgba(66,111,201,.12));
+          position: relative;
+          display: block;
+          top: auto;
+          left: auto;
+          right: auto;
+          transform: none !important;
+          width: 100%;
+          max-width: 100%;
+          margin: 0 auto 20px;
+          white-space: nowrap;
+          text-align: center;
+          font-family: "Arial Black", Arial, Helvetica, sans-serif;
+          font-size: clamp(72px, 12vw, 180px);
+          font-weight: 900;
+          letter-spacing: -.05em;
+          color: rgba(43, 65, 103, .22);
+          -webkit-text-stroke: 1px rgba(82, 112, 160, .06);
+          filter: none;
+          opacity: 1;
           user-select: none;
           pointer-events: none;
           z-index: 0;
-          line-height: 1;
+          line-height: .8;
         }
+        .ct-watermark-word {
+          position: relative;
+          display: inline-block;
+          isolation: isolate;
+          pointer-events: auto;
+          cursor: crosshair;
+          transition: color .25s ease, text-shadow .25s ease;
+        }
+        .ct-watermark-word::before,
+        .ct-watermark-word::after {
+          content: attr(data-text);
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity .28s ease;
+        }
+        .ct-watermark-word::after {
+          z-index: 1;
+          color: transparent;
+          -webkit-text-fill-color: transparent;
+          background: radial-gradient(ellipse 150px 90px at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(226,237,255,.62), rgba(143,177,240,.25) 42%, transparent 76%);
+          background-clip: text;
+          -webkit-background-clip: text;
+        }
+        .ct-watermark-word.is-hovered {
+          text-shadow: 0 0 14px rgba(132,164,223,.1);
+        }
+        .ct-watermark-word.is-hovered::after { opacity: .8; }
+        .ct-watermark-dot {
+          position: absolute;
+          display: block;
+          width: var(--dot-size, 2px);
+          height: var(--dot-size, 2px);
+          border-radius: 50%;
+          background: #b9ceff;
+          box-shadow: 0 0 8px 1px rgba(119,158,245,.38);
+          opacity: .2;
+          pointer-events: none;
+          transition: opacity .35s ease;
+        }
+        .ct-watermark-word.is-hovered ~ .ct-watermark-dot { filter: brightness(1.35); }
 
         /* Particle canvas */
         .ct-particles {
@@ -501,37 +557,14 @@ export default function ContactPage() {
         }
 
         /* ══════════ LEFT ══════════ */
-        .ct-left { display: flex; flex-direction: column; padding-top: 16px; }
-
-        .ct-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          width: fit-content;
-          padding: 6px 14px 6px 10px;
-          border: 1px solid var(--border);
-          border-radius: 100px;
-          background: var(--card);
-          color: var(--gray);
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: .04em;
-          margin-bottom: 24px;
-        }
-        .ct-badge-dot {
-          width: 6px; height: 6px;
-          border-radius: 50%;
-          background: var(--accent);
-          box-shadow: 0 0 8px var(--accent);
-          animation: ct-pulse 3s ease-in-out infinite;
-        }
+        .ct-left { display: flex; flex-direction: column; padding-top: 4px; }
 
         .ct-title {
           margin: 0;
           font-family: Arial, Helvetica, sans-serif;
-          font-size: clamp(42px, 5.2vw, 64px);
+          font-size: clamp(36px, 3.35vw, 48px);
           font-weight: 600;
-          letter-spacing: -.065em;
+          letter-spacing: -.055em;
           line-height: 1.05;
           color: #f4f5f8;
         }
@@ -547,125 +580,116 @@ export default function ContactPage() {
 
         .ct-sub {
           max-width: 380px;
-          margin: 16px 0 32px;
+          margin: 12px 0 24px;
           color: var(--gray);
           font-size: 13px;
           line-height: 1.7;
         }
 
         /* ══════════ CONTACT CARDS ══════════ */
-        .ct-cards { display: flex; flex-direction: column; gap: 10px; }
+        .ct-cards { position: relative; display: flex; flex-direction: column; gap: 12px; perspective: 1000px; }
 
         .ct-card {
           box-sizing: border-box;
           position: relative;
           z-index: 0;
           display: grid;
-          grid-template-columns: auto minmax(0, 1fr) auto;
+          grid-template-columns: 40px minmax(0, 1fr) auto;
           align-items: center;
-          gap: 14px;
-          height: 68px;
-          padding: 14px 16px;
+          gap: 13px;
+          min-height: 76px;
+          padding: 13px 15px;
           border: 1px solid var(--border);
           border-radius: 12px;
           background: rgba(13,17,32,.92);
-          overflow: hidden;
-          transition: height .3s cubic-bezier(.22,1,.36,1), scale .28s cubic-bezier(.22,1,.36,1), border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
-          cursor: default;
+          overflow: visible;
+          transform-style: preserve-3d;
+          will-change: transform;
+          transition: border-color .2s ease, background-color .2s ease;
+          cursor: pointer;
         }
         .ct-card:hover {
           border-color: #30374a;
           background-color: #0d1221;
         }
-        .ct-card.is-expanded {
-          z-index: 2;
-          height: 208px;
-          scale: 1.025;
-          will-change: height, scale;
-          border-color: #424b61;
-          border-radius: 15px;
-          background: #0d1221;
-          box-shadow: 0 18px 42px rgba(0,0,0,.62);
-        }
+        .ct-card.is-focused { border-color: #52607a; background: #0e1422; }
 
         .ct-card-icon {
-          width: 18px;
-          height: 18px;
-          color: var(--accent);
+          display: grid;
+          width: 38px;
+          height: 38px;
+          padding: 9px;
+          box-sizing: border-box;
+          border: 1px solid rgba(169,184,214,.14);
+          border-radius: 10px;
+          background: rgba(255,255,255,.035);
+          color: #c8d1e0;
           flex-shrink: 0;
-          opacity: .7;
-          transition: opacity .3s;
         }
-        .ct-card.is-expanded .ct-card-icon { opacity: 1; }
 
         .ct-card-body {
           display: flex;
           flex-direction: column;
-          gap: 1px;
+          gap: 5px;
           min-width: 0;
           flex: 1;
         }
-        .ct-card-label {
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--white);
-          letter-spacing: .01em;
-        }
-        .ct-card-value {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .ct-card-value a {
-          color: var(--gray);
-          font-size: 11.5px;
-          text-decoration: none;
-          transition: color .25s;
-        }
-        .ct-card.is-expanded .ct-card-value a { color: #e4e7ee; }
-
-        .ct-card-details {
-          grid-column: 1 / -1;
+        .ct-card-label { color: #e3e7ef; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
+        .ct-card-hint { color: #858d9d; font-size: 11px; line-height: 1.4; }
+        .ct-card-detail {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          right: 0;
           display: grid;
-          grid-template-columns: 1fr auto;
-          align-items: end;
-          gap: 10px 20px;
-          padding-top: 14px;
-          border-top: 1px solid rgba(169,184,214,.12);
-          animation: ct-detail-reveal .38s cubic-bezier(.2,.75,.25,1) both;
+          gap: 10px;
+          padding: 15px 16px;
+          border: 1px solid rgba(153,174,211,.2);
+          border-radius: 12px;
+          background: rgba(10,14,25,.97);
+          box-shadow: 0 20px 46px rgba(0,0,0,.44);
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-7px) scale(.985);
+          transform-origin: top center;
+          transition: opacity .22s ease, transform .28s cubic-bezier(.2,.8,.2,1), visibility .22s;
+          pointer-events: none;
         }
-        .ct-card-detail-label {
-          grid-column: 1 / -1;
-          color: #9da8bd;
-          font-size: 9px;
-          font-weight: 700;
-          letter-spacing: .16em;
+        .ct-card.is-focused .ct-card-detail {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0) scale(1);
+          pointer-events: auto;
         }
-        .ct-card-details p {
-          max-width: 370px;
-          margin: 0;
-          color: #c1c6d1;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 14px;
-          letter-spacing: -.01em;
-          line-height: 1.55;
-        }
-        .ct-card-action {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 10px;
-          border: 1px solid rgba(169,184,214,.17);
-          border-radius: 7px;
-          color: #e1e5ee;
-          font-size: 10px;
-          font-weight: 600;
-          text-decoration: none;
-          white-space: nowrap;
-          transition: background .2s ease, border-color .2s ease;
-        }
-        .ct-card-action:hover { border-color: rgba(169,184,214,.38); background: rgba(255,255,255,.04); }
-
+        .ct-detail-caption { color: #78849a; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
+        .ct-detail-line { display: flex; align-items: center; gap: 9px; min-width: 0; color: #c5ccda; font-size: 12px; line-height: 1.5; }
+        .ct-detail-line svg { flex: 0 0 auto; color: #a8b8d4; }
+        .ct-detail-line a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+        .ct-detail-line a:hover { color: #f1f3f8; }
+        .ct-detail-people { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+        .ct-detail-person { display: grid; gap: 5px; min-width: 0; }
+        .ct-detail-person + .ct-detail-person { border-left: 1px solid rgba(169,184,214,.16); padding-left: 12px; }
+        .ct-detail-person strong { color: #e3e7ef; font-size: 12px; font-weight: 600; }
+        .ct-detail-person a { color: #aab3c2; font-size: 11px; text-decoration: none; }
+        .ct-card.is-focused .ct-card-arrow { color: #edf1f7; }
+        .ct-card-arrow { transition: color .2s ease, border-color .2s ease, background .2s ease; }
+        .ct-card.is-focused .ct-card-arrow { border-color: rgba(169,184,214,.28); background: rgba(255,255,255,.08); }
+        .ct-card-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .ct-meta-item { display: flex; min-width: 0; align-items: center; gap: 7px; color: #9ba4b4; font-size: 11px; line-height: 1.45; }
+        .ct-meta-item a { min-width: 0; color: #9ba4b4; text-decoration: none; overflow-wrap: anywhere; }
+        .ct-meta-item a:hover { color: #eef2f9; }
+        .ct-meta-item svg { flex: 0 0 auto; color: #9fb7dd; }
+        .ct-support-inline { display: flex; align-items: center; gap: 13px; }
+        .ct-support-entry { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+        .ct-support-entry strong { color: #e5e9f1; font-size: 11px; font-weight: 600; }
+        .ct-support-entry a { color: #9ba4b4; font-size: 10.5px; text-decoration: none; white-space: nowrap; }
+        .ct-support-entry a:hover { color: #eef2f9; }
+        .ct-support-entry + .ct-support-entry { padding-left: 13px; border-left: 1px solid rgba(169,184,214,.16); }
+        .ct-location-text { color: #a5adbb; font-size: 11px; line-height: 1.45; text-decoration: none; }
+        .ct-location-text:hover { color: #eef2f9; }
+        .ct-card-arrow { display: grid; width: 27px; height: 27px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(169,184,214,.12); border-radius: 50%; color: #c0c7d3; background: rgba(255,255,255,.04); }
+        .ct-card-arrow svg { transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+        .ct-card.is-focused .ct-card-arrow svg { transform: translate(1px,-1px); }
         .ct-copy {
           display: grid;
           width: 24px; height: 24px;
@@ -876,42 +900,31 @@ export default function ContactPage() {
         }
 
         /* ══════════ KEYFRAMES ══════════ */
-        @keyframes ct-pulse {
-          0%, 100% { box-shadow: 0 0 8px var(--accent); }
-          50% { box-shadow: 0 0 16px var(--accent), 0 0 4px var(--accent); }
-        }
         @keyframes ct-haze {
           from { opacity: .65; transform: translateX(-50%) scale(.94); }
           to { opacity: 1; transform: translateX(-50%) scale(1.06); }
         }
-        @keyframes ct-detail-reveal {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
 
         /* ══════════ RESPONSIVE ══════════ */
         @media (max-width: 900px) {
-          .ct-hero { min-height: auto; padding: 110px 6vw 60px; }
+          .ct-hero { min-height: 110svh; padding: 135px 6vw 100px; }
           .ct-grid { grid-template-columns: 1fr; max-width: 560px; gap: 36px; }
-          .ct-watermark { font-size: clamp(60px, 18vw, 140px); top: 5%; right: 0; }
+          .ct-watermark { font-size: clamp(58px, 15vw, 132px); }
           .ct-glow { width: 500px; height: 350px; }
         }
         @media (max-width: 560px) {
-          .ct-hero { padding: 100px 5vw 50px; }
+          .ct-hero { min-height: 108svh; padding: 135px 5vw 80px; }
           .ct-grid { gap: 28px; }
-          .ct-title { font-size: clamp(36px, 12vw, 52px); }
+          .ct-title { font-size: clamp(34px, 10vw, 44px); }
           .ct-form-card { border-radius: 13px; }
           .ct-form-head { padding: 18px 18px 14px; }
           .ct-form-body { padding: 16px 18px 20px; }
-          .ct-card { padding: 12px 14px; }
+          .ct-card { padding: 11px 12px; }
           .ct-bot { width: 27px !important; height: 27px !important; }
-          .ct-card.is-expanded {
-            height: 236px;
-            scale: 1.01;
-            will-change: height, scale;
-          }
-          .ct-card-details { grid-template-columns: 1fr; gap: 10px; }
-          .ct-card-action { justify-self: start; }
+          .ct-support-inline { gap: 8px; }
+          .ct-support-entry + .ct-support-entry { padding-left: 8px; }
+          .ct-card-meta { grid-template-columns: 1fr; gap: 5px; }
+          .ct-card-detail { padding: 13px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ct-page *, .ct-page *::before, .ct-page *::after {
@@ -919,6 +932,8 @@ export default function ContactPage() {
             transition-duration: .01ms !important;
           }
           .ct-particles { display: none; }
+          .ct-watermark-dot { transition: none; }
+          .ct-watermark-word.is-hovered::after { opacity: 0; }
         }
       `}</style>
 
@@ -928,17 +943,35 @@ export default function ContactPage() {
         <div className="ct-focus-backdrop" aria-hidden="true" />
         {/* Background elements */}
         <div className="ct-glow" />
-        <span className="ct-watermark">CONTACT</span>
+        <span className="ct-watermark" aria-hidden="true">
+          <span
+            className="ct-watermark-word"
+            data-text="CONTACT"
+            onPointerEnter={animateWatermark}
+            onPointerMove={updateWatermarkPointer}
+            onPointerLeave={resetWatermark}
+          >
+            CONTACT
+          </span>
+          {WATERMARK_PARTICLE_POSITIONS.map(([left, top], index) => (
+            <i
+              className="ct-watermark-dot"
+              key={`watermark-dot-${index}`}
+              ref={(node) => { watermarkDotsRef.current[index] = node; }}
+              style={{
+                left: `${left}%`,
+                top: `${top}px`,
+                "--dot-index": index,
+                "--dot-size": `${index % 5 === 0 ? 3 : index % 3 === 0 ? 2.5 : 2}px`,
+              }}
+            />
+          ))}
+        </span>
         <ParticleField />
 
         <div className="ct-grid">
           {/* ─── LEFT ─── */}
           <div className="ct-left">
-            <div className="ct-badge">
-              <span className="ct-badge-dot" />
-              Contact
-            </div>
-
             <h1
               className="ct-title"
               ref={titleRef}
@@ -958,49 +991,69 @@ export default function ContactPage() {
 
             <div className="ct-cards">
               {contacts.map((c, i) => (
-                <div
-                  key={c.label}
-                  className={`ct-card${hoveredCard === i ? " is-expanded" : ""}`}
-                  onMouseEnter={() => setHoveredCard(i)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onFocus={() => setHoveredCard(i)}
-                  onBlur={(event) => {
-                    if (!event.currentTarget.contains(event.relatedTarget)) setHoveredCard(null);
-                  }}
+                <article
+                  key={c.kind}
+                  ref={(node) => { contactCardRefs.current[i] = node; }}
+                  className={`ct-card${hoveredCard === i ? " is-focused" : ""}`}
+                  onMouseEnter={() => { setHoveredCard(i); animateContactCard(i, true); }}
+                  onMouseLeave={() => { setHoveredCard(null); animateContactCard(i, false); }}
+                  onFocus={() => { setHoveredCard(i); animateContactCard(i, true); }}
                   onClick={(event) => {
-                    if (event.target.closest("a, button")) return;
-                    setHoveredCard((active) => active === i ? null : i);
+                    if (event.target.closest("a")) return;
+                    if (window.matchMedia("(hover: hover)").matches) return;
+                    const next = hoveredCard === i ? null : i;
+                    setHoveredCard(next);
+                    animateContactCard(i, next === i);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      const next = hoveredCard === i ? null : i;
+                      setHoveredCard(next);
+                      animateContactCard(i, next === i);
+                    }
+                  }}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                      setHoveredCard(null);
+                      animateContactCard(i, false);
+                    }
                   }}
                   tabIndex={0}
                   aria-expanded={hoveredCard === i}
+                  aria-label={`${c.label} contact details`}
                 >
                   {c.icon}
                   <div className="ct-card-body">
                     <span className="ct-card-label">{c.label}</span>
-                    <div className="ct-card-value">
-                      <a
-                        href={c.href}
-                        {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      >
-                        {c.value}
-                      </a>
-                    </div>
+                    <span className="ct-card-hint">
+                      {c.kind === "general" ? "Email and phone" : c.kind === "support" ? "Help with inductions and support" : "BIT Sindri"}
+                    </span>
                   </div>
-                  <CopyButton text={c.copyText} />
-                  {hoveredCard === i && (
-                    <div className="ct-card-details">
-                      <span className="ct-card-detail-label">{c.detailLabel}</span>
-                      <p>{c.description}</p>
-                      <a
-                        className="ct-card-action"
-                        href={c.href}
-                        {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      >
-                        {c.action}<ArrowUpRight size={14} strokeWidth={1.8} />
-                      </a>
-                    </div>
-                  )}
-                </div>
+                  <span className="ct-card-arrow" aria-hidden="true"><ArrowUpRight size={15} strokeWidth={1.8} /></span>
+                  <div className="ct-card-detail">
+                    <span className="ct-detail-caption">{c.kind === "general" ? "GENERAL QUERIES" : c.kind === "support" ? "INDUCTIONS & SUPPORT" : "OUR LOCATION"}</span>
+                    {c.kind === "general" && (
+                      <>
+                        <div className="ct-detail-line"><Mail size={14} /><a href={`mailto:${c.email}`}>{c.email}</a></div>
+                        <div className="ct-detail-line"><Phone size={14} /><a href={`tel:${c.phone.replaceAll(" ", "")}`}>{c.phone}</a></div>
+                      </>
+                    )}
+                    {c.kind === "support" && (
+                      <div className="ct-detail-people">
+                        {c.people.map((person) => (
+                          <div className="ct-detail-person" key={person.name}>
+                            <strong>{person.name}</strong>
+                            <a href={`tel:${person.phone.replaceAll(" ", "")}`}>{person.phone}</a>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {c.kind === "location" && (
+                      <div className="ct-detail-line"><MapPin size={14} /><a href={c.href} target="_blank" rel="noopener noreferrer">{c.location}</a></div>
+                    )}
+                  </div>
+                </article>
               ))}
             </div>
 
