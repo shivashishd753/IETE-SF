@@ -376,39 +376,203 @@
 //   );
 // }
 
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import IntroLoader from "./components/introloader";
+// import Navbar from "./components/navbar";
+// import Footer from "./components/footer";
+// import WeeklyCube from "./components/weeklycube";
+
+// export default function Home() {
+//   const [logoOpacity, setLogoOpacity] = useState(1);
+
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       const fadeStart = 80;
+//       const fadeDistance = 400;
+
+//       const progress = Math.min(
+//         Math.max((window.scrollY - fadeStart) / fadeDistance, 0),
+//         1
+//       );
+
+//       setLogoOpacity(1 - progress);
+//     };
+
+//     window.addEventListener("scroll", handleScroll, {
+//       passive: true,
+//     });
+
+//     handleScroll();
+
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
+
+//   return (
+//     <>
+//       <IntroLoader />
+
+//       <main
+//         id="home"
+//         className="min-h-screen overflow-x-clip bg-[#070B18] text-white"
+//       >
+//         <Navbar />
+
+//         {/* Tech Udbhav + Join Us buttons */}
+//         <div className="absolute left-1/2 top-[125px] z-40 mt-5 flex -translate-x-1/2 items-center gap-3 sm:gap-5">
+//           {[
+//             {
+//               label: "Tech Udbhav",
+//               href: "https://techudbhav.ietebit.com/",
+//             },
+//             {
+//               label: "Join Us",
+//               href: "https://iete-induction-26.vercel.app/",
+//             },
+//           ].map((item) => (
+//             <a
+//               key={item.label}
+//               href={item.href}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="group relative flex items-center gap-4 rounded-xl border border-violet-400/40 bg-[#0B0B19]/85 px-4 py-3 shadow-[0_0_18px_rgba(139,92,246,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/70 hover:shadow-[0_0_24px_rgba(34,211,238,0.18)] sm:px-5"
+//             >
+//               <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.8)] transition-shadow group-hover:shadow-[0_0_15px_rgba(103,232,249,1)]" />
+
+//               <span className="whitespace-nowrap text-sm font-semibold tracking-wide text-white transition-colors group-hover:text-cyan-200">
+//                 {item.label}
+//               </span>
+
+//               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-base text-violet-200 transition-all duration-300 group-hover:translate-x-0.5 group-hover:border-cyan-300/40 group-hover:bg-cyan-300/10 group-hover:text-cyan-200">
+//                 ↗
+//               </span>
+//             </a>
+//           ))}
+//         </div>
+
+//         {/* Hero Section */}
+//         <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-12 pt-36">
+//           {/* Dark navy background with subtle blue lighting */}
+//           <div
+//             className="pointer-events-none absolute inset-0 z-0"
+//             style={{
+//               background: `
+//                 radial-gradient(
+//                   ellipse at 50% 43%,
+//                   rgba(15, 91, 220, 0.20) 0%,
+//                   rgba(12, 39, 91, 0.13) 30%,
+//                   transparent 62%
+//                 ),
+//                 radial-gradient(
+//                   ellipse at 50% 100%,
+//                   rgba(13, 53, 115, 0.14) 0%,
+//                   transparent 55%
+//                 ),
+//                 linear-gradient(
+//                   135deg,
+//                   #0b1020 0%,
+//                   #070b17 48%,
+//                   #03050b 100%
+//                 )
+//               `,
+//             }}
+//           />
+
+//           {/* Subtle technical grid */}
+//           <div
+//             className="pointer-events-none absolute inset-0 z-0"
+//             style={{
+//               backgroundImage: `
+//                 linear-gradient(rgba(82, 137, 220, 0.035) 1px, transparent 1px),
+//                 linear-gradient(90deg, rgba(82, 137, 220, 0.035) 1px, transparent 1px)
+//               `,
+//               backgroundSize: "64px 64px",
+//               maskImage:
+//                 "radial-gradient(ellipse at center, black 0%, transparent 78%)",
+//               WebkitMaskImage:
+//                 "radial-gradient(ellipse at center, black 0%, transparent 78%)",
+//             }}
+//           />
+
+//           {/* Existing rotating pyramid */}
+//           <div
+//             className="pointer-events-none fixed left-1/2 top-[17vh] z-20 w-full max-w-[min(76vw,520px)] -translate-x-1/2"
+//             style={{
+//               opacity: logoOpacity,
+//               transition: "opacity 80ms linear",
+//               willChange: "opacity",
+//             }}
+//           >
+//             <div className="relative">
+//               <div className="absolute left-1/2 top-1/2 -z-10 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/20 blur-[90px] sm:h-[420px] sm:w-[420px]" />
+
+//               {/* <IetePyramid /> */}
+//             </div>
+//           </div>
+
+//           {/* Keeps space for the pyramid */}
+//           <div
+//             className="h-[460px] w-full max-w-[min(76vw,520px)]"
+//             aria-hidden="true"
+//           />
+
+//           {/* IETE-SF title */}
+//           <div className="relative z-30 -mt-5 text-center sm:-mt-8">
+//             <h1 className="text-4xl font-black uppercase tracking-[0.18em] text-white sm:text-6xl sm:tracking-[0.24em]">
+//               IETE-SF
+//             </h1>
+
+//             <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-32" />
+
+//             <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.3em] text-slate-400 sm:text-xs sm:tracking-[0.4em]">
+//               Students’ Forum · BIT Sindri
+//             </p>
+//           </div>
+//         </section>
+
+//         {/* Weekly Segment */}
+        
+//         <section
+//           id="weekly-segment"
+//           className="relative z-30 mx-auto w-full max-w-6xl px-6 py-20 sm:py-28"
+//         >
+//           <div className="text-center">
+//             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300">
+//               Discover · Learn · Grow
+//             </p>
+
+//             <h2 className="mt-5 text-3xl font-semibold tracking-wide text-white sm:text-5xl">
+//               Weekly Segment
+//             </h2>
+
+//             <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
+
+//             <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+//               Fresh ideas, technology insights, and knowledge worth sharing.
+//             </p>
+//           </div>
+
+//           {/* Weekly segment content can be added here */}
+//         </section>
+// <WeeklyCube />
+
+//         {/* Footer */}
+//         <Footer />
+//       </main>
+//     </>
+//   );
+// }
+
+
 "use client";
 
-import { useState, useEffect } from "react";
 import IntroLoader from "./components/introloader";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import WeeklyCube from "./components/weeklycube";
 
 export default function Home() {
-  const [logoOpacity, setLogoOpacity] = useState(1);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const fadeStart = 80;
-      const fadeDistance = 400;
-
-      const progress = Math.min(
-        Math.max((window.scrollY - fadeStart) / fadeDistance, 0),
-        1
-      );
-
-      setLogoOpacity(1 - progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
-
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <>
       <IntroLoader />
@@ -452,28 +616,24 @@ export default function Home() {
         </div>
 
         {/* Hero Section */}
-        <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-12 pt-36">
-          {/* Dark navy background with subtle blue lighting */}
+        <section className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-48 text-center">
+
+          {/* Background */}
           <div
-            className="pointer-events-none absolute inset-0 z-0"
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10"
             style={{
               background: `
                 radial-gradient(
-                  ellipse at 50% 43%,
-                  rgba(15, 91, 220, 0.20) 0%,
-                  rgba(12, 39, 91, 0.13) 30%,
-                  transparent 62%
-                ),
-                radial-gradient(
-                  ellipse at 50% 100%,
-                  rgba(13, 53, 115, 0.14) 0%,
-                  transparent 55%
+                  ellipse at 50% 45%,
+                  rgba(30, 48, 80, 0.20) 0%,
+                  transparent 65%
                 ),
                 linear-gradient(
-                  135deg,
-                  #0b1020 0%,
-                  #070b17 48%,
-                  #03050b 100%
+                  145deg,
+                  #0b0e16 0%,
+                  #080b13 55%,
+                  #05070c 100%
                 )
               `,
             }}
@@ -481,58 +641,58 @@ export default function Home() {
 
           {/* Subtle technical grid */}
           <div
-            className="pointer-events-none absolute inset-0 z-0"
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12]"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(82, 137, 220, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(82, 137, 220, 0.035) 1px, transparent 1px)
+                linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px)
               `,
-              backgroundSize: "64px 64px",
+              backgroundSize: "72px 72px",
               maskImage:
-                "radial-gradient(ellipse at center, black 0%, transparent 78%)",
+                "radial-gradient(ellipse at center, black, transparent 75%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse at center, black 0%, transparent 78%)",
+                "radial-gradient(ellipse at center, black, transparent 75%)",
             }}
           />
 
-          {/* Existing rotating pyramid */}
-          <div
-            className="pointer-events-none fixed left-1/2 top-[17vh] z-20 w-full max-w-[min(76vw,520px)] -translate-x-1/2"
-            style={{
-              opacity: logoOpacity,
-              transition: "opacity 80ms linear",
-              willChange: "opacity",
-            }}
-          >
-            <div className="relative">
-              <div className="absolute left-1/2 top-1/2 -z-10 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/20 blur-[90px] sm:h-[420px] sm:w-[420px]" />
+          <div className="relative z-10 mx-auto max-w-5xl">
 
-              {/* <IetePyramid /> */}
+            {/* Forum identity */}
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/[0.09] bg-white/[0.025] px-4 py-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+
+              <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-slate-400 sm:text-xs">
+                IETE Students’ Forum · BIT Sindri
+              </span>
             </div>
-          </div>
 
-          {/* Keeps space for the pyramid */}
-          <div
-            className="h-[460px] w-full max-w-[min(76vw,520px)]"
-            aria-hidden="true"
-          />
-
-          {/* IETE-SF title */}
-          <div className="relative z-30 -mt-5 text-center sm:-mt-8">
-            <h1 className="text-4xl font-black uppercase tracking-[0.18em] text-white sm:text-6xl sm:tracking-[0.24em]">
-              IETE-SF
+            {/* Main heading */}
+            <h1 className="mt-9 text-[clamp(3.5rem,11vw,8rem)] font-semibold leading-[0.95] tracking-[-0.075em] text-white">
+              IETE<span className="text-slate-500">-</span>SF
             </h1>
 
-            <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent sm:w-32" />
+            <div className="mx-auto mt-7 h-px w-20 bg-gradient-to-r from-transparent via-slate-400/60 to-transparent" />
 
-            <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.3em] text-slate-400 sm:text-xs sm:tracking-[0.4em]">
-              Students’ Forum · BIT Sindri
+            {/* Introduction */}
+            <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-slate-200 sm:text-2xl">
+              A community driven by technology, ideas, and innovation.
             </p>
+
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+              Explore new possibilities, learn together, and turn curiosity
+              into meaningful experiences.
+            </p>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-9 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-[9px] font-medium uppercase tracking-[0.3em] text-slate-500">
+            <span>Scroll to explore</span>
+            <span className="text-base">↓</span>
           </div>
         </section>
 
         {/* Weekly Segment */}
-        
         <section
           id="weekly-segment"
           className="relative z-30 mx-auto w-full max-w-6xl px-6 py-20 sm:py-28"
@@ -555,9 +715,9 @@ export default function Home() {
 
           {/* Weekly segment content can be added here */}
         </section>
-<WeeklyCube />
 
-        {/* Footer */}
+        <WeeklyCube />
+
         <Footer />
       </main>
     </>

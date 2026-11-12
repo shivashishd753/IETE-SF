@@ -855,3 +855,161 @@ h6 {
 }
 
 
+/* IETE Four Pillars — continuous signal */
+
+.iete-signal-window {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 7%,
+    #000 93%,
+    transparent
+  );
+}
+
+.iete-signal-track {
+  display: flex;
+  width: max-content;
+  animation: ieteSignalTraverse 42s linear infinite;
+  will-change: transform;
+}
+
+.iete-signal-run {
+  position: relative;
+  flex: 0 0 max(100vw, 1440px);
+  width: max(100vw, 1440px);
+  height: 245px;
+}
+
+.iete-signal-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 160px;
+  overflow: visible;
+}
+
+.iete-signal-base {
+  stroke: rgba(155, 177, 207, 0.38);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iete-signal-pulse {
+  stroke: #91B2DF;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.045 0.955;
+  animation: ieteSignalPulse 8s linear infinite;
+}
+
+.iete-signal-node {
+  position: absolute;
+  top: 72px;
+  display: flex;
+  width: 25%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.iete-signal-marker {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  margin-top: -29px;
+  place-items: center;
+  border: 1px solid rgba(164, 184, 214, 0.46);
+  border-radius: 50%;
+  background: #0D121B;
+  color: #B7CDEB;
+  box-shadow: 0 0 0 9px rgba(9, 13, 19, 0.85);
+  transition: border-color 250ms ease, background 250ms ease;
+}
+
+.iete-signal-number {
+  margin-top: 17px;
+  color: #91A9C8;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+}
+
+.iete-signal-title {
+  margin-top: 8px;
+  color: #B9D0F1;
+  font-size: clamp(16px, 1.55vw, 23px);
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.iete-signal-stage {
+  margin-top: 8px;
+  color: #8995A7;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+}
+
+@keyframes ieteSignalTraverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes ieteSignalPulse {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@media (hover: hover) {
+  .iete-signal-node:hover .iete-signal-marker {
+    border-color: rgba(180, 202, 233, 0.9);
+    background: #18263A;
+  }
+
+  .iete-signal-node:hover .iete-signal-title {
+    color: #E1EDFF;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iete-signal-track,
+  .iete-signal-pulse {
+    animation: none;
+  }
+
+  .iete-signal-track {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .iete-signal-run {
+    flex-basis: 1280px;
+    width: 1280px;
+  }
+
+  .iete-signal-title {
+    font-size: 17px;
+  }
+
+  .iete-signal-marker {
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+  }
+}
+
+
