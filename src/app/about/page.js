@@ -1564,6 +1564,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import dynamic from "next/dynamic";
 
 import {
   Layers3,
@@ -1583,9 +1584,6 @@ import {
    CONFIGURATION
 ═══════════════════════════════════════════ */
 
-// Set this to the exact path of your existing SVG inside public/.
-// Example: "/images/india-centres.svg"
-const INDIA_MAP_SRC = "/india-glowing-map.svg";
 
 /* ═══════════════════════════════════════════
    SCROLL REVEAL
@@ -1986,18 +1984,112 @@ function InteractiveStatCard({
 //   );
 // }
 
+const IETE_CENTRES = [
+  ["Agra", 27.1767, 78.0081],
+  ["Ahmedabad", 23.0225, 72.5714],
+  ["Aligarh", 27.8974, 78.088],
+  ["Allahabad", 25.4358, 81.8463],
+  ["Ambala", 30.3782, 76.7767],
+  ["Amravati", 20.9374, 77.7796],
+  ["Aurangabad", 19.8762, 75.3433],
+  ["Bangalore", 12.9716, 77.5946],
+  ["Bhopal", 23.2599, 77.4126],
+  ["Bhubaneswar", 20.2961, 85.8245],
+  ["Burdwan", 23.2324, 87.8615],
+  ["Chandigarh", 30.7333, 76.7794],
+  ["Chennai", 13.0827, 80.2707],
+  ["Coimbatore", 11.0168, 76.9558],
+  ["Dehradun", 30.3165, 78.0322],
+  ["Delhi", 28.6139, 77.209],
+  ["Dharwad", 15.4589, 75.0078],
+  ["Erode", 11.341, 77.7172],
+  ["Goa", 15.4909, 73.8278],
+  ["Guwahati", 26.1445, 91.7362],
+  ["Gwalior", 26.2183, 78.1828],
+  ["Hyderabad", 17.385, 78.4867],
+  ["Imphal", 24.817, 93.9368],
+  ["Indore", 22.7196, 75.8577],
+  ["Jabalpur", 23.1815, 79.9864],
+  ["Jaipur", 26.9124, 75.7873],
+  ["Jalandhar", 31.326, 75.5762],
+  ["Jammu", 32.7266, 74.857],
+  ["Kakinada", 16.9891, 82.2475],
+  ["Kalaburagi", 17.3297, 76.8343],
+  ["Kanpur", 26.4499, 80.3319],
+  ["Kathmandu", 27.7172, 85.324],
+  ["Kochi", 9.9312, 76.2673],
+  ["Kolkata", 22.5726, 88.3639],
+  ["Kozhikode", 11.2588, 75.7804],
+  ["Lucknow", 26.8467, 80.9462],
+  ["Mankapur", 27.03, 82.23],
+  ["Mhow", 22.557, 75.756],
+  ["Mumbai", 19.076, 72.8777],
+  ["Mysore", 12.2958, 76.6394],
+  ["Nagpur", 21.1458, 79.0882],
+  ["Nashik", 19.9975, 73.7898],
+  ["Navi Mumbai", 19.033, 73.0297],
+  ["Noida", 28.5355, 77.391],
+  ["Palakkad", 10.7867, 76.6548],
+  ["Patna", 25.5941, 85.1376],
+  ["Pilani", 28.367, 75.603],
+  ["Pune", 18.5204, 73.8567],
+  ["Raipur", 21.2514, 81.6296],
+  ["Rajkot", 22.3039, 70.8022],
+  ["Ranchi", 23.3441, 85.3096],
+  ["Shimla", 31.1048, 77.1734],
+  ["Shimoga", 13.9299, 75.5681],
+  ["Sivakasi", 9.4533, 77.8024],
+  ["Surat", 21.1702, 72.8311],
+  ["Thiruvananthapuram", 8.5241, 76.9366],
+  ["Tirupati", 13.6288, 79.4192],
+  ["Vadodara", 22.3072, 73.1812],
+  ["Varanasi", 25.3176, 82.9739],
+  ["Vijayawada", 16.5062, 80.648],
+  ["Visakhapatnam", 17.6868, 83.2185],
+  ["Warangal", 17.9689, 79.5941],
+  ["Yavatmal", 20.3888, 78.1204],
+];
+
+
+const IETE_DIRECTORY = "https://www.iete.org/iete-centres-2/";
+
 function GlowingIndiaMap() {
   return (
-    <div className="relative mx-auto flex min-h-[360px] w-full max-w-[720px] items-center justify-center sm:min-h-[500px]">
-      <img
-        src={INDIA_MAP_SRC}
-        alt="Glowing map of India showing IETE centres"
-        loading="eager"
-        className="block h-auto max-h-[650px] w-full object-contain opacity-100"
-      />
+    <div className="relative mx-auto w-full max-w-4xl">
+      <div className="relative aspect-[4/5] w-full">
+        <img
+          src="/india-glowing-map.svg"
+          alt="IETE centres across India"
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+
+        {IETE_CENTRES.map(([name, lat, lon]) => {
+          const x = ((lon - 68) / 29.5) * 100;
+          const y = ((35.5 - lat) / 29) * 100;
+
+          return (
+            <a
+              key={name}
+              href={IETE_DIRECTORY}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open IETE ${name} centre directory`}
+              title={`IETE ${name}`}
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+              }}
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+            >
+              <span className="block h-3 w-3 rounded-full border-2 border-white bg-cyan-300 shadow-[0_0_14px_5px_rgba(56,189,248,0.8)] transition-transform duration-200 hover:scale-150" />
+            </a>
+          );
+        })}
+      </div>
     </div>
   );
 }
+
 
 /* ═══════════════════════════════════════════
    FOUR PILLARS — CONTINUOUS SIGNAL
@@ -2232,13 +2324,20 @@ export default function AboutPage() {
   ];
 
   const nationwideStats = [
+    // {
+    //   Icon: Globe,
+    //   target: 64,
+    //   suffix: "+",
+    //   label: "Centres Across India",
+    //   sublabel: "Active chapters & sub-centres",
+    // },
     {
-      Icon: Globe,
-      target: 64,
-      suffix: "+",
-      label: "Centres Across India",
-      sublabel: "Active chapters & sub-centres",
-    },
+  Icon: Globe,
+  target: 63,
+  suffix: "",
+  label: "IETE Centres",
+  sublabel: "Across India and abroad",
+},
     {
       Icon: Users,
       target: 125000,

@@ -1,4 +1,4 @@
-
+import ChangePasswordForm from "@/app/components/change-password-form";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -113,26 +113,24 @@ export default async function SettingsPage() {
           </div>
 
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5 sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-3 text-slate-300">
-                  <KeyRound size={20} />
-                </div>
+           <div>
+  <div className="flex items-start gap-4">
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-3 text-slate-300">
+      <KeyRound size={20} />
+    </div>
 
-                <div>
-                  <p className="text-sm font-medium text-white">
-                    Password
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">
-                    Keep your account secure with a strong password.
-                  </p>
-                </div>
-              </div>
+    <div>
+      <p className="text-sm font-medium text-white">
+        Change Password
+      </p>
+      <p className="mt-1 text-xs leading-5 text-slate-500">
+        Update your account password securely.
+      </p>
+    </div>
+  </div>
 
-              <span className="w-fit rounded-lg border border-white/[0.08] px-3 py-2 text-xs text-slate-400">
-                Password management
-              </span>
-            </div>
+  <ChangePasswordForm />
+</div>
           </div>
         </section>
 
