@@ -1,7 +1,6 @@
-
 "use client";
 
-import { Orbitron, Rajdhani } from "next/font/google";
+import { Orbitron, Rajdhani, Space_Grotesk } from "next/font/google";
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
@@ -14,10 +13,26 @@ const rajdhani = Rajdhani({
   weight: ["400", "500", "600", "700"],
 });
 
-import { useEffect, useRef, useState } from "react";
+// Used only for member names, roles and branches.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
+});
+
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowUpRight,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+/* ------------------------------------------------------------------ */
+/*  DATA (unchanged)                                                   */
+/* ------------------------------------------------------------------ */
 
 const directors = [
   { name: "Adarsh Kumar", role: "Board of Directors", branch: "Electrical Engineering", image: "/Images/Adarsh.jpg", linkedin: "https://www.linkedin.com/in/adarsh-kumar-abb0a3259/" },
@@ -71,6 +86,9 @@ const nextGen = [
   { name: "Rimisha Kumari", branch: "Information Technology", image: "/Images/rimisha.png", linkedin: "https://www.linkedin.com/in/rimisha-kumari-67a2ba334/" },
   { name: "Shashank Gupta", branch: "Mechanical Engineering", image: "/Images/shashank.jpg", linkedin: "https://www.linkedin.com/in/shashank-gupta-230489338/" },
 ];
+
+// Kept for later (the 2k25 batch was commented out in the original page).
+// eslint-disable-next-line no-unused-vars
 const nextGen2 = [
   { name: "Angel Priya", branch: "Metallurgical Engineering", image: "/Images/angel.png", linkedin: "https://www.linkedin.com/in/angel-p-a86374372/" },
   { name: "Ankit Kumar", branch: "Electrical Engineering", image: "/Images/ankit.png", linkedin: "https://www.linkedin.com/in/ankit-kumar-863260231/" },
@@ -86,8 +104,15 @@ const nextGen2 = [
   { name: "Siddharth Mishra", branch: "Cyber Security", image: "/Images/sid.png", linkedin: "https://www.linkedin.com/in/siddharth-mishra-a5486b317/" },
   { name: "Shivashish Dwivedi", branch: "Electronics and Communication", image: "/Images/shiva.png", linkedin: "https://www.linkedin.com/in/shivashish-dwivedi-028723321/" },
   { name: "Shiwani Shah", branch: "Electronics and Communication", image: "/Images/shiwani.png", linkedin: "https://www.linkedin.com/in/shiwani-shah-b31964384/" },
-  { name: "Soumya Sinha", branch: "Information Technology", image: "/Images/soumya.jpg", linkedin: "https://www.linkedin.com/in/-soumya-sinha/" }
-  ];
+  { name: "Soumya Sinha", branch: "Information Technology", image: "/Images/soumya.jpg", linkedin: "https://www.linkedin.com/in/-soumya-sinha/" },
+];
+
+/* Links that point to the LinkedIn 404 page are treated as "no link". */
+const hasLink = (m) => Boolean(m.linkedin) && !m.linkedin.includes("/404");
+
+/* ------------------------------------------------------------------ */
+/*  HERO BACKGROUND (unchanged)                                        */
+/* ------------------------------------------------------------------ */
 
 function NetworkBackground() {
   const canvasRef = useRef(null);
@@ -301,6 +326,9 @@ function NetworkBackground() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  SECTION HEADING (unchanged)                                        */
+/* ------------------------------------------------------------------ */
 
 function SectionHeading({ eyebrow, title, description }) {
   const headingRef = useRef(null);
@@ -379,94 +407,390 @@ function SectionHeading({ eyebrow, title, description }) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  SHARED PIECES                                                      */
+/* ------------------------------------------------------------------ */
 
 
+function Portrait({ member, className = "", eager = false }) {
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef(null);
+  const initials = member.name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("");
 
-function MemberCard({ member }) {
-  return (
-    <article className="member-card group relative overflow-hidden rounded-xl border border-white/15 bg-[#0B1220]">
-      <div className="relative aspect-[4/3.8] overflow-hidden">
-        <img
-          src={member.image}
-          alt={member.name}
-          loading="lazy"
-          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-        />
+  // Catches images that failed before React hydrated (onError never fires for those).
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050914] via-[#050914]/15 to-transparent" />
-
-        {member.role && (
-          <span className="absolute left-2 top-2 rounded-full border border-cyan-300/30 bg-black/55 px-2 py-1 text-[8px] font-bold uppercase tracking-wide text-cyan-200 backdrop-blur-md">
-            {member.role}
-          </span>
-        )}
-
-        {member.linkedin && (
-          <a
-            href={member.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Open ${member.name}'s LinkedIn profile`}
-            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:border-cyan-300 hover:bg-cyan-300 hover:text-black"
-          >
-            <ArrowUpRight size={14} />
-          </a>
-        )}
-
-        <div className="absolute bottom-0 left-0 right-0 p-3">
-          <div className="mb-1.5 h-px w-7 bg-cyan-300 transition-all duration-300 group-hover:w-12" />
-
-          <h3 className="text-base font-bold text-white sm:text-lg">
-            {member.name}
-          </h3>
-
-          <p className="mt-1 text-[10px] leading-4 text-slate-300 sm:text-[11px]">
-            {member.branch}
-          </p>
-        </div>
+  if (failed) {
+    return (
+      <div
+        className={`portrait-fallback flex items-center justify-center ${className}`}
+      >
+        <span>{initials}</span>
       </div>
+    );
+  }
 
-      {member.domain && (
-        <div className="flex items-center justify-between gap-2 border-t border-white/10 px-3 py-2.5">
-          <span className="text-[10px] text-slate-300 sm:text-[11px]">
-            {member.domain}
-          </span>
-
-          <ArrowUpRight
-            size={14}
-            className="shrink-0 text-cyan-300 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
-          />
-        </div>
-      )}
-    </article>
+  return (
+    <img
+      ref={imgRef}
+      src={member.image}
+      alt={member.name}
+      loading={eager ? "eager" : "lazy"}
+      draggable={false}
+      onError={() => setFailed(true)}
+      className={`object-cover object-center ${className}`}
+    />
   );
 }
 
+function LinkedInButton({ member, compact = false }) {
+  if (!hasLink(member)) return null;
+  return (
+    <a
+      href={member.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Open ${member.name}'s LinkedIn profile`}
+      className={compact ? "icon-link" : "cta-link"}
+    >
+      {!compact && <span>LinkedIn</span>}
+      <ArrowUpRight size={compact ? 16 : 15} />
+    </a>
+  );
+}
 
+/* ------------------------------------------------------------------ */
+/*  THE DRUM — used for every team                                     */
+/*  Each team sits on a 3D rotating ring that fits in one screen.      */
+/*  Scrolling up/down moves through the page as normal; scrolling      */
+/*  sideways (trackpad / shift + wheel), dragging, swiping, the arrow  */
+/*  keys or the arrow buttons turn the ring. Whoever faces you is lit  */
+/*  up and their details appear underneath automatically.             */
+/* ------------------------------------------------------------------ */
 
-export default function MembersPage() {
-  const [search, setSearch] = useState("");
+const mod = (a, n) => ((a % n) + n) % n;
+const PX_PER_MEMBER = 140; // sideways scroll distance that turns one person
 
-  const matchesSearch = (member) =>
-    `${member.name} ${member.branch} ${member.domain || ""}`
-      .toLowerCase()
-      .includes(search.toLowerCase());
+function MemberDrum({ id, title, description, members, showRole = false }) {
+  const sectionRef = useRef(null);
+  const stageRef = useRef(null);
+  const drumRef = useRef(null);
+  const cardRefs = useRef([]);
+  const posRef = useRef(0);
+  const targetRef = useRef(0);
+  const rafRef = useRef(0);
+  const loopRef = useRef(null);
+  const activeRef = useRef(-1);
+  const dragRef = useRef(null);
+  const draggedRef = useRef(false);
+  const snapTimer = useRef(0);
+  const [active, setActive] = useState(0);
+  const [stage, setStage] = useState({ w: 1280, h: 460 });
 
-  const filteredDirectors = directors.filter(matchesSearch);
-  const filteredOBearers = OBearers.filter(matchesSearch);
-  const filterednextGen = nextGen.filter(matchesSearch);
-  const filterednextGen2 = nextGen2.filter(matchesSearch);
+  const n = members.length;
+  const step = n > 0 ? 360 / n : 0;
+  const tanStep = Math.tan(Math.PI / Math.max(3, n));
+  const isSmall = stage.w < 640;
+  const byHeight = (stage.h - 56) / 1.32;
+  const byWidth = (2 * stage.w * (isSmall ? 1.3 : 0.64) * tanStep) / 1.08;
+  const cardW = Math.round(
+    Math.max(120, Math.min(340, byHeight, byWidth, stage.w * (isSmall ? 0.62 : 0.58)))
+  );
+  const cardH = Math.round(cardW * 1.32);
+  const radius =
+    n >= 3
+      ? Math.round((cardW / 2 / tanStep) * 1.08)
+      : Math.round(cardW * 0.9);
+  const perspective = Math.round(Math.max(1100, radius * 2.6));
+  cardRefs.current.length = n;
+
+  // Measure the space the ring is allowed to use so everything fits on screen.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const update = () => setStage({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const apply = useCallback(
+    (pos) => {
+      const drum = drumRef.current;
+      if (!drum || n === 0) return;
+      const angle = pos * step;
+      // The tilt pushes the front card down by radius·sin(6°); lift it back to centre.
+      const lift = radius * Math.sin((6 * Math.PI) / 180);
+      drum.style.transform = `translateY(${-lift}px) translateZ(${-radius}px) rotateX(-6deg) rotateY(${-angle}deg)`;
+
+      cardRefs.current.forEach((card, i) => {
+        if (!card) return;
+        const rel = ((((i * step - angle) % 360) + 540) % 360) - 180;
+        const facing = Math.cos((rel * Math.PI) / 180);
+        card.style.setProperty("--focus", (Math.max(0, facing) ** 3).toFixed(3));
+      });
+
+      const index = mod(Math.round(pos), n);
+      if (index !== activeRef.current) {
+        activeRef.current = index;
+        setActive(index);
+      }
+    },
+    [n, step, radius]
+  );
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const tick = () => {
+      const diff = targetRef.current - posRef.current;
+      posRef.current =
+        reduceMotion || Math.abs(diff) < 0.0005
+          ? targetRef.current
+          : posRef.current + diff * 0.13;
+      apply(posRef.current);
+      rafRef.current =
+        posRef.current === targetRef.current ? 0 : requestAnimationFrame(tick);
+    };
+    loopRef.current = () => {
+      if (!rafRef.current) rafRef.current = requestAnimationFrame(tick);
+    };
+    activeRef.current = -1;
+    apply(posRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    };
+  }, [apply]);
+
+  const goTo = useCallback((t) => {
+    targetRef.current = t;
+    loopRef.current?.();
+  }, []);
+
+  const shift = (by) => goTo(Math.round(targetRef.current) + by);
+
+  const jumpTo = (i) => {
+    const cur = Math.round(targetRef.current);
+    let d = mod(i - cur, n);
+    if (d > n / 2) d -= n;
+    goTo(cur + d);
+  };
+
+  // Sideways scrolling turns the ring; up/down scrolling is left to the page.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || n === 0) return;
+    const onWheel = (e) => {
+      let dx = e.deltaX;
+      if (e.shiftKey && Math.abs(dx) < 1) dx = e.deltaY;
+      const sideways = e.shiftKey || Math.abs(dx) > Math.abs(e.deltaY);
+      if (!sideways || Math.abs(dx) < 0.5) return;
+      e.preventDefault();
+      const px = e.deltaMode === 1 ? dx * 32 : e.deltaMode === 2 ? dx * 400 : dx;
+      goTo(targetRef.current + px / PX_PER_MEMBER);
+      clearTimeout(snapTimer.current);
+      snapTimer.current = setTimeout(
+        () => goTo(Math.round(targetRef.current)),
+        140
+      );
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      clearTimeout(snapTimer.current);
+    };
+  }, [n, goTo]);
+
+  // Drag (mouse) or swipe (touch) sideways to turn the ring.
+  const onPointerDown = (e) => {
+    if (e.button !== 0) return;
+    draggedRef.current = false;
+    dragRef.current = {
+      x: e.clientX,
+      start: targetRef.current,
+      moved: false,
+      lastX: e.clientX,
+      lastT: performance.now(),
+      v: 0,
+    };
+  };
+
+  const onPointerMove = (e) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const dx = e.clientX - d.x;
+    if (!d.moved) {
+      if (Math.abs(dx) < 6) return;
+      d.moved = true;
+      draggedRef.current = true;
+      stageRef.current?.setPointerCapture?.(e.pointerId);
+    }
+    const now = performance.now();
+    const dt = Math.max(1, now - d.lastT);
+    d.v = 0.8 * ((e.clientX - d.lastX) / dt) + 0.2 * d.v;
+    d.lastX = e.clientX;
+    d.lastT = now;
+    goTo(d.start - dx / (cardW * 0.9));
+  };
+
+  const onPointerUp = () => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!d || !d.moved) return;
+    const fling = Math.max(-3, Math.min(3, (-d.v * 160) / (cardW * 0.9)));
+    goTo(Math.round(targetRef.current + fling));
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      shift(1);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      shift(-1);
+    }
+  };
+
+  if (n === 0) return null;
+  const currentIndex = Math.min(active, n - 1);
+  const current = members[currentIndex];
 
   return (
+    <section
+      ref={sectionRef}
+      id={id}
+      className="drum-section border-t border-white/[0.07]"
+    >
+      <div aria-hidden="true" className="starfield" />
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8">
+        <SectionHeading title={title} description={description} />
+      </div>
+
+      <div
+        ref={stageRef}
+        className="drum-stage"
+        tabIndex={0}
+        role="group"
+        aria-roledescription="carousel"
+        aria-label={`${title}: use the left and right arrow keys to turn`}
+        onKeyDown={onKeyDown}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{ perspective: `${perspective}px` }}
+      >
+        <div
+          ref={drumRef}
+          className="drum"
+          style={{ width: cardW, height: cardH }}
+        >
+          <div
+            aria-hidden="true"
+            className="drum-floor"
+            style={{
+              width: radius * 2 + cardW,
+              height: radius * 2 + cardW,
+              marginLeft: -(radius + cardW / 2),
+              marginTop: -(radius + cardW / 2),
+              transform: `translateY(${cardH / 2 + 22}px) rotateX(90deg)`,
+            }}
+          />
+
+          {members.map((member, i) => (
+            <div
+              key={member.name}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+              onClick={() => {
+                if (!draggedRef.current) jumpTo(i);
+              }}
+              className={`drum-card ${i === currentIndex ? "is-active" : ""}`}
+              style={{
+                width: cardW,
+                height: cardH,
+                transform: `rotateY(${i * step}deg) translateZ(${radius}px)`,
+              }}
+            >
+              <div className="drum-face">
+                <Portrait member={member} className="drum-photo h-full w-full" eager />
+                <div className="drum-face-shade" />
+                <p className="drum-caption">{member.name}</p>
+              </div>
+              <div aria-hidden="true" className="drum-back" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="drum-info relative z-10 mx-auto w-full max-w-4xl px-5 sm:px-8">
+        <div className="drum-info-row">
+          <button
+            type="button"
+            className="drum-arrow"
+            aria-label="Previous member"
+            onClick={() => shift(-1)}
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          <div key={current.name} className="drum-info-inner" aria-live="polite">
+            {showRole && current.role && (
+              <p className="drum-role">{current.role}</p>
+            )}
+            <h3 className="drum-name">{current.name}</h3>
+            <div className="drum-meta">
+              <span className="drum-branch">{current.branch}</span>
+              <LinkedInButton member={current} compact />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="drum-arrow"
+            aria-label="Next member"
+            onClick={() => shift(1)}
+          >
+            <ChevronRight size={22} />
+          </button>
+        </div>
+
+        <p className="drum-hint">
+          <span className="hint-fine">Scroll sideways, drag or use the arrows to spin</span>
+          <span className="hint-touch">Swipe sideways to spin</span>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  PAGE                                                               */
+/* ------------------------------------------------------------------ */
+
+export default function MembersPage() {
+  return (
     <main
-  className={`${orbitron.variable} ${rajdhani.variable} relative isolate min-h-screen overflow-x-clip bg-[#050812] text-white`}
->
+      className={`${orbitron.variable} ${rajdhani.variable} ${spaceGrotesk.variable} members-page relative isolate min-h-screen overflow-x-clip bg-[#050812] text-white`}
+    >
       <Navbar />
 
       <style>{`
         html {
           scroll-behavior: smooth;
-          scroll-padding-top: 110px;
+          scroll-padding-top: 0;
         }
 
         body {
@@ -474,57 +798,59 @@ export default function MembersPage() {
           background: #050812;
         }
 
+        .font-display {
+          font-family: var(--font-rajdhani), sans-serif;
+        }
 
-.section-title {
-  font-family: var(--font-orbitron), sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  text-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
-}
+        .section-title {
+          font-family: var(--font-orbitron), sans-serif;
+          font-weight: 700;
+          letter-spacing: 0.025em;
+          text-transform: uppercase;
+          text-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+        }
 
-.section-subtitle,
-.section-heading p {
-  font-family: var(--font-rajdhani), sans-serif;
-}
+        .section-subtitle,
+        .section-heading p {
+          font-family: var(--font-rajdhani), sans-serif;
+        }
 
-.section-hidden {
-  opacity: 0;
-  transform: translateY(18px);
-}
+        .section-hidden {
+          opacity: 0;
+          transform: translateY(18px);
+        }
 
-.section-fade-in {
-  animation: sectionFadeIn 0.7s ease-out both;
-}
+        .section-fade-in {
+          animation: sectionFadeIn 0.7s ease-out both;
+        }
 
-.description-delay {
-  animation-delay: 0.15s;
-}
+        .description-delay {
+          animation-delay: 0.15s;
+        }
 
-.typing-cursor {
-  display: inline-block;
-  margin-left: 3px;
-  color: #67e8f9;
-  animation: cursorBlink 0.7s steps(2, start) infinite;
-}
+        .typing-cursor {
+          display: inline-block;
+          margin-left: 3px;
+          color: #67e8f9;
+          animation: cursorBlink 0.7s steps(2, start) infinite;
+        }
 
-@keyframes sectionFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+        @keyframes sectionFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(18px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-@keyframes cursorBlink {
-  to {
-    visibility: hidden;
-  }
-}
-
+        @keyframes cursorBlink {
+          to {
+            visibility: hidden;
+          }
+        }
 
         .network-background-canvas {
           position: absolute;
@@ -534,19 +860,6 @@ export default function MembersPage() {
           height: 100%;
           pointer-events: none;
           z-index: 0;
-        }
-
-        .member-card {
-          transition:
-            transform 0.35s ease,
-            border-color 0.35s ease,
-            box-shadow 0.35s ease;
-        }
-
-        .member-card:hover {
-          transform: translateY(-6px);
-          border-color: rgba(34, 211, 238, 0.7);
-          box-shadow: 0 16px 45px rgba(8, 145, 178, 0.12);
         }
 
         @keyframes heroReveal {
@@ -572,6 +885,400 @@ export default function MembersPage() {
           animation-delay: 0.3s;
         }
 
+        /* ---------- navy theme for everything below the hero ---------- */
+        .members-page {
+          --navy-950: #050b22;
+          --navy-900: #071233;
+          --navy-850: #0a173f;
+          --navy-800: #0f1f4f;
+          --navy-line: rgba(148, 190, 255, 0.12);
+          --cyan: #67e8f9;
+          --cyan-strong: #22d3ee;
+          --nav-offset: 100px;
+          --font-member: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+        }
+
+        @media (max-width: 767px) {
+          .members-page {
+            --nav-offset: 84px;
+          }
+        }
+
+        .portrait-fallback {
+          background:
+            radial-gradient(circle at 30% 25%, rgba(103, 232, 249, 0.35), transparent 55%),
+            linear-gradient(160deg, #13286b, #081236);
+          color: #cffafe;
+          font-family: var(--font-orbitron), sans-serif;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          font-size: clamp(0.8rem, 2.4vw, 1.6rem);
+        }
+
+        .starfield {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background-image:
+            radial-gradient(1px 1px at 12px 24px, rgba(255, 255, 255, 0.55), transparent 60%),
+            radial-gradient(1px 1px at 90px 140px, rgba(186, 230, 253, 0.5), transparent 60%),
+            radial-gradient(1.5px 1.5px at 170px 70px, rgba(103, 232, 249, 0.55), transparent 60%),
+            radial-gradient(1px 1px at 230px 210px, rgba(255, 255, 255, 0.4), transparent 60%);
+          background-size: 260px 260px;
+          animation: twinkle 6s ease-in-out infinite;
+          opacity: 0.55;
+        }
+
+        @keyframes twinkle {
+          50% {
+            opacity: 0.25;
+          }
+        }
+
+        .cta-link {
+          display: inline-flex;
+          flex-shrink: 0;
+          align-items: center;
+          gap: 0.5rem;
+          border-radius: 999px;
+          border: 1px solid rgba(103, 232, 249, 0.4);
+          background: rgba(34, 211, 238, 0.06);
+          padding: 0.65rem 1.15rem;
+          font-family: var(--font-rajdhani), sans-serif;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #cffafe;
+          transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-link:hover {
+          background: var(--cyan);
+          color: var(--navy-950);
+          box-shadow: 0 0 30px rgba(103, 232, 249, 0.45);
+        }
+
+        .icon-link {
+          display: inline-flex;
+          height: 40px;
+          width: 40px;
+          flex-shrink: 0;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          border: 1px solid rgba(148, 190, 255, 0.25);
+          background: transparent;
+          color: #fff;
+          cursor: pointer;
+          transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .icon-link:hover {
+          background: var(--cyan);
+          border-color: var(--cyan);
+          color: var(--navy-950);
+        }
+
+        .cta-link:focus-visible,
+        .icon-link:focus-visible,
+        .drum-stage:focus-visible {
+          outline: 2px solid var(--cyan);
+          outline-offset: 3px;
+        }
+
+        /* ---------- THE DRUM (every team) ---------- */
+        .drum-section {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          height: 100svh;
+          min-height: 600px;
+          overflow: hidden;
+          padding: var(--nav-offset) 0 clamp(14px, 2.6vh, 30px);
+          background:
+            radial-gradient(ellipse at 50% 55%, rgba(8, 100, 160, 0.2), transparent 55%),
+            radial-gradient(ellipse at 20% 85%, rgba(14, 116, 144, 0.09), transparent 45%),
+            #050812;
+        }
+
+        .drum-section .section-heading {
+          margin-bottom: 0;
+        }
+
+        .drum-section .section-title {
+          font-size: clamp(1.5rem, 3.4vw, 2.6rem);
+        }
+
+        .drum-section .section-heading p:not(.section-subtitle) {
+          margin-top: 0.35rem;
+        }
+
+        .drum-stage {
+          position: relative;
+          z-index: 5;
+          display: flex;
+          flex: 1 1 0;
+          min-height: 0;
+          align-items: center;
+          justify-content: center;
+          cursor: grab;
+          touch-action: pan-y;
+          user-select: none;
+          -webkit-user-select: none;
+          outline: none;
+        }
+
+        .drum-stage:active {
+          cursor: grabbing;
+        }
+
+        .drum-stage:focus-visible .drum-card.is-active .drum-face {
+          outline: 2px solid var(--cyan);
+          outline-offset: 6px;
+        }
+
+        .drum {
+          position: relative;
+          transform-style: preserve-3d;
+          will-change: transform;
+        }
+
+        .drum-card {
+          position: absolute;
+          inset: 0;
+          cursor: pointer;
+          transform-style: preserve-3d;
+        }
+
+        .drum-face,
+        .drum-back {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          border-radius: 20px;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        .drum-face {
+          border: 1px solid rgba(148, 190, 255, 0.18);
+          background: var(--navy-800);
+          box-shadow: 0 20px 60px rgba(2, 6, 23, 0.6);
+          transition: border-color 0.4s, box-shadow 0.4s;
+        }
+
+        .drum-photo {
+          pointer-events: none;
+          filter: grayscale(calc(1 - var(--focus, 1))) brightness(calc(0.4 + 0.6 * var(--focus, 1)));
+        }
+
+        .drum-face-shade {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(5, 11, 34, 0.92), rgba(5, 11, 34, 0.1) 42%, transparent 65%);
+        }
+
+        .drum-caption {
+          position: absolute;
+          left: 14px;
+          right: 14px;
+          bottom: 12px;
+          margin: 0;
+          font-family: var(--font-member);
+          font-size: clamp(15px, 1.5vw, 19px);
+          font-weight: 700;
+          line-height: 1.1;
+          color: #fff;
+          text-shadow: 0 2px 12px rgba(2, 6, 23, 0.9);
+          opacity: calc(var(--focus, 1) * 0.9);
+        }
+
+        .drum-card.is-active .drum-caption {
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .drum-card.is-active .drum-face {
+          border-color: rgba(103, 232, 249, 0.85);
+          box-shadow:
+            0 0 0 1px rgba(103, 232, 249, 0.4),
+            0 0 60px rgba(34, 211, 238, 0.4),
+            0 30px 80px rgba(2, 6, 23, 0.7);
+        }
+
+        .drum-back {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: rotateY(180deg);
+          border: 1px solid rgba(148, 190, 255, 0.12);
+          background: linear-gradient(160deg, rgba(14, 40, 80, 0.5), rgba(5, 8, 18, 0.6));
+        }
+
+        .drum-floor {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          pointer-events: none;
+          border-radius: 50%;
+          border: 1px dashed rgba(103, 232, 249, 0.4);
+          background: radial-gradient(circle, rgba(34, 211, 238, 0.18), rgba(30, 64, 175, 0.1) 45%, transparent 70%);
+        }
+
+        .drum-floor::after {
+          content: "";
+          position: absolute;
+          inset: 14%;
+          border-radius: 50%;
+          border: 1px solid rgba(148, 190, 255, 0.14);
+        }
+
+        .drum-info {
+          flex: none;
+          padding-top: clamp(6px, 1.6vh, 16px);
+        }
+
+        .drum-info-row {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          align-items: center;
+          gap: clamp(10px, 3vw, 32px);
+        }
+
+        .drum-info-inner {
+          text-align: center;
+          animation: infoIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        @keyframes infoIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+            filter: blur(5px);
+          }
+          to {
+            opacity: 1;
+            transform: none;
+            filter: none;
+          }
+        }
+
+        .drum-role {
+          display: inline-flex;
+          max-width: 100%;
+          align-items: center;
+          gap: 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(103, 232, 249, 0.35);
+          background: rgba(34, 211, 238, 0.08);
+          padding: 5px 16px;
+          font-family: var(--font-member);
+          font-size: clamp(0.8rem, 1.3vw, 0.95rem);
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #cffafe;
+        }
+
+        .drum-name {
+          margin-top: 0.4rem;
+          font-family: var(--font-member);
+          font-size: clamp(1.9rem, 4.2vw, 3.3rem);
+          font-weight: 700;
+          line-height: 1.02;
+          letter-spacing: -0.01em;
+          color: transparent;
+          background: linear-gradient(180deg, #ffffff 35%, #a5f3fc);
+          -webkit-background-clip: text;
+          background-clip: text;
+          filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
+        }
+
+        .drum-meta {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 0.35rem;
+        }
+
+        .drum-branch {
+          font-family: var(--font-member);
+          font-size: clamp(1rem, 1.6vw, 1.2rem);
+          font-weight: 500;
+          letter-spacing: 0.01em;
+          color: #cbd5e1;
+        }
+
+        .drum-meta .icon-link {
+          height: 34px;
+          width: 34px;
+          border-color: rgba(103, 232, 249, 0.45);
+          color: var(--cyan);
+        }
+
+        .drum-arrow {
+          display: inline-flex;
+          height: 48px;
+          width: 48px;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          border: 1px solid rgba(103, 232, 249, 0.4);
+          background: rgba(5, 11, 34, 0.6);
+          color: var(--cyan);
+          cursor: pointer;
+          transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .drum-arrow:hover {
+          background: var(--cyan);
+          color: var(--navy-950);
+          box-shadow: 0 0 26px rgba(103, 232, 249, 0.5);
+        }
+
+        @media (max-width: 639px) {
+          .drum-arrow {
+            height: 40px;
+            width: 40px;
+          }
+        }
+
+        .drum-hint {
+          margin-top: 0.3rem;
+          text-align: center;
+          font-family: var(--font-rajdhani), sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: #64748b;
+        }
+
+        .hint-touch {
+          display: none;
+        }
+
+        @media (hover: none) {
+          .hint-fine {
+            display: none;
+          }
+          .hint-touch {
+            display: inline;
+          }
+        }
+
+        .drum-arrow:focus-visible {
+          outline: 2px solid var(--cyan);
+          outline-offset: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .starfield {
+            animation: none !important;
+          }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           *,
           *::before,
@@ -584,7 +1291,7 @@ export default function MembersPage() {
         }
       `}</style>
 
-      {/* HERO */}
+      {/* HERO (unchanged) */}
       <section
         id="members-home"
         className="relative isolate flex min-h-[100svh] w-full items-center justify-center overflow-hidden"
@@ -627,105 +1334,28 @@ export default function MembersPage() {
         </a>
       </section>
 
-      {/* BOARD OF DIRECTORS */}
-      <section
+      {/* Every team is shown on the same 3D drum */}
+      <MemberDrum
         id="directors"
-        className="relative scroll-mt-24 border-t border-white/[0.07] px-5 py-20 sm:px-8 md:py-28"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            title="Board of Directors"
-            description="Architects of the Vision"
-          />
+        title="Board of Directors"
+        description="Architects of the Vision"
+        members={directors}
+      />
 
-          {filteredDirectors.length > 0 ? (
-            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filteredDirectors.map((member) => (
-                <MemberCard key={member.name} member={member} />
-              ))}
-            </div>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-400">
-              No directors match your search.
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* OFFICE BEARERS */}
-      <section
+      <MemberDrum
         id="core-team"
-        className="relative scroll-mt-24 border-t border-white/[0.07] bg-[#080D19] px-5 py-20 sm:px-8 md:py-28"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            title="Office Bearers"
-            description="Leading the vision of IETE"
-          />
+        title="Office Bearers"
+        description="Leading the vision of IETE"
+        members={OBearers}
+        showRole
+      />
 
-          {filteredOBearers.length > 0 ? (
-            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filteredOBearers.map((member) => (
-                <MemberCard key={member.name} member={member} />
-              ))}
-            </div>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-400">
-              No core team members match your search.
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* NEXT GEN */}
-      <section
+      <MemberDrum
         id="next-gen"
-        className="relative scroll-mt-24 border-t border-white/[0.07] bg-[#080D19] px-5 py-20 sm:px-8 md:py-28"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            title="Next Gen"
-            description="The future of innovation"
-          />
-
-          {filterednextGen.length > 0 ? (
-            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filterednextGen.map((member) => (
-                <MemberCard key={member.name} member={member} />
-              ))}
-            </div>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-400">
-              No next-gen members match your search.
-            </p>
-          )}
-        </div>
-      </section>
-
-      {/* NEXT GEN - 2k25
-      <section
-        id="next-gen"
-        className="relative scroll-mt-24 border-t border-white/[0.07] bg-[#080D19] px-5 py-20 sm:px-8 md:py-28"
-      >
-        <div className="mx-auto max-w-7xl">
-          <SectionHeading
-            title="Next Gen"
-            description="The future of innovation"
-          />
-
-          {filterednextGen2.length > 0 ? (
-            <div className="grid grid-cols-1 gap-25 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filterednextGen2.map((member) => (
-                <MemberCard key={member.name} member={member} />
-              ))}
-            </div>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-400">
-              No next-gen members match your search.
-            </p>
-          )}
-        </div>
-      </section> */}
+        title="Next Gen"
+        description="The future of innovation"
+        members={nextGen}
+      />
 
       <Footer />
     </main>
