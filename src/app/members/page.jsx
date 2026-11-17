@@ -767,10 +767,10 @@ function MemberDrum({ id, title, description, members, showRole = false }) {
           </button>
         </div>
 
-        <p className="drum-hint">
+        {/* <p className="drum-hint">
           <span className="hint-fine">Scroll sideways, drag or use the arrows to spin</span>
           <span className="hint-touch">Swipe sideways to spin</span>
-        </p>
+        </p> */}
       </div>
     </section>
   );
@@ -1245,15 +1245,15 @@ export default function MembersPage() {
           }
         }
 
-        .drum-hint {
-          margin-top: 0.3rem;
-          text-align: center;
-          font-family: var(--font-rajdhani), sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: #64748b;
-        }
+        // .drum-hint {
+        //   margin-top: 0.3rem;
+        //   text-align: center;
+        //   font-family: var(--font-rajdhani), sans-serif;
+        //   font-size: 11px;
+        //   letter-spacing: 0.28em;
+        //   text-transform: uppercase;
+        //   color: #64748b;
+        // }
 
         .hint-touch {
           display: none;
@@ -1356,6 +1356,13 @@ export default function MembersPage() {
         description="The future of innovation"
         members={nextGen}
       />
+
+      {/* <MemberDrum
+        id="next-gen2"
+        title="Next Gen"
+        description="The future of innovation"
+        members={nextGen2}
+      /> */}
 
       <Footer />
     </main>
