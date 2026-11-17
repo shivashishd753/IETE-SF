@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import DomainsHero from "./DomainsHero";
 
 const DOMAINS = [
   {
@@ -602,7 +603,7 @@ export default function DomainsPage() {
   return (
     <>
       <Navbar />
-
+    <DomainsHero />
       <main className="domains-page">
         <style jsx global>{`
           @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap");
@@ -619,7 +620,7 @@ export default function DomainsPage() {
             height: 100vh;
             min-height: 600px;
             overflow: hidden;
-            background: #080808;
+            background: #060d1b;
             color: #fff;
           }
 
