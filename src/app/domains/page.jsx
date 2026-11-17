@@ -603,15 +603,15 @@ export default function DomainsPage() {
   return (
     <>
       <Navbar />
-    <DomainsHero />
+      <DomainsHero />
       <main className="domains-page">
-        <style jsx global>{`
+        <style>{`
           @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap");
 
           html,
           body {
             margin: 0;
-            background: #080808;
+            background: #070a0f;
           }
 
           .domains-page {
@@ -620,7 +620,19 @@ export default function DomainsPage() {
             height: 100vh;
             min-height: 600px;
             overflow: hidden;
-            background: #060d1b;
+            background:
+              radial-gradient(
+                ellipse at 50% 45%,
+                rgba(50, 75, 112, 0.17) 0%,
+                transparent 65%
+              ),
+              linear-gradient(
+                145deg,
+                #10141b 0%,
+                #090d14 54%,
+                #070a0f 100%
+              );
+            background-attachment: fixed;
             color: #fff;
           }
 

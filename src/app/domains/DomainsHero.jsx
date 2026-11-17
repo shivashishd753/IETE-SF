@@ -1,151 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
-const WORDS = [
-  "Competitive Programming",
-  "IoT & Robotics",
-  "AI & ML",
-  "Video Editing",
-  "Graphic Designing",
-  "Web Development",
-];
-
-const SPACING = 36; // distance between dots
-const RADIUS = 190; // cursor influence radius
+import { useRef } from "react";
 
 export default function DomainsHero() {
   const sectionRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  /* ---------------- animated background: living dot-field ---------------- */
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const section = sectionRef.current;
-    if (!canvas || !section) return;
-    const ctx = canvas.getContext("2d");
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-    let w = 0;
-    let h = 0;
-    let dpr = 1;
-    let dots = [];
-    let floaters = [];
-    let raf = 0;
-    const mouse = { x: -9999, y: -9999, active: false, tx: -9999, ty: -9999 };
-
-    const build = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = section.clientWidth;
-      h = section.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      dots = [];
-      const cols = Math.ceil(w / SPACING) + 1;
-      const rows = Math.ceil(h / SPACING) + 1;
-      const ox = (w - (cols - 1) * SPACING) / 2;
-      const oy = (h - (rows - 1) * SPACING) / 2;
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          dots.push({ bx: ox + c * SPACING, by: oy + r * SPACING });
-        }
-      }
-
-      floaters = WORDS.map((text, i) => ({
-        text,
-        x: Math.random() * w,
-        y: h * (0.12 + (i / WORDS.length) * 0.8),
-        speed: 8 + Math.random() * 10,
-        size: 12 + Math.random() * 4,
-      }));
-    };
-    build();
-
-    const onMove = (e) => {
-      const rect = section.getBoundingClientRect();
-      mouse.tx = e.clientX - rect.left;
-      mouse.ty = e.clientY - rect.top;
-      if (!mouse.active) {
-        mouse.x = mouse.tx;
-        mouse.y = mouse.ty;
-      }
-      mouse.active = true;
-    };
-    const onLeave = () => {
-      mouse.active = false;
-    };
-    section.addEventListener("pointermove", onMove);
-    section.addEventListener("pointerleave", onLeave);
-    const ro = new ResizeObserver(build);
-    ro.observe(section);
-
-    let t0 = performance.now();
-    const draw = (now) => {
-      const t = (now - t0) / 1000;
-
-      // when idle, a virtual pointer wanders so the field never feels dead
-      if (!mouse.active) {
-        mouse.tx = w * (0.5 + 0.32 * Math.sin(t * 0.45));
-        mouse.ty = h * (0.5 + 0.28 * Math.sin(t * 0.31 + 1.3));
-      }
-      mouse.x += (mouse.tx - mouse.x) * 0.08;
-      mouse.y += (mouse.ty - mouse.y) * 0.08;
-
-      ctx.clearRect(0, 0, w, h);
-
-      // floating domain names, drifting slowly behind the dots
-      ctx.textBaseline = "middle";
-      floaters.forEach((f) => {
-        f.x += f.speed * 0.016;
-        ctx.font = `400 ${f.size}px "Space Grotesk", Arial, sans-serif`;
-        const tw = ctx.measureText(f.text).width;
-        if (f.x > w + 20) f.x = -tw - 20;
-        ctx.fillStyle = "rgba(120,185,240,0.13)";
-        ctx.fillText(f.text.toUpperCase(), f.x, f.y);
-      });
-
-      // dots
-      for (let i = 0; i < dots.length; i++) {
-        const d = dots[i];
-        const wave =
-          Math.sin(d.bx * 0.012 + t * 0.9) * Math.cos(d.by * 0.012 + t * 0.7);
-        let x = d.bx;
-        let y = d.by + wave * 3;
-
-        const dx = d.bx - mouse.x;
-        const dy = d.by - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        let near = 0;
-        if (dist < RADIUS) {
-          near = 1 - dist / RADIUS;
-          const push = near * near * 34;
-          x += (dx / (dist || 1)) * push;
-          y += (dy / (dist || 1)) * push;
-        }
-
-        const alpha = 0.16 + near * 0.8 + (wave + 1) * 0.04;
-        const size = 1 + near * 2.2;
-        ctx.fillStyle = `rgba(110,200,245,${alpha})`;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      if (!reduced) raf = requestAnimationFrame(draw);
-    };
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      section.removeEventListener("pointermove", onMove);
-      section.removeEventListener("pointerleave", onLeave);
-    };
-  }, []);
 
   /* ---------------- scroll to the carousel section below ---------------- */
   const goDown = () => {
@@ -156,8 +14,26 @@ export default function DomainsHero() {
   };
 
   return (
-    <section ref={sectionRef} className="dh-hero">
-      <style jsx global>{`
+    <section
+      ref={sectionRef}
+      className="dh-hero"
+      style={{
+        background: `
+          radial-gradient(
+            ellipse at 50% 45%,
+            rgba(50, 75, 112, 0.17) 0%,
+            transparent 65%
+          ),
+          linear-gradient(
+            145deg,
+            #10141B 0%,
+            #090D14 54%,
+            #070A0F 100%
+          )
+        `,
+      }}
+    >
+      <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
 
         .dh-hero {
@@ -166,37 +42,12 @@ export default function DomainsHero() {
           height: 100vh;
           min-height: 600px;
           overflow: hidden;
-          background: radial-gradient(
-              ellipse at 50% 38%,
-              #001532 0%,
-              #000814 45%,
-              #060d1b 100%
-            );
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: center;
           text-align: center;
           font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
-        }
-
-        .dh-canvas {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-        }
-
-        .dh-vignette {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          pointer-events: none;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(7, 15, 30, 0.7) 0%,
-            rgba(7, 15, 30, 0.3) 45%,
-            rgba(7, 15, 30, 0) 75%
-          );
         }
 
         .dh-content {
@@ -283,7 +134,7 @@ export default function DomainsHero() {
           font-size: 12px;
           letter-spacing: 0.35em;
           opacity: 0;
-          animation: dh-rise 1s 1.3s forwards cubic-bezier(0.2, 0.7, 0.2, 1);
+          animation: dh-rise-cta 1s 1.3s forwards cubic-bezier(0.2, 0.7, 0.2, 1);
         }
 
         .dh-cta-ring {
@@ -333,20 +184,6 @@ export default function DomainsHero() {
             transform: translateY(0);
           }
         }
-        @keyframes dh-bob {
-          0%,
-          100% {
-            transform: translateY(-3px);
-          }
-          50% {
-            transform: translateY(4px);
-          }
-        }
-
-        /* keep the button centred while its rise animation runs */
-        .dh-cta {
-          animation-name: dh-rise-cta;
-        }
         @keyframes dh-rise-cta {
           from {
             opacity: 0;
@@ -355,6 +192,15 @@ export default function DomainsHero() {
           to {
             opacity: 1;
             transform: translate(-50%, 0);
+          }
+        }
+        @keyframes dh-bob {
+          0%,
+          100% {
+            transform: translateY(-3px);
+          }
+          50% {
+            transform: translateY(4px);
           }
         }
 
@@ -371,9 +217,6 @@ export default function DomainsHero() {
           }
         }
       `}</style>
-
-      <canvas ref={canvasRef} className="dh-canvas" />
-      <div className="dh-vignette" />
 
       <div className="dh-content">
         <span className="dh-eyebrow">/ WHAT WE DO</span>
