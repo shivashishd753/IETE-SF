@@ -219,7 +219,7 @@ export default function DomainsHero() {
       `}</style>
 
       <div className="dh-content">
-        <span className="dh-eyebrow">/ WHAT WE DO</span>
+       
         <h1 className="dh-title">
           <span className="dh-line">
             <span>Our Domains</span>

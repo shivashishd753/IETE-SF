@@ -1238,12 +1238,60 @@ export default function MembersPage() {
           box-shadow: 0 0 26px rgba(103, 232, 249, 0.5);
         }
 
-        @media (max-width: 639px) {
-          .drum-arrow {
-            height: 40px;
-            width: 40px;
-          }
-        }
+        
+@media (max-width: 639px) {
+  .drum-info-row {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .drum-info-inner {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 48px;
+    text-align: center;
+  }
+
+  .drum-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 38px;
+    width: 38px;
+    z-index: 5;
+  }
+
+  .drum-arrow:first-child {
+    left: 0;
+  }
+
+  .drum-arrow:last-child {
+    right: 0;
+  }
+
+  .drum-name {
+    text-align: center;
+    overflow-wrap: break-word;
+  }
+
+  .drum-meta {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .drum-branch {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+}
+
 
         // .drum-hint {
         //   margin-top: 0.3rem;
