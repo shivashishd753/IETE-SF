@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
@@ -82,6 +82,12 @@ const WHEEL_SPEED = 0.0016; // cards per wheel pixel
 const CHROMA = 0.032; // RGB split strength per card of lag
 const TILT = 0.035; // subtle pointer tilt (set 0 to disable)
 const SHOW_TEXT = true; // draw the domain text on each card
+const MOBILE_QUERY = "(max-width: 700px)";
+const TABLET_QUERY = "(max-width: 1100px)"; // phones also match; phone is checked first
+const CARD_ASPECT_MOBILE = 0.8; // card width / height on phones (smaller = taller card)
+const TEXT_SCALE_MOBILE = 2.6; // card text size on phones
+const CARD_ASPECT_TABLET = 1.15; // card width / height on tablets / iPads (smaller = taller card)
+const TEXT_SCALE_TABLET = 1.6; // card text size on tablets / iPads
 
 function wrap(value, length) {
   return ((value % length) + length) % length;
@@ -111,9 +117,10 @@ function setSpacing(ctx, px) {
   if ("letterSpacing" in ctx) ctx.letterSpacing = `${px}px`;
 }
 
-function drawOverlay(domain) {
+function drawOverlay(domain, aspect = CARD_ASPECT, s = 1) {
   const W = 1800;
-  const H = Math.round(W / CARD_ASPECT);
+  const H = Math.round(W / aspect);
+  const mobile = s > 1;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -123,7 +130,7 @@ function drawOverlay(domain) {
   // bottom shade
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, "rgba(0,0,0,0.05)");
-  g.addColorStop(0.38, "rgba(0,0,0,0.15)");
+  g.addColorStop(mobile ? 0.5 : 0.38, "rgba(0,0,0,0.15)");
   g.addColorStop(1, "rgba(0,0,0,0.8)");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
@@ -131,64 +138,73 @@ function drawOverlay(domain) {
   if (!SHOW_TEXT) return canvas;
 
   const font = `"Inter", "Helvetica Neue", Arial, sans-serif`;
-  const pad = 78;
+  const pad = mobile ? Math.round(78 + (s - 1) * 29.4) : 78;
+  const titleScale = mobile ? s * 0.78 : 1;
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "left";
 
   // number, top-left
   ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.font = `500 20px ${font}`;
-  setSpacing(ctx, 3.5);
-  ctx.fillText(`${domain.number} / ${String(TOTAL).padStart(2, "0")}`, pad, 72);
+  ctx.font = `500 ${20 * s}px ${font}`;
+  setSpacing(ctx, 3.5 * s);
+  ctx.fillText(
+    `${domain.number} / ${String(TOTAL).padStart(2, "0")}`,
+    pad,
+    mobile ? Math.round(72 + (s - 1) * 36.25) : 72
+  );
 
   // build from the bottom up
   let y = H - pad;
 
   // tags
-  ctx.font = `500 16px ${font}`;
-  setSpacing(ctx, 2.4);
+  ctx.font = `500 ${16 * s}px ${font}`;
+  setSpacing(ctx, 2.4 * s);
   let x = pad;
-  const tagH = 40;
+  const tagH = 40 * s;
   domain.tags.forEach((tag) => {
-    const w = ctx.measureText(tag).width + 28;
+    const w = ctx.measureText(tag).width + 28 * s;
     ctx.strokeStyle = "rgba(255,255,255,0.4)";
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.5 * s;
     ctx.strokeRect(x + 0.75, y - tagH + 0.75, w - 1.5, tagH - 1.5);
     ctx.fillStyle = "rgba(255,255,255,0.92)";
-    ctx.fillText(tag, x + 14, y - 14);
-    x += w + 12;
+    ctx.fillText(tag, x + 14 * s, y - 14 * s);
+    x += w + 12 * s;
   });
-  y -= tagH + 34;
+  y -= tagH + 34 * s;
 
   // description
-  ctx.font = `400 23px ${font}`;
+  ctx.font = `400 ${23 * s}px ${font}`;
   setSpacing(ctx, 0);
   ctx.fillStyle = "rgba(255,255,255,0.8)";
-  const descLines = wrapLines(ctx, domain.description, 900);
-  const lh = 40;
+  const descLines = wrapLines(ctx, domain.description, mobile ? W - pad * 2 : 900);
+  const lh = 40 * s;
   for (let i = descLines.length - 1; i >= 0; i--) {
     ctx.fillText(descLines[i], pad, y);
     y -= lh;
   }
-  y -= 22;
+  y -= 22 * s;
 
   // title
-  ctx.font = `500 104px ${font}`;
-  setSpacing(ctx, -5);
+  ctx.font = `500 ${104 * titleScale}px ${font}`;
+  setSpacing(ctx, -5 * titleScale);
   ctx.fillStyle = "#fff";
   ctx.shadowColor = "rgba(0,0,0,0.4)";
   ctx.shadowBlur = 30;
-  const titleLines = wrapLines(ctx, domain.name, W - pad * 2 - 160);
+  const titleLines = wrapLines(
+    ctx,
+    domain.name,
+    mobile ? W - pad * 2 : W - pad * 2 - 160
+  );
   for (let i = titleLines.length - 1; i >= 0; i--) {
     ctx.fillText(titleLines[i], pad, y);
-    y -= 104;
+    y -= 104 * titleScale;
   }
   ctx.shadowBlur = 0;
-  y -= 6;
+  y -= 6 * s;
 
   // eyebrow
-  ctx.font = `600 17px ${font}`;
-  setSpacing(ctx, 4);
+  ctx.font = `600 ${17 * s}px ${font}`;
+  setSpacing(ctx, 4 * s);
   ctx.fillStyle = "rgba(255,255,255,0.78)";
   ctx.fillText(domain.headline, pad, y);
 
@@ -247,8 +263,37 @@ export default function DomainsPage() {
   const stageRef = useRef(null);
   const nameRef = useRef(null);
   const fillRef = useRef(null);
+  const [tier, setTier] = useState(null); // "phone" | "tablet" | "desktop" (null until known)
+
+  // phones and tablets get a taller card, desktop keeps the wide card
+  useEffect(() => {
+    const phone = window.matchMedia(MOBILE_QUERY);
+    const tablet = window.matchMedia(TABLET_QUERY);
+    const update = () =>
+      setTier(phone.matches ? "phone" : tablet.matches ? "tablet" : "desktop");
+    update();
+    phone.addEventListener("change", update);
+    tablet.addEventListener("change", update);
+    return () => {
+      phone.removeEventListener("change", update);
+      tablet.removeEventListener("change", update);
+    };
+  }, []);
 
   useEffect(() => {
+    if (tier === null) return;
+    const cardAspect =
+      tier === "phone"
+        ? CARD_ASPECT_MOBILE
+        : tier === "tablet"
+        ? CARD_ASPECT_TABLET
+        : CARD_ASPECT;
+    const textScale =
+      tier === "phone"
+        ? TEXT_SCALE_MOBILE
+        : tier === "tablet"
+        ? TEXT_SCALE_TABLET
+        : 1;
     const container = stageRef.current;
     const nameHost = nameRef.current;
     const fillPath = fillRef.current;
@@ -270,7 +315,7 @@ export default function DomainsPage() {
     scene.add(tilt);
 
     const chord = 2 * Math.sin(CARD_ANGLE / 2);
-    const cardHeight = chord / CARD_ASPECT;
+    const cardHeight = chord / cardAspect;
     const geometry = new THREE.CylinderGeometry(
       1,
       1,
@@ -306,7 +351,9 @@ export default function DomainsPage() {
       videoTexture.magFilter = THREE.LinearFilter;
       videoTexture.generateMipmaps = false;
 
-      const textTexture = new THREE.CanvasTexture(drawOverlay(domain));
+      const textTexture = new THREE.CanvasTexture(
+        drawOverlay(domain, cardAspect, textScale)
+      );
       textTexture.anisotropy = maxAniso;
 
       const material = new THREE.ShaderMaterial({
@@ -317,7 +364,7 @@ export default function DomainsPage() {
           tVideo: { value: videoTexture },
           tText: { value: textTexture },
           uShift: { value: 0 },
-          uCardAspect: { value: CARD_ASPECT },
+          uCardAspect: { value: cardAspect },
           uVideoAspect: { value: 16 / 9 },
           uHasVideo: { value: 0 },
         },
@@ -357,8 +404,8 @@ export default function DomainsPage() {
 
       const fraction =
         aspect < 0.9
-          ? CENTER_WIDTH_MOBILE
-          : Math.min(CENTER_WIDTH, (MAX_HEIGHT * CARD_ASPECT) / aspect);
+          ? Math.min(CENTER_WIDTH_MOBILE, (MAX_HEIGHT * cardAspect) / aspect)
+          : Math.min(CENTER_WIDTH, (MAX_HEIGHT * cardAspect) / aspect);
       const tanH = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
       const distance = chord / (2 * tanH * aspect * fraction);
       camera.position.set(0, 0, 1 + distance);
@@ -598,7 +645,7 @@ export default function DomainsPage() {
       container.removeChild(renderer.domElement);
       container.removeChild(videoHost);
     };
-  }, []);
+  }, [tier]);
 
   return (
     <>
