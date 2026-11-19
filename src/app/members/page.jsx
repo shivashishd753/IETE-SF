@@ -1405,12 +1405,12 @@ export default function MembersPage() {
         members={nextGen}
       />
 
-      {/* <MemberDrum
+      <MemberDrum
         id="next-gen2"
         title="Next Gen"
         description="The future of innovation"
         members={nextGen2}
-      /> */}
+      />
 
       <Footer />
     </main>

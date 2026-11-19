@@ -2381,7 +2381,7 @@ export default function AboutPage() {
   target: 63,
   suffix: "",
   label: "IETE Centres",
-  sublabel: "Across India and abroad",
+  sublabel: "Across India",
 },
     {
       Icon: Users,

@@ -388,8 +388,8 @@ export default function ContactPage() {
   };
 
   const contacts = [
-    { kind: "general", icon: <Mail className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "GENERAL QUERIES", email: "contact@ietebits.com", phone: "+91 9142040066" },
-    { kind: "support", icon: <UsersRound className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "INDUCTIONS & SUPPORT", people: [{ name: "Aditya Raj", phone: "+91 9142040066" }, { name: "Amit Kumar Gupta", phone: "+91 6200983787" }] },
+    { kind: "general", icon: <Mail className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "GENERAL QUERIES", email: "contact@ietebits.com", phone: "+91 8987475187" },
+    { kind: "support", icon: <UsersRound className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "INDUCTIONS & SUPPORT", people: [{ name: "Aditya Raj", phone: "+91 8987475187" }, { name: "Amit Kumar Gupta", phone: "+91 6200983787" }] },
     { kind: "location", icon: <MapPin className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "OUR LOCATION", location: "BIT Sindri, Dhanbad, Jharkhand, India — 828122", href: "https://maps.google.com/?q=BIT+Sindri+Dhanbad" },
   ];
 
@@ -1075,7 +1075,7 @@ export default function ContactPage() {
 
           {/* ─── RIGHT — FORM ─── */}
           <div className="ct-form-wrap">
-            <BorderBot containerRef={formCardRef} />
+            {/* <BorderBot containerRef={formCardRef} /> */}
             <div className="ct-form-card" ref={formCardRef}>
               <div className="ct-form-head">
                 <h2>Send a message</h2>
