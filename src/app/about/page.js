@@ -1984,107 +1984,152 @@ function InteractiveStatCard({
 //   );
 // }
 
-const IETE_CENTRES = [
-  ["Agra", 27.1767, 78.0081],
-  ["Ahmedabad", 23.0225, 72.5714],
-  ["Aligarh", 27.8974, 78.088],
-  ["Allahabad", 25.4358, 81.8463],
-  ["Ambala", 30.3782, 76.7767],
-  ["Amravati", 20.9374, 77.7796],
-  ["Aurangabad", 19.8762, 75.3433],
-  ["Bangalore", 12.9716, 77.5946],
-  ["Bhopal", 23.2599, 77.4126],
-  ["Bhubaneswar", 20.2961, 85.8245],
-  ["Burdwan", 23.2324, 87.8615],
-  ["Chandigarh", 30.7333, 76.7794],
-  ["Chennai", 13.0827, 80.2707],
-  ["Coimbatore", 11.0168, 76.9558],
-  ["Dehradun", 30.3165, 78.0322],
-  ["Delhi", 28.6139, 77.209],
-  ["Dharwad", 15.4589, 75.0078],
-  ["Erode", 11.341, 77.7172],
-  ["Goa", 15.4909, 73.8278],
-  ["Guwahati", 26.1445, 91.7362],
-  ["Gwalior", 26.2183, 78.1828],
-  ["Hyderabad", 17.385, 78.4867],
-  ["Imphal", 24.817, 93.9368],
-  ["Indore", 22.7196, 75.8577],
-  ["Jabalpur", 23.1815, 79.9864],
-  ["Jaipur", 26.9124, 75.7873],
-  ["Jalandhar", 31.326, 75.5762],
-  ["Jammu", 32.7266, 74.857],
-  ["Kakinada", 16.9891, 82.2475],
-  ["Kalaburagi", 17.3297, 76.8343],
-  ["Kanpur", 26.4499, 80.3319],
-  ["Kathmandu", 27.7172, 85.324],
-  ["Kochi", 9.9312, 76.2673],
-  ["Kolkata", 22.5726, 88.3639],
-  ["Kozhikode", 11.2588, 75.7804],
-  ["Lucknow", 26.8467, 80.9462],
-  ["Mankapur", 27.03, 82.23],
-  ["Mhow", 22.557, 75.756],
-  ["Mumbai", 19.076, 72.8777],
-  ["Mysore", 12.2958, 76.6394],
-  ["Nagpur", 21.1458, 79.0882],
-  ["Nashik", 19.9975, 73.7898],
-  ["Navi Mumbai", 19.033, 73.0297],
-  ["Noida", 28.5355, 77.391],
-  ["Palakkad", 10.7867, 76.6548],
-  ["Patna", 25.5941, 85.1376],
-  ["Pilani", 28.367, 75.603],
-  ["Pune", 18.5204, 73.8567],
-  ["Raipur", 21.2514, 81.6296],
-  ["Rajkot", 22.3039, 70.8022],
-  ["Ranchi", 23.3441, 85.3096],
-  ["Shimla", 31.1048, 77.1734],
-  ["Shimoga", 13.9299, 75.5681],
-  ["Sivakasi", 9.4533, 77.8024],
-  ["Surat", 21.1702, 72.8311],
-  ["Thiruvananthapuram", 8.5241, 76.9366],
-  ["Tirupati", 13.6288, 79.4192],
-  ["Vadodara", 22.3072, 73.1812],
-  ["Varanasi", 25.3176, 82.9739],
-  ["Vijayawada", 16.5062, 80.648],
-  ["Visakhapatnam", 17.6868, 83.2185],
-  ["Warangal", 17.9689, 79.5941],
-  ["Yavatmal", 20.3888, 78.1204],
+const IETE_LOCATIONS = [
+  { name: "Bengaluru", type: "Centre", coords: [77.5946, 12.9716], url: "https://www.ietebangalore.org/" },
+  { name: "Bhopal", type: "Centre", coords: [77.4126, 23.2599], url: "https://ieteb.org/" },
+  { name: "Chandigarh", type: "Centre", coords: [76.7794, 30.7333], url: "http://www.ietechandigarh.org/" },
+  { name: "Chennai", type: "Centre", coords: [80.2707, 13.0827], mapCoords: [80.02, 13.16], url: "http://ietechennai.in/" },
+  { name: "Delhi", type: "Centre", coords: [77.15, 28.65], url: "https://ietedelhi.com/" },
+  { name: "Hyderabad", type: "Centre", coords: [78.4867, 17.385], url: "https://www.ietehyd.org/" },
+  { name: "Kolkata", type: "Centre", coords: [88.3639, 22.5726], mapCoords: [88.2, 22.62] },
+  { name: "Mumbai", type: "Centre", coords: [72.8777, 19.076], mapCoords: [73.12, 19.18] },
+  { name: "Noida", type: "Centre", coords: [77.391, 28.5355], url: "http://ietenoida.org/" },
+  { name: "Pune", type: "Centre", coords: [73.8567, 18.5204] },
+  { name: "Ahmedabad", type: "Centre", coords: [72.5714, 23.0225] },
+  { name: "Aligarh", type: "Centre", coords: [78.088, 27.8974] },
+  { name: "Allahabad (Prayagraj)", type: "Centre", coords: [81.8463, 25.4358] },
+  { name: "Amravati", type: "Centre", coords: [77.7523, 20.932], url: "http://www.ieteamravati.org/" },
+  { name: "Aurangabad", type: "Centre", coords: [75.3433, 19.8762] },
+  { name: "Bhubaneswar", type: "Centre", coords: [85.8245, 20.2961], mapCoords: [85.65, 20.38] },
+  { name: "Coimbatore", type: "Centre", coords: [76.9558, 11.0168] },
+  { name: "Dehradun", type: "Centre", coords: [78.0322, 30.3165] },
+  { name: "Erode", type: "Centre", coords: [77.7172, 11.341] },
+  { name: "Guwahati", type: "Centre", coords: [91.7362, 26.1445] },
+  { name: "Kalaburagi (Gulbarga)", type: "Centre", coords: [76.8343, 17.3297], url: "http://ieteklb.org/" },
+  { name: "Imphal", type: "Centre", coords: [93.9368, 24.817] },
+  { name: "Jaipur", type: "Centre", coords: [75.7873, 26.9124] },
+  { name: "Kanpur", type: "Centre", coords: [80.3319, 26.4499] },
+  { name: "Kochi", type: "Centre", coords: [76.2673, 9.9312], mapCoords: [76.45, 10.1], url: "https://ietekochi.in/" },
+  { name: "Kakinada", type: "Centre", coords: [82.2475, 16.9891], mapCoords: [81.98, 17.12] },
+  { name: "Lucknow", type: "Centre", coords: [80.9462, 26.8467] },
+  { name: "Mankapur", type: "Centre", coords: [82.23, 27.03] },
+  { name: "Mysuru", type: "Centre", coords: [76.6394, 12.2958] },
+  { name: "Nagpur", type: "Centre", coords: [79.0882, 21.1458] },
+  { name: "Navi Mumbai", type: "Centre", coords: [73.0297, 19.033], mapCoords: [73.28, 19.13] },
+  { name: "Palakkad", type: "Centre", coords: [76.6548, 10.7867] },
+  { name: "Pilani", type: "Centre", coords: [75.6033, 28.367] },
+  { name: "Rajkot", type: "Centre", coords: [70.8022, 22.3039], url: "http://www.ieterajkot.org/" },
+  { name: "Ranchi", type: "Centre", coords: [85.3096, 23.3441] },
+  { name: "Shivamogga", type: "Centre", coords: [75.5681, 13.9299] },
+  { name: "Sivakasi", type: "Centre", coords: [77.795, 9.4533], url: "http://www.mepcoeng.ac.in/" },
+  { name: "Thiruvananthapuram", type: "Centre", coords: [76.9366, 8.5241], mapCoords: [77.13, 8.7], url: "http://www.ietetvm.org/" },
+  { name: "Tirupati", type: "Centre", coords: [79.4192, 13.6288], url: "https://www.ietetirupati.org/" },
+  { name: "Vadodara", type: "Centre", coords: [73.1812, 22.3072] },
+  { name: "Vijayawada", type: "Centre", coords: [80.648, 16.5062] },
+  { name: "Visakhapatnam", type: "Centre", coords: [83.2185, 17.6868], mapCoords: [82.98, 17.85] },
+  { name: "Warangal", type: "Centre", coords: [79.5941, 17.9689] },
+  { name: "Patna", type: "Centre", coords: [85.1376, 25.5941], url: "http://www.ietepatna.in/" },
+  { name: "BIT Sindri", type: "Home centre", coords: [86.4735, 23.6546], url: "https://www.bitsindri.ac.in/iete-students-forum/", isHome: true },
+  { name: "Agra", type: "Sub-centre", coords: [78.0081, 27.1767] },
+  { name: "Amity Noida", type: "Sub-centre", coords: [77.334, 28.544] },
+  { name: "Burdwan", type: "Sub-centre", coords: [87.8615, 23.2324] },
+  { name: "Dharwad", type: "Sub-centre", coords: [75.0078, 15.4589] },
+  { name: "Goa", type: "Sub-centre", coords: [73.8278, 15.4909], mapCoords: [74.08, 15.43] },
+  { name: "Gwalior", type: "Sub-centre", coords: [78.1828, 26.2183] },
+  { name: "Indore", type: "Sub-centre", coords: [75.8577, 22.7196] },
+  { name: "Jabalpur", type: "Sub-centre", coords: [79.9864, 23.1815] },
+  { name: "Jalandhar", type: "Sub-centre", coords: [75.5762, 31.326] },
+  { name: "Jammu", type: "Sub-centre", coords: [74.857, 32.7266] },
+  { name: "Kolhapur", type: "Sub-centre", coords: [74.2433, 16.705] },
+  { name: "Kozhikode", type: "Sub-centre", coords: [75.7804, 11.2588], mapCoords: [75.98, 11.32] },
+  { name: "Mhow", type: "Sub-centre", coords: [75.7644, 22.5524] },
+  { name: "Nashik", type: "Sub-centre", coords: [73.7898, 19.9975] },
+  { name: "Shimla", type: "Sub-centre", coords: [77.1734, 31.1048] },
+  { name: "Surat", type: "Sub-centre", coords: [72.8311, 21.1702], mapCoords: [73.02, 21.23] },
+  { name: "Varanasi", type: "Sub-centre", coords: [82.9739, 25.3176] },
+  { name: "Yavatmal", type: "Sub-centre", coords: [78.1204, 20.3888] },
 ];
 
+const INDIA_MAP_BOUNDS = {
+  minLon: 68.1766,
+  maxLon: 97.4026,
+  minLat: 8.0667,
+  maxLat: 37.0841,
+};
 
-const IETE_DIRECTORY = "https://www.iete.org/iete-centres-2/";
+function getIndiaMapPosition([lon, lat]) {
+  const { minLon, maxLon, minLat, maxLat } = INDIA_MAP_BOUNDS;
+  const cosLat = Math.cos((((minLat + maxLat) / 2) * Math.PI) / 180);
+  const spanX = (maxLon - minLon) * cosLat;
+  const spanY = maxLat - minLat;
+  const scale = Math.min(690 / spanX, 770 / spanY);
+  const offsetX = (800 - spanX * scale) / 2;
+  const offsetY = (880 - spanY * scale) / 2;
+
+  return {
+    left: `${(offsetX + (lon - minLon) * cosLat * scale) / 8}%`,
+    top: `${(880 - (offsetY + (lat - minLat) * scale)) / 8.8}%`,
+  };
+}
+
+function getLocationUrl(location) {
+  if (location.url) return location.url;
+  const query = encodeURIComponent(`IETE ${location.name} ${location.type}`);
+  return `https://www.google.com/maps/search/?api=1&query=${query}`;
+}
 
 function GlowingIndiaMap() {
   return (
     <div className="relative mx-auto w-full max-w-4xl">
-      <div className="relative aspect-[4/5] w-full">
+      <div className="relative aspect-[10/11] w-full">
         <img
-          src="/india-glowing-map.svg"
-          alt="IETE centres across India"
+          src="/india-glowing-map-v2.svg"
+          alt="Glowing map of India with IETE centre locations"
           className="absolute inset-0 h-full w-full object-contain"
         />
-
-        {IETE_CENTRES.map(([name, lat, lon]) => {
-          const x = ((lon - 68) / 29.5) * 100;
-          const y = ((35.5 - lat) / 29) * 100;
-
-          return (
-            <a
-              key={name}
-              href={IETE_DIRECTORY}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Open IETE ${name} centre directory`}
-              title={`IETE ${name}`}
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-              }}
-              className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-            >
-              <span className="block h-3 w-3 rounded-full border-2 border-white bg-cyan-300 shadow-[0_0_14px_5px_rgba(56,189,248,0.8)] transition-transform duration-200 hover:scale-150" />
-            </a>
-          );
-        })}
+        {IETE_LOCATIONS.map((location) => (
+          <a
+            key={`${location.type}-${location.name}`}
+            href={getLocationUrl(location)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${location.type.toLowerCase()} details for ${location.name} in a new tab`}
+            title={`${location.name} · ${location.type} · Open in new tab`}
+            style={getIndiaMapPosition(location.mapCoords || location.coords)}
+            className="group absolute z-10 flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#080C12]"
+          >
+            <span
+              className={`relative z-10 block rounded-full border border-white transition-transform group-hover:scale-150 group-focus-visible:scale-150 ${
+                location.isHome
+                  ? "h-3.5 w-3.5 bg-emerald-300 shadow-[0_0_15px_5px_rgba(52,211,153,0.9)]"
+                  : location.type === "Centre"
+                    ? "h-2.5 w-2.5 bg-cyan-300 shadow-[0_0_12px_3px_rgba(56,189,248,0.75)]"
+                    : "h-2 w-2 bg-amber-200 shadow-[0_0_10px_2px_rgba(251,191,36,0.7)]"
+              }`}
+            />
+            {location.isHome && (
+              <span className="pointer-events-none absolute h-7 w-7 animate-ping rounded-full bg-emerald-300/25" />
+            )}
+            <span className="pointer-events-none absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md border border-white/10 bg-[#080C12]/95 px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              {location.name}
+            </span>
+          </a>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-400">
+        <span className="inline-flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full border border-white bg-cyan-300 shadow-[0_0_8px_2px_rgba(56,189,248,0.65)]" />
+          IETE Centres
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full border border-white bg-amber-200 shadow-[0_0_8px_2px_rgba(251,191,36,0.6)]" />
+          IETE Sub-centres
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full border border-white bg-emerald-300 shadow-[0_0_8px_3px_rgba(52,211,153,0.75)]" />
+          BIT Sindri · Home centre
+        </span>
+        <span>Click a marker to open its website or Google Maps in a new tab.</span>
       </div>
     </div>
   );
