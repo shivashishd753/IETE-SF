@@ -1565,6 +1565,7 @@ import Link from "next/link";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import dynamic from "next/dynamic";
+import { Space_Grotesk, Manrope } from "next/font/google";
 
 import {
   Layers3,
@@ -1579,6 +1580,24 @@ import {
   AudioLines,
   Rocket,
 } from "lucide-react";
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY — matches the Members page
+   Headings / labels: Space Grotesk
+   Body copy: Manrope (light), slate-400
+═══════════════════════════════════════════ */
+
+const headingFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const bodyFont = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
 
 /* ═══════════════════════════════════════════
    CONFIGURATION
@@ -1838,7 +1857,7 @@ function NationalBodyInfoCard() {
           }}
         />
 
-        <p className="relative z-10 text-center text-lg leading-relaxed text-slate-300 sm:text-xl">
+        <p className="relative z-10 text-center text-lg font-light leading-relaxed text-slate-400 sm:text-xl">
           The Institution of Electronics and Telecommunication Engineers
           (IETE) stands as the{" "}
           <span className="font-semibold text-[#AFC8EA]">
@@ -1848,7 +1867,7 @@ function NationalBodyInfoCard() {
           professionals in India.
         </p>
 
-        <p className="relative z-10 mt-8 text-center text-lg leading-relaxed text-slate-300 sm:mt-9 sm:text-xl">
+        <p className="relative z-10 mt-8 text-center text-lg font-light leading-relaxed text-slate-400 sm:mt-9 sm:text-xl">
           With a prestigious legacy spanning seven decades, IETE has grown to
           encompass a thriving community of{" "}
           <span className="font-semibold text-[#AFC8EA]">
@@ -1884,11 +1903,11 @@ function ObjectiveCard({ icon, title, desc, index }) {
         {icon}
       </div>
 
-      <h3 className="relative z-10 mt-6 text-[1.25rem] font-semibold leading-snug tracking-[-0.02em] text-white sm:text-[1.4rem]">
+      <h3 className={`${headingFont.className} relative z-10 mt-6 text-[1.25rem] font-semibold leading-snug tracking-[-0.02em] text-white sm:text-[1.4rem]`}>
         {title}
       </h3>
 
-      <p className="relative z-10 mt-3 flex-1 text-[15px] leading-7 text-slate-400">
+      <p className="relative z-10 mt-3 flex-1 text-[15px] font-light leading-7 text-slate-400">
         {desc}
       </p>
 
@@ -1918,19 +1937,19 @@ function InteractiveStatCard({
             <Icon size={21} strokeWidth={1.6} />
           </div>
 
-          <p className="text-sm font-medium tracking-wide text-[#B2C7E3]">
+          <p className={`${headingFont.className} text-sm font-medium tracking-wide text-[#B2C7E3]`}>
             {label}
           </p>
         </div>
 
         <div className="my-7">
-          <p className="text-4xl font-semibold tracking-[-0.055em] text-white sm:text-5xl">
+          <p className={`${headingFont.className} text-4xl font-bold tracking-[-0.03em] text-white sm:text-5xl`}>
             <AnimatedCounter target={target} suffix={suffix} />
           </p>
         </div>
 
         <div className="mt-auto min-h-[52px] border-t border-white/[0.08] pt-4">
-          <p className="text-sm leading-6 text-slate-400">
+          <p className="text-sm font-light leading-6 text-slate-400">
             {sublabel}
           </p>
         </div>
@@ -2281,15 +2300,15 @@ function SignalRun() {
               <Icon size={25} strokeWidth={1.5} />
             </div>
 
-            <span className="iete-signal-number">
+            <span className="iete-signal-number" style={headingFont.style}>
               {pillar.number}
             </span>
 
-            <h3 className="iete-signal-title">
+            <h3 className="iete-signal-title" style={headingFont.style}>
               {pillar.title}
             </h3>
 
-            <span className="iete-signal-stage">
+            <span className="iete-signal-stage" style={bodyFont.style}>
               {pillar.stage}
             </span>
           </article>
@@ -2305,15 +2324,15 @@ function PillarsSignal() {
     <section
       id="four-pillars"
       aria-label="The four pillars of IETE"
-      className="relative overflow-hidden bg-[#080B10] py-16 sm:py-24"
+      className={`${bodyFont.className} relative overflow-hidden bg-[#080B10] py-16 sm:py-24`}
     >
       <div className="mx-auto mb-12 w-full px-5 text-center sm:mb-14">
-  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9CB5D8]">
+  <p className={`${headingFont.className} text-xs font-semibold uppercase tracking-[0.3em] text-[#9CB5D8]`}>
     What Drives Us
   </p>
 
-  <h2 className="mt-4 text-4xl font-bold uppercase tracking-[0.06em] text-white sm:text-5xl md:text-6xl">
-    <span className="bg-gradient-to-r from-white via-[#BBD0EF] to-[#829FC7] bg-clip-text text-transparent">
+  <h2 className={`${headingFont.className} mt-4 text-4xl font-bold uppercase tracking-[-0.02em] text-white sm:text-5xl md:text-6xl`}>
+    <span className="text-white">
       Four Pillars
     </span>
   </h2>
@@ -2419,7 +2438,7 @@ const faculty = [
       <Navbar />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative flex min-h-[90svh] items-center justify-center overflow-hidden px-5 pb-16 pt-32">
+      <section className={`${bodyFont.className} relative flex min-h-[90svh] items-center justify-center overflow-hidden px-5 pb-16 pt-32`}>
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -2458,9 +2477,9 @@ const faculty = [
 
         <div className="relative z-10 flex w-full max-w-6xl flex-col items-center text-center">
           <RevealGroup delay={100}>
-            <h1 className="text-6xl font-extrabold uppercase leading-[0.95] tracking-[-0.045em] sm:text-8xl md:text-[8.5rem]">
+            <h1 className={`${headingFont.className} text-6xl font-bold uppercase leading-[0.95] tracking-[-0.02em] sm:text-8xl md:text-[8.5rem]`}>
               <span className="text-white">About </span>
-              <span className="bg-gradient-to-b from-[#DCE9FA] via-[#AFC9ED] to-[#7295C8] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-[#BBF2FF] to-[#00D6F4] bg-clip-text text-transparent">
                 IETE
               </span>
             </h1>
@@ -2471,7 +2490,7 @@ const faculty = [
           </RevealGroup>
 
           <RevealGroup delay={300}>
-            <p className="mt-8 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-xl sm:leading-relaxed">
+            <p className="mt-8 max-w-3xl text-base font-light leading-relaxed text-slate-400 sm:text-xl sm:leading-relaxed">
               The Institution of Electronics and Telecommunication Engineers
               (IETE) is India&apos;s leading recognised professional society
               devoted to the advancement of science and technology of
@@ -2487,20 +2506,20 @@ const faculty = [
       {/* ═══ NATIONAL BODY ═══ */}
       <section
         id="national-body"
-        className="relative overflow-hidden bg-[#080B10] px-5 pt-16 pb-24 sm:pt-28 sm:pb-36"
+        className={`${bodyFont.className} relative overflow-hidden bg-[#080B10] px-5 pt-16 pb-24 sm:pt-28 sm:pb-36`}
       >
         <div className="relative z-10 mx-auto max-w-6xl">
           <RevealGroup>
             <div className="flex justify-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#91B2DF]/25 bg-[#91B2DF]/[0.06] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-[#B7CDED]">
+              <span className={`${headingFont.className} inline-flex items-center gap-2 rounded-full border border-[#91B2DF]/25 bg-[#91B2DF]/[0.06] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-[#B7CDED]`}>
                 Our Parent Body
               </span>
             </div>
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-6 text-center text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-5xl md:text-6xl">
-              <span className="bg-gradient-to-b from-white to-[#AFC7E7] bg-clip-text text-transparent">
+            <h2 className={`${headingFont.className} mt-6 text-center text-4xl font-bold uppercase leading-tight tracking-[-0.02em] sm:text-5xl md:text-6xl`}>
+              <span className="text-white">
                 IETE National Body
               </span>
             </h2>
@@ -2515,7 +2534,7 @@ const faculty = [
       </section>
 
       {/* ═══ OBJECTIVES ═══ */}
-      <section className="relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32">
+      <section className={`${bodyFont.className} relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32`}>
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.09]"
@@ -2535,7 +2554,7 @@ const faculty = [
         <div className="relative z-10 mx-auto max-w-6xl">
           <RevealGroup>
             <div className="flex justify-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#91B2DF]/25 bg-[#91B2DF]/[0.06] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-[#B7CDED]">
+              <span className={`${headingFont.className} inline-flex items-center gap-2 rounded-full border border-[#91B2DF]/25 bg-[#91B2DF]/[0.06] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-[#B7CDED]`}>
                 <Layers3 size={14} />
                 Our Mission
               </span>
@@ -2543,15 +2562,15 @@ const faculty = [
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-6 text-center text-4xl font-black uppercase leading-tight tracking-[0.04em] sm:text-5xl md:text-6xl">
-              <span className="bg-gradient-to-b from-white to-[#AFC7E7] bg-clip-text text-transparent">
+            <h2 className={`${headingFont.className} mt-6 text-center text-4xl font-bold uppercase leading-tight tracking-[-0.02em] sm:text-5xl md:text-6xl`}>
+              <span className="text-white">
                 Objective of IETE
               </span>
             </h2>
           </RevealGroup>
 
           <RevealGroup delay={160}>
-            <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed text-slate-400 sm:text-xl">
+            <p className="mx-auto mt-5 max-w-2xl text-center text-lg font-light leading-relaxed text-slate-400 sm:text-xl">
               Driving excellence in electronics, telecommunications, and IT
               across the country.
             </p>
@@ -2580,17 +2599,17 @@ const faculty = [
       <PillarsSignal />
 
       {/* ═══ FACULTY / LEADERS ═══ */}
-      <section className="relative overflow-hidden bg-[#080B10] px-5 py-20 sm:py-28">
+      <section className={`${bodyFont.className} relative overflow-hidden bg-[#080B10] px-5 py-20 sm:py-28`}>
         <div className="relative z-10 mx-auto max-w-5xl">
           <RevealGroup>
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#9CB5D8]">
+            <p className={`${headingFont.className} text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#9CB5D8]`}>
               Meet Our Support
             </p>
           </RevealGroup>
 
           <RevealGroup delay={100}>
-            <h2 className="mt-4 text-center text-3xl font-semibold tracking-tight sm:text-5xl">
-              <span className="bg-gradient-to-b from-white to-[#AFC7E7] bg-clip-text text-transparent">
+            <h2 className={`${headingFont.className} mt-4 text-center text-3xl font-bold tracking-[-0.02em] sm:text-5xl`}>
+              <span className="text-white">
                 Our Support
               </span>
             </h2>
@@ -2618,15 +2637,15 @@ const faculty = [
   />
 </div>
 
-                  <p className="text-xs font-semibold tracking-[0.12em] text-[#AFC8EA]">
+                  <p className={`${headingFont.className} text-xs font-semibold tracking-[0.12em] text-[#AFC8EA]`}>
                     {person.role}
                   </p>
 
-                  <h3 className="mt-3 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                  <h3 className={`${headingFont.className} mt-3 text-xl font-semibold tracking-tight text-white sm:text-2xl`}>
                     {person.name}
                   </h3>
 
-                  <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-400">
+                  <p className="mx-auto mt-3 max-w-md text-sm font-light leading-relaxed text-slate-400">
                     {person.desc}
                   </p>
                 </div>
@@ -2637,11 +2656,11 @@ const faculty = [
       </section>
 
       {/* ═══ NATIONWIDE PRESENCE ═══ */}
-      <section className="relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32">
+      <section className={`${bodyFont.className} relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32`}>
         <div className="relative z-10 mx-auto max-w-5xl text-center">
           <RevealGroup delay={100}>
-            <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
-              <span className="bg-gradient-to-b from-white to-[#AFC7E7] bg-clip-text text-transparent">
+            <h2 className={`${headingFont.className} text-3xl font-bold leading-tight tracking-[-0.02em] text-white sm:text-4xl md:text-5xl`}>
+              <span className="text-white">
                 IETE is All Around India
               </span>
             </h2>
@@ -2677,5 +2696,3 @@ const faculty = [
     </main>
   );
 }
-
-

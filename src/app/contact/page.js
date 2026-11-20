@@ -5,6 +5,52 @@ import { Send, ArrowUpRight, Mail, Phone, UsersRound, MapPin } from "lucide-reac
 import { gsap } from "gsap";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import { Space_Grotesk, Manrope } from "next/font/google";
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY — matches the Members page
+   Headings / labels: Space Grotesk
+   Descriptions: Manrope (light), soft grey-blue
+═══════════════════════════════════════════ */
+
+const headingFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--ct-heading-font",
+});
+
+const bodyFont = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--ct-body-font",
+});
+
+/* White → light cyan → bright cyan fade, sampled from the Members page */
+const TITLE_FADE_STOPS = [
+  [0, [255, 255, 255]],
+  [0.55, [230, 247, 255]],
+  [0.78, [187, 242, 255]],
+  [1, [0, 214, 244]],
+];
+
+function fadeColorAt(position) {
+  const t = Math.min(1, Math.max(0, position));
+  for (let i = 1; i < TITLE_FADE_STOPS.length; i++) {
+    const [stop, stopColor] = TITLE_FADE_STOPS[i];
+    const [prevStop, prevColor] = TITLE_FADE_STOPS[i - 1];
+    if (t <= stop) {
+      const span = stop - prevStop || 1;
+      const mix = (t - prevStop) / span;
+      const channels = stopColor.map((value, channel) =>
+        Math.round(prevColor[channel] + (value - prevColor[channel]) * mix)
+      );
+      return `rgb(${channels[0]}, ${channels[1]}, ${channels[2]})`;
+    }
+  }
+  return "rgb(0, 214, 244)";
+}
 
 const WATERMARK_PARTICLE_POSITIONS = [
   [19, 10], [23, 56], [27, 128], [30, -8], [33, 92], [36, 34], [39, 142],
@@ -394,7 +440,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <main className={`ct-page${hoveredCard !== null ? " ct-card-focus" : ""}`}>
+    <main className={`ct-page ${headingFont.variable} ${bodyFont.variable}${hoveredCard !== null ? " ct-card-focus" : ""}`}>
       <style>{`
         /* ══════════ RESET & BASE ══════════ */
         .ct-page {
@@ -414,7 +460,7 @@ export default function ContactPage() {
             radial-gradient(ellipse at 12% 76%, rgba(26, 43, 91, .13), transparent 42%),
             linear-gradient(145deg, #05060b 0%, #090d1a 54%, #070912 100%);
           color: var(--white);
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: var(--ct-body-font), "Helvetica Neue", Arial, sans-serif;
           overflow-x: hidden;
         }
         .ct-page ::selection { color: #000; background: var(--accent); }
@@ -477,9 +523,9 @@ export default function ContactPage() {
           margin: 0 auto 20px;
           white-space: nowrap;
           text-align: center;
-          font-family: "Arial Black", Arial, Helvetica, sans-serif;
+          font-family: var(--ct-heading-font), "Arial Black", Arial, Helvetica, sans-serif;
           font-size: clamp(72px, 12vw, 180px);
-          font-weight: 900;
+          font-weight: 700;
           letter-spacing: -.05em;
           color: rgba(43, 65, 103, .22);
           -webkit-text-stroke: 1px rgba(82, 112, 160, .06);
@@ -561,10 +607,10 @@ export default function ContactPage() {
 
         .ct-title {
           margin: 0;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: var(--ct-heading-font), Arial, Helvetica, sans-serif;
           font-size: clamp(36px, 3.35vw, 48px);
           font-weight: 600;
-          letter-spacing: -.055em;
+          letter-spacing: -.02em;
           line-height: 1.05;
           color: #f4f5f8;
         }
@@ -581,8 +627,10 @@ export default function ContactPage() {
         .ct-sub {
           max-width: 380px;
           margin: 12px 0 24px;
-          color: var(--gray);
+          color: #94a3b8;
+          font-family: var(--ct-body-font), "Helvetica Neue", Arial, sans-serif;
           font-size: 13px;
+          font-weight: 300;
           line-height: 1.7;
         }
 
@@ -634,7 +682,7 @@ export default function ContactPage() {
           min-width: 0;
           flex: 1;
         }
-        .ct-card-label { color: #e3e7ef; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
+        .ct-card-label { color: #e3e7ef; font-family: var(--ct-heading-font), Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
         .ct-card-hint { color: #858d9d; font-size: 11px; line-height: 1.4; }
         .ct-card-detail {
           position: absolute;
@@ -661,7 +709,7 @@ export default function ContactPage() {
           transform: translateY(0) scale(1);
           pointer-events: auto;
         }
-        .ct-detail-caption { color: #78849a; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
+        .ct-detail-caption { color: #78849a; font-family: var(--ct-heading-font), Arial, sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
         .ct-detail-line { display: flex; align-items: center; gap: 9px; min-width: 0; color: #c5ccda; font-size: 12px; line-height: 1.5; }
         .ct-detail-line svg { flex: 0 0 auto; color: #a8b8d4; }
         .ct-detail-line a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
@@ -669,7 +717,7 @@ export default function ContactPage() {
         .ct-detail-people { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
         .ct-detail-person { display: grid; gap: 5px; min-width: 0; }
         .ct-detail-person + .ct-detail-person { border-left: 1px solid rgba(169,184,214,.16); padding-left: 12px; }
-        .ct-detail-person strong { color: #e3e7ef; font-size: 12px; font-weight: 600; }
+        .ct-detail-person strong { color: #e3e7ef; font-family: var(--ct-heading-font), Arial, sans-serif; font-size: 12px; font-weight: 600; }
         .ct-detail-person a { color: #aab3c2; font-size: 11px; text-decoration: none; }
         .ct-card.is-focused .ct-card-arrow { color: #edf1f7; }
         .ct-card-arrow { transition: color .2s ease, border-color .2s ease, background .2s ease; }
@@ -681,7 +729,7 @@ export default function ContactPage() {
         .ct-meta-item svg { flex: 0 0 auto; color: #9fb7dd; }
         .ct-support-inline { display: flex; align-items: center; gap: 13px; }
         .ct-support-entry { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
-        .ct-support-entry strong { color: #e5e9f1; font-size: 11px; font-weight: 600; }
+        .ct-support-entry strong { color: #e5e9f1; font-family: var(--ct-heading-font), Arial, sans-serif; font-size: 11px; font-weight: 600; }
         .ct-support-entry a { color: #9ba4b4; font-size: 10.5px; text-decoration: none; white-space: nowrap; }
         .ct-support-entry a:hover { color: #eef2f9; }
         .ct-support-entry + .ct-support-entry { padding-left: 13px; border-left: 1px solid rgba(169,184,214,.16); }
@@ -735,6 +783,7 @@ export default function ContactPage() {
         .ct-soc-label {
           margin-left: 6px;
           color: var(--dim);
+          font-family: var(--ct-heading-font), Arial, sans-serif;
           font-size: 9px;
           font-weight: 700;
           letter-spacing: .14em;
@@ -779,16 +828,18 @@ export default function ContactPage() {
         }
         .ct-form-head h2 {
           margin: 0;
-          font-family: Georgia, 'Times New Roman', serif;
+          font-family: var(--ct-heading-font), Arial, Helvetica, sans-serif;
           font-size: 22px;
-          font-weight: 400;
-          letter-spacing: -.025em;
+          font-weight: 600;
+          letter-spacing: -.02em;
           color: var(--white);
         }
         .ct-form-head p {
           margin: 6px 0 0;
-          color: var(--dim);
+          color: #94a3b8;
+          font-family: var(--ct-body-font), "Helvetica Neue", Arial, sans-serif;
           font-size: 11px;
+          font-weight: 300;
           line-height: 1.6;
         }
 
@@ -808,7 +859,9 @@ export default function ContactPage() {
           background: rgba(255,255,255,.02);
           padding: 14px 15px;
           color: var(--white);
-          font: 400 13px Arial, Helvetica, sans-serif;
+          font-family: var(--ct-body-font), "Helvetica Neue", Arial, sans-serif;
+          font-size: 13px;
+          font-weight: 400;
           transition: border-color .3s, box-shadow .3s;
         }
         .ct-field input { min-height: 48px; }
@@ -829,7 +882,9 @@ export default function ContactPage() {
           border-radius: 10px;
           background: var(--white);
           color: #000;
-          font: 700 12px Arial, Helvetica, sans-serif;
+          font-family: var(--ct-heading-font), Arial, Helvetica, sans-serif;
+          font-size: 12px;
+          font-weight: 700;
           letter-spacing: .03em;
           cursor: pointer;
           transition: .3s;
@@ -979,7 +1034,12 @@ export default function ContactPage() {
               onPointerEnter={animateTitleTiles}
             >
               {"Get in touch".split("").map((letter, index) => (
-                <span className="ct-title-letter" aria-hidden="true" key={`${letter}-${index}`}>
+                <span
+                  className="ct-title-letter"
+                  aria-hidden="true"
+                  key={`${letter}-${index}`}
+                  style={{ color: fadeColorAt(index / ("Get in touch".length - 1)) }}
+                >
                   {letter === " " ? "\u00a0" : letter}
                 </span>
               ))}
