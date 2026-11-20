@@ -1129,7 +1129,7 @@ export default function ContactPage() {
                   <svg viewBox="0 0 24 24" aria-hidden="true">{s.icon}</svg>
                 </a>
               ))}
-              <span className="ct-soc-label">FOLLOW US</span>
+              {/* <span className="ct-soc-label">FOLLOW US</span> */}
             </div>
           </div>
 
