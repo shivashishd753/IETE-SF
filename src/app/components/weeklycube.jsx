@@ -229,37 +229,37 @@ const segments = [
   },
 ];
 
+/* POSTERS: LARGER, MORE NATURAL DISTRIBUTION */
 const posterPositions = [
-  ["-2%", "2%", 125, -17],
-  ["9%", "13%", 105, 12],
-  ["21%", "-3%", 135, -9],
-  ["34%", "12%", 95, 16],
-  ["47%", "-4%", 120, -13],
-  ["60%", "10%", 145, 8],
-  ["75%", "-2%", 110, -15],
-  ["89%", "12%", 135, 11],
-  ["96%", "32%", 115, -8],
-  ["-3%", "32%", 140, 10],
-  ["12%", "38%", 100, -14],
-  ["25%", "29%", 125, 7],
-  ["39%", "40%", 110, -11],
-  ["53%", "31%", 135, 14],
-  ["68%", "43%", 100, -7],
-  ["82%", "32%", 145, 12],
-  ["-4%", "58%", 115, -12],
-  ["10%", "69%", 140, 9],
-  ["25%", "59%", 105, -16],
-  ["39%", "72%", 130, 11],
-  ["54%", "62%", 110, -8],
-  ["69%", "74%", 140, 15],
-  ["84%", "61%", 105, -13],
-  ["96%", "76%", 130, 8],
-  ["1%", "88%", 115, -9],
-  ["17%", "91%", 135, 13],
-  ["34%", "87%", 105, -12],
-  ["50%", "94%", 125, 7],
-  ["66%", "88%", 110, -15],
-  ["81%", "94%", 140, 10],
+  ["-3%", "3%", 185, -16],
+  ["16%", "7%", 165, 12],
+  ["37%", "-5%", 195, -9],
+  ["61%", "5%", 175, 15],
+  ["83%", "-3%", 190, -13],
+  ["96%", "21%", 165, 10],
+
+  ["-5%", "27%", 195, 11],
+  ["19%", "24%", 170, -14],
+  ["39%", "31%", 185, 8],
+  ["66%", "25%", 200, -12],
+  ["88%", "36%", 175, 16],
+
+  ["-2%", "53%", 175, -10],
+  ["17%", "48%", 205, 13],
+  ["43%", "54%", 165, -17],
+  ["64%", "49%", 185, 9],
+  ["91%", "57%", 200, -8],
+
+  ["-4%", "77%", 195, 14],
+  ["21%", "73%", 175, -11],
+  ["42%", "79%", 200, 10],
+  ["68%", "72%", 170, -15],
+  ["88%", "81%", 190, 12],
+
+  ["8%", "94%", 175, -8],
+  ["32%", "91%", 190, 15],
+  ["57%", "95%", 175, -13],
+  ["81%", "92%", 205, 9],
 ];
 
 export default function WeeklyCube() {
@@ -269,6 +269,7 @@ export default function WeeklyCube() {
   const [progress, setProgress] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
+  /* SCROLL-BASED CUBE ROTATION */
   useEffect(() => {
     let frame = 0;
 
@@ -293,6 +294,7 @@ export default function WeeklyCube() {
     window.addEventListener("scroll", updateProgress, {
       passive: true,
     });
+
     window.addEventListener("resize", updateProgress);
     updateProgress();
 
@@ -303,6 +305,29 @@ export default function WeeklyCube() {
     };
   }, []);
 
+  /* CHANGE THE ENTIRE PAGE BACKGROUND ON HOVER */
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    const previousHtmlBackground = html.style.backgroundColor;
+    const previousBodyBackground = body.style.backgroundColor;
+
+    if (hoveredIndex !== null) {
+      html.style.backgroundColor = "#000000";
+      body.style.backgroundColor = "#000000";
+    } else {
+      html.style.backgroundColor = previousHtmlBackground;
+      body.style.backgroundColor = previousBodyBackground;
+    }
+
+    return () => {
+      html.style.backgroundColor = previousHtmlBackground;
+      body.style.backgroundColor = previousBodyBackground;
+    };
+  }, [hoveredIndex]);
+
+  /* INNOTECH VIDEO CONTROL */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -316,8 +341,14 @@ export default function WeeklyCube() {
   }, [hoveredIndex]);
 
   const angle = progress * 180;
-  const activeIndex = Math.min(2, Math.floor((angle + 0.001) / 90));
-  const showPosters = hoveredIndex === 0 || hoveredIndex === 2;
+
+  const activeIndex = Math.min(
+    2,
+    Math.floor((angle + 0.001) / 90)
+  );
+
+  const showPosters =
+    hoveredIndex === 0 || hoveredIndex === 2;
 
   const posterSource =
     hoveredIndex === 0 ? MEDIA.innoventure : MEDIA.tech;
@@ -326,139 +357,149 @@ export default function WeeklyCube() {
     <section
       ref={sectionRef}
       aria-label="Explore IETE Students' Forum"
-      className="relative h-[260svh] bg-[#050A18] text-white"
+      className={`relative h-[260svh] text-white transition-colors duration-700 ${
+        hoveredIndex !== null ? "bg-black" : "bg-[#050A18]"
+      }`}
     >
-      {/* Softer charcoal-black background */}
-      <div
-        className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 ${
-          hoveredIndex !== null
-            ? "opacity-100"
-            : "opacity-0"
-        }`}
-        style={{
-          background:
-            "linear-gradient(135deg, #242424 0%, #181818 45%, #101010 100%)",
-        }}
-      />
+      {/* STICKY CUBE STAGE */}
+      <div className="sticky top-[138px] flex h-[calc(100svh-138px)] flex-col items-center justify-center overflow-hidden bg-transparent px-5">
 
-      {/* INNOTECH video */}
-      <video
-        ref={videoRef}
-        src={MEDIA.innotech}
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        className={`pointer-events-none fixed inset-0 z-[1] h-full w-full object-cover transition-opacity duration-700 ${
-          hoveredIndex === 1 ? "opacity-[0.18]" : "opacity-0"
-        }`}
-      />
+        {/* BLACK HOVER BACKGROUND */}
+        <div
+          className={`pointer-events-none absolute inset-0 z-0 transition-colors duration-700 ${
+            hoveredIndex !== null ? "bg-black" : "bg-transparent"
+          }`}
+        />
 
-      {/* Section-specific scattered posters */}
-      <div
-        className={`pointer-events-none fixed inset-0 z-[2] overflow-hidden transition-opacity duration-700 ${
-          showPosters ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {showPosters &&
-          posterPositions.map(([x, y, width, rotation], index) => (
-            <img
-              key={`${hoveredIndex}-${index}`}
-              src={posterSource}
-              alt=""
-              draggable="false"
-              className="absolute h-auto max-w-none object-contain"
-              style={{
-                left: x,
-                top: y,
-                width: `${width}px`,
-                transform: `rotate(${rotation}deg)`,
-                opacity: 0.38,
-              }}
-            />
-          ))}
-      </div>
+        {/* INNOTECH VIDEO */}
+        <video
+          ref={videoRef}
+          src={MEDIA.innotech}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className={`pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover transition-opacity duration-700 ${
+            hoveredIndex === 1 ? "opacity-[0.18]" : "opacity-0"
+          }`}
+        />
 
-      {/* Foreground content */}
-      <div className="sticky top-[138px] flex h-[calc(100svh-138px)] flex-col items-center justify-center overflow-hidden px-5">
-
-        <div className="relative z-30 mb-7 flex items-center gap-3 text-[10px] font-medium tracking-[0.32em] text-slate-300 sm:text-xs">
-          <span className="h-1.5 w-1.5 rounded-full bg-white" />
-          EXPLORE THE FORUM
+        {/* POSTER LAYER - STRICTLY CONFINED TO STAGE */}
+        <div
+          className={`pointer-events-none absolute inset-0 z-[2] overflow-hidden transition-opacity duration-700 ${
+            showPosters ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {showPosters &&
+            posterPositions.map(
+              ([x, y, width, rotation], index) => (
+                <img
+                  key={`${hoveredIndex}-${index}`}
+                  src={posterSource}
+                  alt=""
+                  draggable="false"
+                  className="absolute h-auto max-w-none select-none object-contain"
+                  style={{
+                    left: x,
+                    top: y,
+                    width: `${width}px`,
+                    transform: `rotate(${rotation}deg)`,
+                    opacity: 0.43,
+                  }}
+                />
+              )
+            )}
         </div>
 
-        {/* Opaque cube */}
-        <div
-          className="relative z-30 w-full max-w-[560px]"
-          style={{
-            perspective: "1800px",
-            isolation: "isolate",
-          }}
-        >
+        {/* FOREGROUND CONTENT */}
+        <div className="relative z-10 flex w-full flex-col items-center">
+
+          {/* SECTION LABEL */}
+          <div className="relative z-30 mb-7 flex items-center gap-3 text-[10px] font-medium tracking-[0.32em] text-slate-300 sm:text-xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-white" />
+            EXPLORE THE FORUM
+          </div>
+
+          {/* OPAQUE 3D CUBE */}
           <div
-            className="relative aspect-square w-full"
+            className="relative z-30 w-full max-w-[560px]"
             style={{
-              transformStyle: "preserve-3d",
-              transform: `rotateX(${angle}deg)`,
-              willChange: "transform",
+              perspective: "1800px",
+              isolation: "isolate",
             }}
           >
-            {segments.map((segment, index) => (
-              <article
-                key={segment.number}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className="absolute inset-0 overflow-hidden border border-white/20 text-center"
-                style={{
-                  transform: `rotateX(${-index * 90}deg) translateZ(min(calc((100vw - 2.5rem) / 2), 280px))`,
-                  backfaceVisibility: "hidden",
-                  background: "#070B18",
-                  opacity: 1,
-                  boxShadow: "none",
-                }}
-              >
-                <div
-                  className="flex h-full w-full flex-col items-center justify-center px-7 py-10 sm:px-12"
-                  style={{ background: "#070B18" }}
+            <div
+              className="relative aspect-square w-full"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: `rotateX(${angle}deg)`,
+                willChange: "transform",
+              }}
+            >
+              {segments.map((segment, index) => (
+                <article
+                  key={segment.number}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className="absolute inset-0 overflow-hidden border border-white/20 text-center"
+                  style={{
+                    transform: `rotateX(${-index * 90}deg) translateZ(min(calc((100vw - 2.5rem) / 2), 280px))`,
+                    backfaceVisibility: "hidden",
+                    backgroundColor: "#050810",
+                    opacity: 1,
+                    boxShadow:
+                      "0 20px 70px rgba(0,0,0,0.55)",
+                  }}
                 >
-                  <div className="mb-8 grid h-[76px] w-[76px] place-items-center border border-white/20">
-                    <span className="text-2xl font-light tracking-widest">
-                      {segment.number}
-                    </span>
+                  {/* SOLID CUBE FACE */}
+                  <div
+                    className="flex h-full w-full flex-col items-center justify-center px-7 py-10 sm:px-12"
+                    style={{
+                      backgroundColor: "#050810",
+                      opacity: 1,
+                    }}
+                  >
+                    <div className="mb-8 grid h-[76px] w-[76px] place-items-center border border-white/20 bg-[#080D18]">
+                      <span className="text-2xl font-light tracking-widest">
+                        {segment.number}
+                      </span>
+                    </div>
+
+                    <p className="text-[10px] font-medium tracking-[0.25em] text-slate-300 sm:text-xs">
+                      {segment.eyebrow}
+                    </p>
+
+                    <h2 className="mt-5 max-w-[440px] text-3xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl">
+                      {segment.title}
+                    </h2>
+
+                    <p className="mt-5 max-w-[380px] text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                      {segment.description}
+                    </p>
+
+                    <div className="mt-8 h-px w-20 bg-white/60" />
                   </div>
+                </article>
+              ))}
+            </div>
+          </div>
 
-                  <p className="text-[10px] font-medium tracking-[0.25em] text-slate-300 sm:text-xs">
-                    {segment.eyebrow}
-                  </p>
-
-                  <h2 className="mt-5 max-w-[440px] text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl">
-                    {segment.title}
-                  </h2>
-
-                  <p className="mt-5 max-w-[380px] text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
-                    {segment.description}
-                  </p>
-
-                  <div className="mt-8 h-px w-20 bg-white/60" />
-                </div>
-              </article>
+          {/* SLIDE INDICATORS */}
+          <div className="relative z-30 mt-8 flex items-center gap-3">
+            {segments.map((segment, index) => (
+              <span
+                key={segment.number}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  index === activeIndex
+                    ? "w-9 bg-white"
+                    : "w-3 bg-white/25"
+                }`}
+              />
             ))}
           </div>
-        </div>
-
-        <div className="relative z-30 mt-8 flex items-center gap-3">
-          {segments.map((segment, index) => (
-            <span
-              key={segment.number}
-              className={`h-1 rounded-full transition-all duration-300 ${
-                index === activeIndex
-                  ? "w-9 bg-white"
-                  : "w-3 bg-white/25"
-              }`}
-            />
-          ))}
         </div>
       </div>
     </section>
   );
 }
+

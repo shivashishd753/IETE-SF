@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Save, RefreshCw } from "lucide-react";
@@ -10,7 +10,6 @@ const initialForm = {
   title: "",
   description: "",
   category: "",
-  status: "upcoming",
   starts_at: "",
   ends_at: "",
   location: "",
@@ -41,7 +40,7 @@ function toLocalDateTime(value) {
   )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export default function EditEventPage() {
+function EditEventForm() {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
@@ -51,6 +50,12 @@ export default function EditEventPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const isCurrentlyLive =
+    form.starts_at &&
+    form.ends_at &&
+    new Date() >= new Date(form.starts_at) &&
+    new Date() < new Date(form.ends_at);
 
   useEffect(() => {
     if (!id) return;
@@ -81,7 +86,6 @@ export default function EditEventPage() {
           title: event.title ?? "",
           description: event.description ?? "",
           category: event.category ?? "",
-          status: event.status ?? "upcoming",
           starts_at: toLocalDateTime(event.starts_at),
           ends_at: toLocalDateTime(event.ends_at),
           location: event.location ?? "",
@@ -97,7 +101,9 @@ export default function EditEventPage() {
           setError(err.message || "Something went wrong.");
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
@@ -119,9 +125,6 @@ export default function EditEventPage() {
           : name === "sort_order"
             ? Number(value)
             : value,
-      ...(name === "status" && value !== "live"
-        ? { is_featured: false }
-        : {}),
     }));
   }
 
@@ -132,18 +135,35 @@ export default function EditEventPage() {
     setError("");
     setSuccess("");
 
-    if (
-      form.starts_at &&
-      form.ends_at &&
-      new Date(form.ends_at) < new Date(form.starts_at)
-    ) {
-      setError("End date cannot be earlier than start date.");
+    if (!form.starts_at || !form.ends_at) {
+      setError("Both start and end dates are required.");
       setSaving(false);
       return;
     }
 
-    if (form.is_featured && form.status !== "live") {
-      setError("Only live events can be featured.");
+    const startDate = new Date(form.starts_at);
+    const endDate = new Date(form.ends_at);
+
+    if (
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
+    ) {
+      setError("Please enter valid event dates.");
+      setSaving(false);
+      return;
+    }
+
+    if (endDate <= startDate) {
+      setError("End date and time must be after start date and time.");
+      setSaving(false);
+      return;
+    }
+
+    const currentlyLive =
+      new Date() >= startDate && new Date() < endDate;
+
+    if (form.is_featured && !currentlyLive) {
+      setError("Only currently live events can be featured.");
       setSaving(false);
       return;
     }
@@ -151,12 +171,9 @@ export default function EditEventPage() {
     try {
       const payload = {
         ...form,
-        starts_at: form.starts_at
-          ? new Date(form.starts_at).toISOString()
-          : null,
-        ends_at: form.ends_at
-          ? new Date(form.ends_at).toISOString()
-          : null,
+        starts_at: startDate.toISOString(),
+        ends_at: endDate.toISOString(),
+        is_featured: currentlyLive ? form.is_featured : false,
       };
 
       const response = await fetch(`/api/events/${id}`, {
@@ -243,6 +260,7 @@ export default function EditEventPage() {
           onSubmit={handleSubmit}
           className="space-y-7 rounded-xl border border-white/[0.08] bg-white/[0.025] p-5 backdrop-blur-xl sm:p-8"
         >
+          {/* Basic Information */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Basic Information
@@ -274,37 +292,22 @@ export default function EditEventPage() {
                 />
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>Category</label>
-                  <input
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    placeholder="Technical, Cultural, Workshop..."
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Event Status *</label>
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="live">Live</option>
-                    <option value="past">Past</option>
-                  </select>
-                </div>
+              <div>
+                <label className={labelClass}>Category</label>
+                <input
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  placeholder="Technical, Cultural, Workshop..."
+                  className={inputClass}
+                />
               </div>
             </div>
           </section>
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Date and Location */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Date and Location
@@ -312,8 +315,9 @@ export default function EditEventPage() {
 
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className={labelClass}>Start Date & Time</label>
+                <label className={labelClass}>Start Date & Time *</label>
                 <input
+                  required
                   type="datetime-local"
                   name="starts_at"
                   value={form.starts_at}
@@ -323,8 +327,9 @@ export default function EditEventPage() {
               </div>
 
               <div>
-                <label className={labelClass}>End Date & Time</label>
+                <label className={labelClass}>End Date & Time *</label>
                 <input
+                  required
                   type="datetime-local"
                   name="ends_at"
                   value={form.ends_at}
@@ -356,10 +361,16 @@ export default function EditEventPage() {
                 />
               </div>
             </div>
+
+            <p className="mt-4 text-xs leading-5 text-cyan-300/70">
+              Event status is calculated automatically: Upcoming before
+              the start time, Live during the event, and Past after it ends.
+            </p>
           </section>
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Event Media */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Event Media
@@ -384,7 +395,9 @@ export default function EditEventPage() {
 
               {form.poster_url && (
                 <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20 p-2">
-                  <p className="mb-2 text-xs text-slate-500">Poster preview</p>
+                  <p className="mb-2 text-xs text-slate-500">
+                    Poster preview
+                  </p>
                   <img
                     src={form.poster_url}
                     alt="Event poster preview"
@@ -396,19 +409,20 @@ export default function EditEventPage() {
               <div>
                 <label className={labelClass}>Video URL</label>
                 <input
-                  type="url"
-                  name="video_url"
-                  value={form.video_url}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                  className={inputClass}
-                />
+  type="text"
+  name="video_url"
+  value={form.video_url}
+  onChange={handleChange}
+  placeholder="/videos/event-name.mp4 or https://..."
+  className={inputClass}
+/>
               </div>
             </div>
           </section>
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Publishing Settings */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Publishing Settings
@@ -432,7 +446,7 @@ export default function EditEventPage() {
                   name="is_featured"
                   checked={form.is_featured}
                   onChange={handleChange}
-                  disabled={form.status !== "live"}
+                  disabled={!isCurrentlyLive}
                   className="h-4 w-4 accent-cyan-400 disabled:cursor-not-allowed"
                 />
                 Feature this event in the homepage hero
@@ -451,6 +465,7 @@ export default function EditEventPage() {
             </div>
           </section>
 
+          {/* Error and Success Messages */}
           {error && (
             <div className="rounded-lg border border-red-400/20 bg-red-400/[0.06] p-3 text-sm text-red-300">
               {error}
@@ -463,6 +478,7 @@ export default function EditEventPage() {
             </div>
           )}
 
+          {/* Form Actions */}
           <div className="flex flex-wrap justify-end gap-3 border-t border-white/[0.08] pt-6">
             <Link
               href="/dashboard/events"
@@ -483,5 +499,20 @@ export default function EditEventPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function EditEventPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center gap-3 bg-[#080B14] text-sm text-slate-400">
+          <RefreshCw size={17} className="animate-spin" />
+          Loading edit page...
+        </main>
+      }
+    >
+      <EditEventForm />
+    </Suspense>
   );
 }
