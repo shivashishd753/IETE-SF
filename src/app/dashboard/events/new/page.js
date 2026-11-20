@@ -385,14 +385,13 @@ const initialForm = {
   title: "",
   description: "",
   category: "",
-  status: "upcoming",
   starts_at: "",
   ends_at: "",
   location: "",
   registration_url: "",
   poster_url: "",
   video_url: "",
-  is_published: false,
+  is_published: true,
   is_featured: false,
   sort_order: 0,
 };
@@ -418,6 +417,12 @@ export default function AddEventPage() {
   const [posterFile, setPosterFile] = useState(null);
   const [ruleBookFile, setRuleBookFile] = useState(null);
   const [posterPreview, setPosterPreview] = useState("");
+
+  const isCurrentlyLive =
+    form.starts_at &&
+    form.ends_at &&
+    new Date() >= new Date(form.starts_at) &&
+    new Date() < new Date(form.ends_at);
 
   useEffect(() => {
     return () => {
@@ -517,12 +522,26 @@ export default function AddEventPage() {
     setError("");
     setSuccess("");
 
+    if (!form.starts_at || !form.ends_at) {
+      setError("Both start and end dates are required.");
+      setSaving(false);
+      return;
+    }
+
+    const startDate = new Date(form.starts_at);
+    const endDate = new Date(form.ends_at);
+
     if (
-      form.starts_at &&
-      form.ends_at &&
-      new Date(form.ends_at) < new Date(form.starts_at)
+      Number.isNaN(startDate.getTime()) ||
+      Number.isNaN(endDate.getTime())
     ) {
-      setError("End date cannot be earlier than start date.");
+      setError("Please enter valid event dates.");
+      setSaving(false);
+      return;
+    }
+
+    if (endDate <= startDate) {
+      setError("End date and time must be after start date and time.");
       setSaving(false);
       return;
     }
@@ -532,12 +551,8 @@ export default function AddEventPage() {
     try {
       const payload = {
         ...form,
-        starts_at: form.starts_at
-          ? new Date(form.starts_at).toISOString()
-          : null,
-        ends_at: form.ends_at
-          ? new Date(form.ends_at).toISOString()
-          : null,
+        starts_at: startDate.toISOString(),
+        ends_at: endDate.toISOString(),
       };
 
       const response = await fetch("/api/events", {
@@ -555,7 +570,6 @@ export default function AddEventPage() {
         throw new Error(data.message || "Unable to create event.");
       }
 
-      // The events API should return the inserted row as data.event.
       createdEventId = data.event?.id;
 
       if (!createdEventId) {
@@ -565,19 +579,11 @@ export default function AddEventPage() {
       }
 
       if (posterFile) {
-        await uploadEventMedia(
-          createdEventId,
-          posterFile,
-          "poster"
-        );
+        await uploadEventMedia(createdEventId, posterFile, "poster");
       }
 
       if (ruleBookFile) {
-        await uploadEventMedia(
-          createdEventId,
-          ruleBookFile,
-          "rulebook"
-        );
+        await uploadEventMedia(createdEventId, ruleBookFile, "rulebook");
       }
 
       setSuccess("Event and selected media created successfully.");
@@ -626,6 +632,7 @@ export default function AddEventPage() {
           onSubmit={handleSubmit}
           className="space-y-7 rounded-xl border border-white/[0.08] bg-white/[0.025] p-5 backdrop-blur-xl sm:p-8"
         >
+          {/* Basic Information */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Basic Information
@@ -657,37 +664,22 @@ export default function AddEventPage() {
                 />
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>Category</label>
-                  <input
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    placeholder="Technical, Cultural, Workshop..."
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Event Status *</label>
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="live">Live</option>
-                    <option value="past">Past</option>
-                  </select>
-                </div>
+              <div>
+                <label className={labelClass}>Category</label>
+                <input
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  placeholder="Technical, Cultural, Workshop..."
+                  className={inputClass}
+                />
               </div>
             </div>
           </section>
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Date and Location */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Date and Location
@@ -695,8 +687,9 @@ export default function AddEventPage() {
 
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label className={labelClass}>Start Date & Time</label>
+                <label className={labelClass}>Start Date & Time *</label>
                 <input
+                  required
                   type="datetime-local"
                   name="starts_at"
                   value={form.starts_at}
@@ -706,8 +699,9 @@ export default function AddEventPage() {
               </div>
 
               <div>
-                <label className={labelClass}>End Date & Time</label>
+                <label className={labelClass}>End Date & Time *</label>
                 <input
+                  required
                   type="datetime-local"
                   name="ends_at"
                   value={form.ends_at}
@@ -739,18 +733,25 @@ export default function AddEventPage() {
                 />
               </div>
             </div>
+
+            <p className="mt-4 text-xs leading-5 text-cyan-300/70">
+              Event status is assigned automatically from these dates:
+              Upcoming before the start, Live during the event, and Past
+              after it ends.
+            </p>
           </section>
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Event Media */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Event Media
             </h2>
 
             <p className="mb-4 text-xs leading-5 text-slate-500">
-              Upload a poster and an optional Rule Book PDF.
-              You can also provide an existing poster URL.
+              Upload a poster and an optional Rule Book PDF. You can also
+              provide an existing poster URL.
             </p>
 
             <div className="space-y-5">
@@ -830,6 +831,7 @@ export default function AddEventPage() {
 
           <div className="border-t border-white/[0.08]" />
 
+          {/* Publishing Settings */}
           <section>
             <h2 className="mb-5 text-sm font-semibold text-white">
               Publishing Settings
@@ -853,7 +855,7 @@ export default function AddEventPage() {
                   name="is_featured"
                   checked={form.is_featured}
                   onChange={handleChange}
-                  disabled={form.status !== "live"}
+                  disabled={!isCurrentlyLive}
                   className="h-4 w-4 accent-cyan-400"
                 />
                 Feature this event in the homepage hero
@@ -906,4 +908,3 @@ export default function AddEventPage() {
     </main>
   );
 }
-

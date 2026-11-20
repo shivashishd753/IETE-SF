@@ -2,47 +2,48 @@
 import "server-only";
 import { sql } from "@/lib/db";
 
-// Validate the event schedule before saving it.
+// Validate the event schedule before saving.
 export function validateEventTimes(startsAt, endsAt) {
-  const start = startsAt ? new Date(startsAt) : null;
-  const end = endsAt ? new Date(endsAt) : null;
+  if (!startsAt || !endsAt) {
+    return "Both event start and end date/time are required.";
+  }
 
-  if (start && Number.isNaN(start.getTime())) {
+  const start = new Date(startsAt);
+  const end = new Date(endsAt);
+
+  if (Number.isNaN(start.getTime())) {
     return "Invalid event start date and time.";
   }
 
-  if (end && Number.isNaN(end.getTime())) {
+  if (Number.isNaN(end.getTime())) {
     return "Invalid event end date and time.";
   }
 
-  if (start && end && end <= start) {
+  if (end <= start) {
     return "End date and time must be after the start date and time.";
   }
 
   return null;
 }
 
-// Calculate the effective event status.
+// Always calculate status from the event schedule.
 export function getEffectiveEventStatus(
-  { status, starts_at, ends_at },
+  { starts_at, ends_at },
   now = new Date()
 ) {
-  // Preserve manually selected status for events without
-  // a complete schedule.
   if (!starts_at || !ends_at) {
-    return status;
+    throw new Error("Event start and end times are required.");
   }
 
   const start = new Date(starts_at);
   const end = new Date(ends_at);
 
-  // Preserve the existing status if legacy dates are invalid.
   if (
     Number.isNaN(start.getTime()) ||
     Number.isNaN(end.getTime()) ||
     end <= start
   ) {
-    return status;
+    throw new Error("Invalid event schedule.");
   }
 
   if (now < start) return "upcoming";
@@ -51,19 +52,20 @@ export function getEffectiveEventStatus(
   return "past";
 }
 
-// Synchronize scheduled events in the database.
+// Synchronize scheduled event statuses in the database.
 export async function syncEventStatuses() {
   await sql`
     UPDATE events
     SET
       status = CASE
-        WHEN NOW() < starts_at THEN 'upcoming'
-        WHEN NOW() < ends_at THEN 'live'
+        WHEN CURRENT_TIMESTAMP < starts_at THEN 'upcoming'
+        WHEN CURRENT_TIMESTAMP < ends_at THEN 'live'
         ELSE 'past'
       END,
 
       is_featured = CASE
-        WHEN NOW() >= starts_at AND NOW() < ends_at
+        WHEN CURRENT_TIMESTAMP >= starts_at
+          AND CURRENT_TIMESTAMP < ends_at
           THEN is_featured
         ELSE FALSE
       END
@@ -73,16 +75,16 @@ export async function syncEventStatuses() {
       AND ends_at > starts_at
       AND (
         status IS DISTINCT FROM CASE
-          WHEN NOW() < starts_at THEN 'upcoming'
-          WHEN NOW() < ends_at THEN 'live'
+          WHEN CURRENT_TIMESTAMP < starts_at THEN 'upcoming'
+          WHEN CURRENT_TIMESTAMP < ends_at THEN 'live'
           ELSE 'past'
         END
 
         OR (
           is_featured = TRUE
           AND (
-            NOW() < starts_at
-            OR NOW() >= ends_at
+            CURRENT_TIMESTAMP < starts_at
+            OR CURRENT_TIMESTAMP >= ends_at
           )
         )
       )

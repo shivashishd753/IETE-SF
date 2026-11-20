@@ -224,9 +224,9 @@ const stats = {
                 {displayName}
                 <span className="text-cyan-300">.</span>
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
+              {/* <p className="mt-2 text-sm text-slate-500">
                 Manage events and website content from here.
-              </p>
+              </p> */}
             </section>
 
          <section>
@@ -253,9 +253,9 @@ const stats = {
     ))}
   </div>
 
-  <p className="mt-3 text-xs text-slate-600">
+  {/* <p className="mt-3 text-xs text-slate-600">
     Live statistics from the IETE-SF events database.
-  </p>
+  </p> */}
 </section>
 
             <section className="mt-12">

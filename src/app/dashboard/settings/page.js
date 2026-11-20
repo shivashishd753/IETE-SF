@@ -1,3 +1,4 @@
+export const instant = false;
 import ChangePasswordForm from "@/app/components/change-password-form";
 import Link from "next/link";
 import { redirect } from "next/navigation";

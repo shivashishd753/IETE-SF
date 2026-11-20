@@ -8,8 +8,6 @@ import {
   syncEventStatuses,
 } from "@/lib/event-status";
 
-const allowedStatuses = ["upcoming", "live", "past"];
-
 function createSlug(title) {
   const base = title
     .toLowerCase()
@@ -32,7 +30,6 @@ export async function GET() {
       );
     }
 
-    // Synchronize scheduled event statuses first.
     await syncEventStatuses();
 
     const events = await sql`
@@ -73,14 +70,13 @@ export async function POST(request) {
       title,
       description = null,
       category = null,
-      status = "upcoming",
       starts_at = null,
       ends_at = null,
       location = null,
       registration_url = null,
       poster_url = null,
       video_url = null,
-      is_published = false,
+      is_published = true,
       is_featured = false,
       sort_order = 0,
     } = body;
@@ -89,14 +85,6 @@ export async function POST(request) {
     if (!title || typeof title !== "string" || !title.trim()) {
       return NextResponse.json(
         { success: false, message: "Event title is required" },
-        { status: 400 }
-      );
-    }
-
-    // Validate manually requested status.
-    if (!allowedStatuses.includes(status)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid event status" },
         { status: 400 }
       );
     }
@@ -112,11 +100,11 @@ export async function POST(request) {
       );
     }
 
-    // Normalize event dates.
+    // Normalize dates.
     const startsAt = starts_at || null;
     const endsAt = ends_at || null;
 
-    // Validate the event schedule.
+    // Both dates are required and must form a valid schedule.
     const scheduleError = validateEventTimes(startsAt, endsAt);
 
     if (scheduleError) {
@@ -126,17 +114,19 @@ export async function POST(request) {
       );
     }
 
-    // Calculate the actual status from the schedule.
+    // Automatically calculate status from event dates.
     const effectiveStatus = getEffectiveEventStatus({
-      status,
       starts_at: startsAt,
       ends_at: endsAt,
     });
 
-    // Only currently live events can be featured.
+    // Only live events can be featured.
     if (is_featured && effectiveStatus !== "live") {
       return NextResponse.json(
-        { success: false, message: "Only live events can be featured" },
+        {
+          success: false,
+          message: "Only live events can be featured",
+        },
         { status: 400 }
       );
     }
