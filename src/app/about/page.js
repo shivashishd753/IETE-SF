@@ -2305,7 +2305,7 @@ function PillarsSignal() {
     <section
       id="four-pillars"
       aria-label="The four pillars of IETE"
-      className="relative overflow-hidden border-y border-white/[0.07] bg-[#090D13] py-16 sm:py-24"
+      className="relative overflow-hidden bg-[#080B10] py-16 sm:py-24"
     >
       <div className="mx-auto mb-12 w-full px-5 text-center sm:mb-14">
   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#9CB5D8]">
@@ -2487,7 +2487,7 @@ const faculty = [
       {/* ═══ NATIONAL BODY ═══ */}
       <section
         id="national-body"
-        className="relative overflow-hidden border-t border-white/[0.05] bg-[#0A0E14] px-5 pt-16 pb-24 sm:pt-28 sm:pb-36"
+        className="relative overflow-hidden bg-[#080B10] px-5 pt-16 pb-24 sm:pt-28 sm:pb-36"
       >
         <div className="relative z-10 mx-auto max-w-6xl">
           <RevealGroup>
@@ -2515,7 +2515,7 @@ const faculty = [
       </section>
 
       {/* ═══ OBJECTIVES ═══ */}
-      <section className="relative overflow-hidden border-t border-white/[0.05] bg-[#080C12] px-5 py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.09]"
@@ -2580,7 +2580,7 @@ const faculty = [
       <PillarsSignal />
 
       {/* ═══ FACULTY / LEADERS ═══ */}
-      <section className="relative overflow-hidden border-t border-white/[0.05] bg-[#0A0E14] px-5 py-20 sm:py-28">
+      <section className="relative overflow-hidden bg-[#080B10] px-5 py-20 sm:py-28">
         <div className="relative z-10 mx-auto max-w-5xl">
           <RevealGroup>
             <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#9CB5D8]">
@@ -2637,7 +2637,7 @@ const faculty = [
       </section>
 
       {/* ═══ NATIONWIDE PRESENCE ═══ */}
-      <section className="relative overflow-hidden border-t border-white/[0.05] bg-[#080C12] px-5 py-24 sm:py-32">
+      <section className="relative overflow-hidden bg-[#080B10] px-5 py-24 sm:py-32">
         <div className="relative z-10 mx-auto max-w-5xl text-center">
           <RevealGroup delay={100}>
             <h2 className="text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">

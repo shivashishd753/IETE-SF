@@ -600,15 +600,15 @@ export default function Home() {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex items-center gap-4 rounded-xl border border-violet-400/40 bg-[#0B0B19]/85 px-4 py-3 shadow-[0_0_18px_rgba(139,92,246,0.12)] backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/70 hover:shadow-[0_0_24px_rgba(34,211,238,0.18)] sm:px-5"
+              className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-white/15 bg-[#10131b] px-4 py-3 shadow-sm shadow-black/20 transition-[transform,border-color,background-color,box-shadow] duration-200 before:absolute before:left-4 before:right-4 before:top-0 before:h-px before:origin-left before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-sky-400/80 before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-[#151923] hover:shadow-md hover:shadow-black/30 hover:before:scale-x-100 active:translate-y-0 sm:px-5"
             >
-              <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.8)] transition-shadow group-hover:shadow-[0_0_15px_rgba(103,232,249,1)]" />
+              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-sky-300 shadow-[0_0_4px_rgba(125,211,252,0.35)] [animation-duration:2.4s]" />
 
-              <span className="whitespace-nowrap text-sm font-semibold tracking-wide text-white transition-colors group-hover:text-cyan-200">
+              <span className="whitespace-nowrap text-sm font-semibold tracking-wide text-white">
                 {item.label}
               </span>
 
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-base text-violet-200 transition-all duration-300 group-hover:translate-x-0.5 group-hover:border-cyan-300/40 group-hover:bg-cyan-300/10 group-hover:text-cyan-200">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-base text-slate-300 transition-[transform,color,border-color] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:text-white">
                 ↗
               </span>
             </a>
