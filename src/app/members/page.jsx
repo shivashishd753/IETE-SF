@@ -450,6 +450,20 @@ function Portrait({ member, className = "", eager = false }) {
   );
 }
 
+function LinkedInGlyph({ size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="2 2 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z" />
+    </svg>
+  );
+}
+
 function LinkedInButton({ member, compact = false }) {
   if (!hasLink(member)) return null;
   return (
@@ -461,7 +475,7 @@ function LinkedInButton({ member, compact = false }) {
       className={compact ? "icon-link" : "cta-link"}
     >
       {!compact && <span>LinkedIn</span>}
-      <ArrowUpRight size={compact ? 16 : 15} />
+      {compact ? <LinkedInGlyph size={16} /> : <ArrowUpRight size={15} />}
     </a>
   );
 }
@@ -498,8 +512,9 @@ function MemberDrum({ id, title, description, members, showRole = false }) {
   const step = n > 0 ? 360 / n : 0;
   const tanStep = Math.tan(Math.PI / Math.max(3, n));
   const isSmall = stage.w < 640;
+  const isTablet = !isSmall && stage.w < 1100;
   const byHeight = (stage.h - 56) / 1.32;
-  const byWidth = (2 * stage.w * (isSmall ? 1.3 : 0.64) * tanStep) / 1.08;
+  const byWidth = (2 * stage.w * (isSmall ? 1.3 : isTablet ? 0.95 : 0.64) * tanStep) / 1.08;
   const cardW = Math.round(
     Math.max(120, Math.min(340, byHeight, byWidth, stage.w * (isSmall ? 0.62 : 0.58)))
   );
@@ -1197,10 +1212,12 @@ export default function MembersPage() {
 
         .drum-meta {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 12px;
+          gap: 10px;
           margin-top: 0.35rem;
+          text-align: center;
         }
 
         .drum-branch {
@@ -1292,6 +1309,44 @@ export default function MembersPage() {
   }
 }
 
+        /* ---------- tablet + mobile: one team per screen, three clearly separated parts ---------- */
+        @media (max-width: 1100px), (max-width: 1400px) and (pointer: coarse) {
+          .drum-section {
+            height: 100svh;
+            min-height: 920px;
+            justify-content: center;
+            padding-bottom: 24px;
+          }
+
+          .drum-stage {
+            flex: none;
+            height: clamp(420px, 44svh, 520px);
+            margin-top: 32px;
+          }
+
+          .drum-info {
+            padding-top: 80px;
+          }
+        }
+
+        @media (max-width: 639px) {
+          .drum-section {
+            min-height: 680px;
+          }
+
+          .drum-stage {
+            height: clamp(320px, 82vw, 380px);
+            margin-top: 30px;
+          }
+
+          .drum-info {
+            padding-top: 80px;
+          }
+
+          .drum-section .section-title {
+            font-size: clamp(1.35rem, 6vw, 1.8rem);
+          }
+        }
 
         // .drum-hint {
         //   margin-top: 0.3rem;

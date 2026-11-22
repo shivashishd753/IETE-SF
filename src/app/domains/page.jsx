@@ -238,24 +238,27 @@ const FRAG = /* glsl */ `
     return (uv - 0.5) * s + 0.5;
   }
 
-  float channel(vec2 uv, int c) {
-    float base = 0.07 + 0.05 * uv.y;
-    float v = base;
+  // one fetch of each texture per call
+  vec3 sampleAll(vec2 uv) {
+    vec3 v = vec3(0.07 + 0.05 * uv.y);
     if (uHasVideo > 0.5) {
-      vec3 vid = texture2D(tVideo, cover(uv)).rgb;
-      v = c == 0 ? vid.r : (c == 1 ? vid.g : vid.b);
+      v = texture2D(tVideo, cover(uv)).rgb;
     }
     vec4 t = texture2D(tText, uv);
-    float tc = c == 0 ? t.r : (c == 1 ? t.g : t.b);
-    return mix(v, tc, t.a);
+    return mix(v, t.rgb, t.a);
   }
 
   void main() {
-    vec2 o = vec2(uShift, 0.0);
-    float r = channel(vUv + o, 0);
-    float g = channel(vUv, 1);
-    float b = channel(vUv - o, 2);
-    gl_FragColor = vec4(r, g, b, 1.0);
+    // at rest there is no RGB split, so a single sample gives the same pixel
+    if (abs(uShift) < 0.0002) {
+      gl_FragColor = vec4(sampleAll(vUv), 1.0);
+    } else {
+      vec2 o = vec2(uShift, 0.0);
+      float r = sampleAll(vUv + o).r;
+      float g = sampleAll(vUv).g;
+      float b = sampleAll(vUv - o).b;
+      gl_FragColor = vec4(r, g, b, 1.0);
+    }
   }
 `;
 
@@ -381,22 +384,28 @@ export default function DomainsPage() {
       video.addEventListener("error", () => {
         material.uniforms.uHasVideo.value = 0;
       });
-      video.play().catch(() => {});
 
       const mesh = new THREE.Mesh(geometry, material);
       mesh.userData.index = index;
       tilt.add(mesh);
 
-      return { mesh, material, video, videoTexture, textTexture, onReady };
+      return { mesh, material, video, videoTexture, textTexture, onReady, want: false };
     });
 
     // resume playback if the browser blocked autoplay
-    const resumeVideos = () => cards.forEach((c) => c.video.play().catch(() => {}));
-    window.addEventListener("pointerdown", resumeVideos, { once: true });
+    // (kept for every tap, not just the first: the first tap may happen before
+    // the carousel is on screen, and play() on a playing video is a no-op)
+    const resumeVideos = () =>
+      cards.forEach((c) => {
+        if (c.want && c.video.paused) c.video.play().catch(() => {});
+      });
+    window.addEventListener("pointerdown", resumeVideos);
 
     /* ---------- sizing ---------- */
+    let cw = 0; // cached container width
     const resize = () => {
       const w = container.clientWidth || window.innerWidth;
+      cw = w;
       const h = container.clientHeight || window.innerHeight;
       renderer.setSize(w, h, false);
       const aspect = w / h;
@@ -432,8 +441,11 @@ export default function DomainsPage() {
     let snapTimer = null;
     let mouseX = 0;
     let mouseY = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    let pointerDirty = false;
 
-    const pxPerCard = () => Math.max(320, container.clientWidth * 0.55);
+    const pxPerCard = () => Math.max(320, cw * 0.55);
 
     const scheduleSnap = (delay = 140) => {
       clearTimeout(snapTimer);
@@ -494,9 +506,9 @@ export default function DomainsPage() {
     };
 
     const onPointerMove = (e) => {
-      const rect = container.getBoundingClientRect();
-      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+      pointerDirty = true;
 
       if (!dragging) return;
       const now = performance.now();
@@ -556,10 +568,27 @@ export default function DomainsPage() {
     window.addEventListener("keydown", onKey);
 
     /* ---------- render loop ---------- */
+    // Only runs while the carousel is on screen and the tab is visible.
+    const PLAY_RANGE = 2.4; // rad: cards inside this range keep their video playing
     let raf = 0;
     let last = performance.now();
+    let running = false;
+    let inView = false;
+    let lastFill = "";
+    let lastTA = "";
+    let lastOA = "";
+    let lastTB = "";
+    let lastOB = "";
+
+    const setPlaying = (card, want) => {
+      if (card.want === want) return;
+      card.want = want;
+      if (want) card.video.play().catch(() => {});
+      else card.video.pause();
+    };
 
     const tick = (now) => {
+      if (!running) return;
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
 
@@ -576,9 +605,17 @@ export default function DomainsPage() {
         card.mesh.rotation.y = angle;
         card.mesh.visible = Math.abs(angle) < 1.75;
         card.material.uniforms.uShift.value = shift;
+        // only decode video for the cards that are (about to be) visible
+        setPlaying(card, Math.abs(angle) < PLAY_RANGE);
       });
 
-      // subtle pointer tilt
+      // subtle pointer tilt (rect measured once per frame, not per event)
+      if (pointerDirty) {
+        const rect = container.getBoundingClientRect();
+        mouseX = ((pointerX - rect.left) / rect.width) * 2 - 1;
+        mouseY = ((pointerY - rect.top) / rect.height) * 2 - 1;
+        pointerDirty = false;
+      }
       tilt.rotation.x += (mouseY * TILT - tilt.rotation.x) * 0.06;
       tilt.rotation.y += (-mouseX * TILT - tilt.rotation.y) * 0.06;
 
@@ -595,10 +632,11 @@ export default function DomainsPage() {
         // wrapping from the last slide back to the first: drain smoothly
         fillShown += (fillTarget - fillShown) * (1 - Math.exp(-dt * 5));
       }
-      fillPath.setAttribute(
-        "stroke-dasharray",
-        `${Math.max(fillShown * 100, 0.01)} 100`
-      );
+      const fillStr = `${Math.max(fillShown * 100, 0.01).toFixed(2)} 100`;
+      if (fillStr !== lastFill) {
+        fillPath.setAttribute("stroke-dasharray", fillStr);
+        lastFill = fillStr;
+      }
 
       // name: old name rolls up, next one rises from below
       if (shownA !== i0) {
@@ -609,20 +647,63 @@ export default function DomainsPage() {
         nameB.textContent = DOMAINS[i1].name;
         shownB = i1;
       }
-      nameA.style.transform = `translateY(${-frac * 100}%)`;
-      nameA.style.opacity = String(1 - 0.65 * frac);
-      nameB.style.transform = `translateY(${(1 - frac) * 100}%)`;
-      nameB.style.opacity = String(0.35 + 0.65 * frac);
+      // DOM is only touched when a value actually changed
+      const tA = `translateY(${(-frac * 100).toFixed(2)}%)`;
+      const oA = (1 - 0.65 * frac).toFixed(3);
+      const tB = `translateY(${((1 - frac) * 100).toFixed(2)}%)`;
+      const oB = (0.35 + 0.65 * frac).toFixed(3);
+      if (tA !== lastTA) {
+        nameA.style.transform = tA;
+        lastTA = tA;
+      }
+      if (oA !== lastOA) {
+        nameA.style.opacity = oA;
+        lastOA = oA;
+      }
+      if (tB !== lastTB) {
+        nameB.style.transform = tB;
+        lastTB = tB;
+      }
+      if (oB !== lastOB) {
+        nameB.style.opacity = oB;
+        lastOB = oB;
+      }
 
       renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      last = performance.now();
+      raf = requestAnimationFrame(tick);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      cards.forEach((c) => setPlaying(c, false));
+    };
+    const sync = () => (inView && !document.hidden ? start() : stop());
+
+    // start a little before the carousel scrolls into view, stop when it leaves
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        sync();
+      },
+      { rootMargin: "20% 0px" }
+    );
+    io.observe(container);
+    document.addEventListener("visibilitychange", sync);
 
     /* ---------- cleanup ---------- */
     return () => {
+      running = false;
       cancelAnimationFrame(raf);
       clearTimeout(snapTimer);
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
       ro.disconnect();
       container.removeEventListener("wheel", onWheel);
       container.removeEventListener("pointerdown", onPointerDown);
