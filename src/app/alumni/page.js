@@ -1588,55 +1588,59 @@ const alumniBatches = ["2023", "2022", "2021","2020", "2019","2018","2017","2016
 
 const alumniPhotos = {
   "2023": [
-    { filename: "aakriti.jpeg", name: "Aakriti Paul", linkedin: "https://www.linkedin.com/in/aakriti-paul-04626a316/" },
-    { filename: "ab.jpg", name: "Ayush Bhagat", linkedin: "https://www.linkedin.com/in/ayush-k-bhagat/" },
-    { filename: "abishek.jpg", name: "Abhishek Prasad", linkedin: "https://www.linkedin.com/in/abhishekprasad09/" },
     { filename: "aditya.jpeg", name: "Aditya Raj", linkedin: "https://www.linkedin.com/in/aditya-raj-461a31274" },
     { filename: "amit.jpeg", name: "Amit Gupta", linkedin: "https://www.linkedin.com/in/amitkrgupta31/" },
-    { filename: "ankit.jpeg", name: "Ankit Yadav", linkedin: "https://www.linkedin.com/in/ankit-yadav-b95a35290/" },
-    { filename: "Anukriti.jpg", name: "Anukriti Kumari", linkedin: "https://www.linkedin.com/in/anukriti-kumari-bb5625290/" },
+    { filename: "rishita.jpeg", name: "Rishita Raj", linkedin: "https://www.linkedin.com/in/rishita-raj-836b13290" },
+    { filename: "ab.jpg", name: "Ayush Bhagat", linkedin: "https://www.linkedin.com/in/ayush-k-bhagat/" },
     { filename: "kashish.jpeg", name: "Kashish Kumari", linkedin: "https://www.linkedin.com/in/kashish-kumari-898771327/" },
-    { filename: "neeraj.jpeg", name: "Neeraj Kachhap", linkedin: "https://www.linkedin.com/in/neeraj-kachhap-081911303/" },
-    { filename: "punam.jpeg", name: "Punam Kumari", linkedin: "https://www.linkedin.com/in/punam-kumari-b17b0a282/" },
     { filename: "roushan.jpeg", name: "Roushan Raj", linkedin: "https://www.linkedin.com/in/roushan-raj-cmd007/" },
+    { filename: "punam.jpeg", name: "Punam Kumari", linkedin: "https://www.linkedin.com/in/punam-kumari-b17b0a282/" },
+    { filename: "neeraj.jpeg", name: "Neeraj Kachhap", linkedin: "https://www.linkedin.com/in/neeraj-kachhap-081911303/" },
+    { filename: "aakriti.jpeg", name: "Aakriti Paul", linkedin: "https://www.linkedin.com/in/aakriti-paul-04626a316/" },
     { filename: "sakshee.jpg", name: "Sakshee Dubey", linkedin: "https://www.linkedin.com/in/sakshee-dubey-0b3459291/" },
+    { filename: "abishek.jpg", name: "Abhishek Prasad", linkedin: "https://www.linkedin.com/in/abhishekprasad09/" },
+    { filename: "Anukriti.jpg", name: "Anukriti Kumari", linkedin: "https://www.linkedin.com/in/anukriti-kumari-bb5625290/" },
+    { filename: "ankit.jpeg", name: "Ankit Yadav", linkedin: "https://www.linkedin.com/in/ankit-yadav-b95a35290/" },
     { filename: "vishnu.jpg", name: "Vishnu Singh", linkedin: "https://www.linkedin.com/in/vishnu-singh-munda-a88a93290/" },
     { filename: "warsha.jpeg", name: "Warsha Karketta", linkedin: "https://www.linkedin.com/in/warsha840/" },
   ],
 
   "2022": [
     { filename: "Adarsh.jpg", name: "Adarsh Kumar", linkedin: "https://www.linkedin.com/in/adarsh-kumar-abb0a3259/",company:"" },
-    { filename: "Anjali1.jpg", name: "Anjali Singh", linkedin: "https://www.linkedin.com/in/anjali-singh-58a58b257/",company:"" },
-    { filename: "Anshika.jpeg", name: "Anshika Mishra", linkedin: "https://www.linkedin.com/in/anshika-mishra-2a7641257/",company:"" },
-    { filename: "Aquib.jpg", name: "Aquib Aftab", linkedin: "https://www.linkedin.com/in/aquib-aftab-65917b252/",company:"" },
-    { filename: "Deepti.jpeg", name: "Deepti Kumari", linkedin: "https://www.linkedin.com/in/deepti-kumari-482049258/",company:"" },
-    { filename: "Faizan.jpg", name: "Faizan Ahmad", linkedin: "https://www.linkedin.com/in/faizan-ahmad-full-stack/" ,company:""},
-    { filename: "Mayank1.jpeg", name: "Kumar Mayank", linkedin: "https://www.linkedin.com/in/kumar-mayank-410660221/",company:"" },
-    { filename: "Puspam.png", name: "Puspam Jha", linkedin: "https://www.linkedin.com/in/puspam-jha-44606a225/",company:"" },
-    { filename: "Rahul.jpg", name: "Rahul Kumar Das", linkedin: "https://www.linkedin.com/in/rahul-das-169596258/",company:"" },
-    { filename: "Rudra.jpg", name: "Rudranil Ganguly", linkedin: "https://www.linkedin.com/in/rudranil-ganguly-305411254/",company:"" },
-    { filename: "Shaswat.jpg", name: "Kumar Shaswat", linkedin: "https://www.linkedin.com/in/kumar-shaswat-3a252a35a/",company:"" },
     { filename: "Shivam.jpeg", name: "Shivam Singh", linkedin: "https://www.linkedin.com/in/shivamsinghpsss/" ,company:""},
     { filename: "simran.jpeg", name: "Simran", linkedin: "https://www.linkedin.com/in/simran-bb9338258/",company:"" },
-    { filename: "sonali.png", name: "Sonali Gorai", linkedin: "https://www.linkedin.com/in/sonali-gorai-b0a631264/" ,company:""},
+    { filename: "Shaswat.jpg", name: "Kumar Shaswat", linkedin: "https://www.linkedin.com/in/kumar-shaswat-3a252a35a/",company:"" },
+    { filename: "Anshika.jpeg", name: "Anshika Mishra", linkedin: "https://www.linkedin.com/in/anshika-mishra-2a7641257/",company:"" },
+    { filename: "Anjali1.jpg", name: "Anjali Singh", linkedin: "https://www.linkedin.com/in/anjali-singh-58a58b257/",company:"" },
     { filename: "Sashi_s.jpeg", name: "Sashi Sekhar Singh", linkedin: "https://www.linkedin.com/in/sashi-sekhar-singh-858a5424a/",company:"" },
+    { filename: "Anjali1.jpg", name: "Anjali Singh", linkedin: "https://www.linkedin.com/in/anjali-singh-58a58b257/",company:"" },
+    { filename: "Rudra.jpg", name: "Rudranil Ganguly", linkedin: "https://www.linkedin.com/in/rudranil-ganguly-305411254/",company:"" },
+    { filename: "Aquib.jpg", name: "Aquib Aftab", linkedin: "https://www.linkedin.com/in/aquib-aftab-65917b252/",company:"" },
+    { filename: "Deepti.jpeg", name: "Deepti Kumari", linkedin: "https://www.linkedin.com/in/deepti-kumari-482049258/",company:"" },
+    { filename: "Mayank1.jpeg", name: "Kumar Mayank", linkedin: "https://www.linkedin.com/in/kumar-mayank-410660221/",company:"" },
+    { filename: "Rahul.jpg", name: "Rahul Kumar Das", linkedin: "https://www.linkedin.com/in/rahul-das-169596258/",company:"" },
+    { filename: "Faizan.jpg", name: "Faizan Ahmad", linkedin: "https://www.linkedin.com/in/faizan-ahmad-full-stack/" ,company:""},
+    { filename: "Puspam.png", name: "Puspam Jha", linkedin: "https://www.linkedin.com/in/puspam-jha-44606a225/",company:"" },
+    
+    { filename: "sonali.png", name: "Sonali Gorai", linkedin: "https://www.linkedin.com/in/sonali-gorai-b0a631264/" ,company:""},
   ],
 
   "2021": [
-    { filename: "ADARSH_IETE.jpg", name: "Adarsh Trivedi", linkedin: "https://www.linkedin.com/in/adarsh-trivedi-10ba6a22a/",company:"Yamaha Motor Solutions India" },
-    { filename: "Ankita.jpg", name: "Ankita Ghosh", linkedin: "https://www.linkedin.com/in/ankitag39/",company:"TCS" },
-    { filename: "Ashish.jpg", name: "Ashish Sinha", linkedin: "https://www.linkedin.com/in/ashish-kumar-sinha-82215124a/",company:"Shree Cement Ltd." },
-    { filename: "Avinash.jpeg", name: "Avinash Yadav", linkedin: "https://www.linkedin.com/in/beyond-avinash/",company:"Youtube Growth Partner @Starter Story" },
-    { filename: "Ayushi.jpeg", name: "Ayushi Tewary", linkedin: "https://www.linkedin.com/in/ayushi-tewary-922ba5253/",company:"Tata Hitachi Construction Machinery Company Private " },
-    { filename: "Deepak.jpg", name: "Deepak Kumar", linkedin: "https://www.linkedin.com/in/deepak-kumar-052779225/",company:"StampMyVisa" },
-    { filename: "Mehar.jpg", name: "Mehar Talat", linkedin: "https://www.linkedin.com/in/mehartalat/",company:"Bokaro Steel Limited, SAIL" },
     { filename: "Priyanshu.jpg", name: "Priyanshu Mukherjee", linkedin: "https://www.linkedin.com/in/mukherjee-priyanshu/" ,company:"XLRI Jamshedpur"},
-    { filename: "Rahul_J.jpg", name: "Rahul Jha", linkedin: "https://www.linkedin.com/in/jharahul28/",company:"GlobalLogic" },
-    { filename: "RAHUL_KR_IETE.jpg", name: "Rahul Kumar", linkedin: "https://www.linkedin.com/in/rahul-kumar-4b133a23b/recent-activity/all/",company:"TCS" },
-    { filename: "Rishita.jpg", name: "Rishita Dutta", linkedin: "https://www.linkedin.com/in/rishita-dutta-24a91824a/",company:"JSW" },
     { filename: "Rohit_iete.jpg", name: "Rohit Kumar Grihi", linkedin: "https://www.linkedin.com/in/rohit-kumar-grihi/",company:"Pi42" },
     { filename: "Saron.jpg", name: "Saron Mukti Ekka", linkedin: "https://www.linkedin.com/in/saron-ekka/",company:"IIM Bangalore" },
+    { filename: "ADARSH_IETE.jpg", name: "Adarsh Trivedi", linkedin: "https://www.linkedin.com/in/adarsh-trivedi-10ba6a22a/",company:"Yamaha Motor Solutions India" },
     { filename: "Supriya.jpg", name: "Supriya Sharma", linkedin: "https://www.linkedin.com/in/supriya-sharma-6a2057225/",company:"Nalco water India private limited, an Ecolab Company" },
+    { filename: "RAHUL_KR_IETE.jpg", name: "Rahul Kumar", linkedin: "https://www.linkedin.com/in/rahul-kumar-4b133a23b/recent-activity/all/",company:"TCS" },
+    { filename: "Deepak.jpg", name: "Deepak Kumar", linkedin: "https://www.linkedin.com/in/deepak-kumar-052779225/",company:"StampMyVisa" },
+    { filename: "Ankita.jpg", name: "Ankita Ghosh", linkedin: "https://www.linkedin.com/in/ankitag39/",company:"TCS" },
+    { filename: "Avinash.jpeg", name: "Avinash Yadav", linkedin: "https://www.linkedin.com/in/beyond-avinash/",company:"Youtube Growth Partner @Starter Story" },
+    { filename: "Mehar.jpg", name: "Mehar Talat", linkedin: "https://www.linkedin.com/in/mehartalat/",company:"Bokaro Steel Limited, SAIL" },
+    { filename: "Rahul_J.jpg", name: "Rahul Jha", linkedin: "https://www.linkedin.com/in/jharahul28/",company:"GlobalLogic" },
+    { filename: "Rishita.jpg", name: "Rishita Dutta", linkedin: "https://www.linkedin.com/in/rishita-dutta-24a91824a/",company:"JSW" },
+    { filename: "Ayushi.jpeg", name: "Ayushi Tewary", linkedin: "https://www.linkedin.com/in/ayushi-tewary-922ba5253/",company:"Tata Hitachi Construction Machinery Company Private " },
+    { filename: "Ashish.jpg", name: "Ashish Sinha", linkedin: "https://www.linkedin.com/in/ashish-kumar-sinha-82215124a/",company:"Shree Cement Ltd." }
+    
   ],
 
   "2020": [
@@ -1647,31 +1651,33 @@ const alumniPhotos = {
   { filename: "muskan.png",name: "Muskan Naaz",linkedin: "https://www.linkedin.com/in/muskan-naaz-a112ba208/",company:"HUL"},
   { filename: "sandeep.png",name: "Sandeep Kr. Hembrom",linkedin: "https://www.linkedin.com/in/sandeephembrom/",company:"TCS Ninja"},
   { filename: "shreya.png",name: "Shreya Prabha",linkedin: "https://www.linkedin.com/in/shreya-prabha-897b27197/",company:"Technip Energies"},
-  { filename: "vaidehi.png", name: "Vaidehi Singh",linkedin: "https://www.linkedin.com/in/vaidehi-singh-a73186207/",company:"Tata Steel"},
   { filename: "vijay.png",name: "Vijay Lowada",linkedin: "https://www.linkedin.com/in/vijay2002/",company:"TCS Ninja"},
-  { filename: "aman.png",name: "Aman Kr. Singh",linkedin: "https://www.linkedin.com/in/aman-singh-rajput-1b6b351bb/",company:"TCS Digital"},
+  { filename: "vaidehi.png", name: "Vaidehi Singh",linkedin: "https://www.linkedin.com/in/vaidehi-singh-a73186207/",company:"Tata Steel"},
   { filename: "avinav.png",name: "Avinav Raj Singh",linkedin: "https://www.linkedin.com/in/avinav-raj-632641207/",company:"Ecolab" },
+  { filename: "aman.png",name: "Aman Kr. Singh",linkedin: "https://www.linkedin.com/in/aman-singh-rajput-1b6b351bb/",company:"TCS Digital"},
+  { filename: "ruma.png", name: "Ruma Rupal",linkedin: "https://www.linkedin.com/in/ruma-rupal-56aa56236/",company:"Higher Studies" },
   { filename: "=aniket.png", name: "Aniket Kr. Gupta",linkedin: "https://www.linkedin.com/in/aniket-kumar-gupta-4469a1213/",company:"Tata Steel" },
   { filename: "manisha.png", name: "Manisha Kumari",linkedin: "https://www.linkedin.com/in/manisha-kumari-3a022a217/",company:"Tata Steel" },
-  { filename: "ruma.png", name: "Ruma Rupal",linkedin: "https://www.linkedin.com/in/ruma-rupal-56aa56236/",company:"Higher Studies" },
 ],
 
 
   "2019": [
+    { filename: "Harsha.jpg", name: "Harsha Sinha", linkedin: "https://www.linkedin.com/in/harsha-sinha-9a51601a1/",company:"AMNS" },
+    { filename: "Himanshu.jpg", name: "Himanshu Jaiswal", linkedin: "https://www.linkedin.com/in/himanshu-jaiswal-889771197/",company:"Global Logic" },
+    
+    { filename: "Shubhangi.jpg", name: "Shubhangi Anand", linkedin: "https://www.linkedin.com/in/shubhangi-anand/",company:"JSW" },
+    { filename: "Dhiraj.jpg", name: "Dhiraj Pandey", linkedin: "https://www.linkedin.com/in/dhiraj-pandey-007bitsindri/" ,company:"L&T"},
+    { filename: "Laxmi.jpg", name: "Lakshmi Sharma", linkedin: "https://www.linkedin.com/in/laxmi-sharma-84806a1b3/",company:"Vedanta" },
     { filename: "Abhishek.jpg", name: "Abhishek Ranjan", linkedin: "https://www.linkedin.com/in/abhishek-ranjan-690a63195/",company:"IIT Madras" },
     { filename: "AnjaliK.jpg", name: "Anjali Kumari", linkedin: "https://www.linkedin.com/in/anjali-kumari-6677421a7/",company:"EXAVALU" },
-    { filename: "AnjaliP.jpg", name: "Anjali Priya", linkedin: "https://www.linkedin.com/in/anjali-priya-4235571a7/",company:"Technip Energies" },
-    { filename: "Ayush.jpg", name: "Ayush Vijayant", linkedin: "https://www.linkedin.com/in/ayush-vijayant-606566198",company:"TCS Digital" },
-    { filename: "Dhiraj.jpg", name: "Dhiraj Pandey", linkedin: "https://www.linkedin.com/in/dhiraj-pandey-007bitsindri/" ,company:"L&T"},
-    { filename: "Harsha.jpg", name: "Harsha Sinha", linkedin: "https://www.linkedin.com/in/harsha-sinha-9a51601a1/",company:"AMNS" },
     { filename: "Harshit.jpg", name: "Harshit Pallove", linkedin: "https://www.linkedin.com/in/harshit-pallove-a39505193/" ,company:"Capgemini"},
-    { filename: "Himanshu.jpg", name: "Himanshu Jaiswal", linkedin: "https://www.linkedin.com/in/himanshu-jaiswal-889771197/",company:"Global Logic" },
-    { filename: "Juhi.jpg", name: "Juhi Sinha", linkedin: "https://www.linkedin.com/in/juhi-sinha-8959981b3/",company:"S.K/SAMANTA & Co(P)Ltd." },
-    { filename: "Laxmi.jpg", name: "Lakshmi Sharma", linkedin: "https://www.linkedin.com/in/laxmi-sharma-84806a1b3/",company:"Vedanta" },
-    { filename: "Ravi.jpg", name: "Ravi Kumar", linkedin: "https://www.linkedin.com/in/ravi-kumar-62bb6b158/",company:"TCS NINJA" },
-    { filename: "Shubhangi.jpg", name: "Shubhangi Anand", linkedin: "https://www.linkedin.com/in/shubhangi-anand/",company:"JSW" },
     { filename: "Simran.jpg", name: "Simran", linkedin: "https://www.linkedin.com/in/simran-125152197/" ,company:"AMNS"},
+    { filename: "Ayush.jpg", name: "Ayush Vijayant", linkedin: "https://www.linkedin.com/in/ayush-vijayant-606566198",company:"TCS Digital" },
     { filename: "Taniya.jpg", name: "Taniya Kumari", linkedin: "https://www.linkedin.com/in/taniya-kumari-a997441a7/",company:"JSW" },
+    { filename: "Ravi.jpg", name: "Ravi Kumar", linkedin: "https://www.linkedin.com/in/ravi-kumar-62bb6b158/",company:"TCS NINJA" },
+    { filename: "Juhi.jpg", name: "Juhi Sinha", linkedin: "https://www.linkedin.com/in/juhi-sinha-8959981b3/",company:"S.K/SAMANTA & Co(P)Ltd." },
+    { filename: "AnjaliP.jpg", name: "Anjali Priya", linkedin: "https://www.linkedin.com/in/anjali-priya-4235571a7/",company:"Technip Energies" },
+    
   ],
 
   "2018": [
@@ -1679,14 +1685,15 @@ const alumniPhotos = {
   { filename: "abhijeet.png",name: "Abhijit Parashar",linkedin: "https://www.linkedin.com/in/abhijit-parashar-811b34112/",company:"Vedanta"},
   { filename: "nidhi.png",name: "Nidhi Kumari",linkedin: "https://www.linkedin.com/in/nidhi-kumari-a4ba70198/",company:"Deloitte"},
   { filename: "rumman.png",name: "Rumman Akhtar",linkedin: "https://www.linkedin.com/in/rummanakhtar/",company:"Cognizant"},
-  { filename: "kiran.png",name: "Kiran Kumari",linkedin: "https://www.linkedin.com/in/kiran-kumari-k99/",company:"Deloitte"},
   { filename: "roshan.png",name: "Roshan Kumar Singh",linkedin: "https://www.linkedin.com/in/roshan-kumar-singh/",company:"Samsung"},
-  { filename: "pallavi.png",name: "Pallavi Singh",linkedin: "https://www.linkedin.com/in/priyapp/",company:"Schlumberger"},
+  { filename: "kiran.png",name: "Kiran Kumari",linkedin: "https://www.linkedin.com/in/kiran-kumari-k99/",company:"Deloitte"},
   { filename: "shailesh.png", name: "Shailesh Anand",linkedin: "https://www.linkedin.com/in/shailesh-aanand/",company:"Google"},
+  { filename: "pallavi.png",name: "Pallavi Singh",linkedin: "https://www.linkedin.com/in/priyapp/",company:"Schlumberger"},
   { filename: "deepak.png",name: "Deepak Kumar",linkedin: "https://www.linkedin.com/in/deepak7870/",company:"Deloitte"},
   { filename: "suraj.png",name: "Suraj Kumar Mahato",linkedin: "https://www.linkedin.com/in/suraj-sloth/",company:"NPCI"},
   { filename: "",name: "Anjali Singh",linkedin: "https://www.linkedin.com/in/anjali-singh-506502215/",company:"PI Industry" },
   { filename: "subhabrata.png", name: "Subhabrata Roy",linkedin: "https://www.linkedin.com/in/subhabrata-roy-84038b180/" ,company:"L&T"},
+  { filename: "deepak.png",name: "Deepak Kumar",linkedin: "https://www.linkedin.com/in/deepak7870/",company:"Deloitte"},
 
 ],
 
@@ -1707,17 +1714,16 @@ const alumniPhotos = {
 ],
 
 "2016": [
-  { filename: "pushpendra.png",name: "Pushpendra Kumar Singh",linkedin: "linkedin.com",company:"Tata Steel"},
-  { filename: "shivank.png",name: "Shivank Jaiswal",linkedin: "linkedin.com",company:"Higher Studies"},
-  { filename: "puja.png",name: "Puja Singh",linkedin: "linkedin.com",company:"Ericsson"},
   { filename: "pratyush.png",name: "Pratyush Prasad",linkedin: "https://www.linkedin.com/in/pratyush-prasad-62702013b/",company:"Tata Steel"},
-  { filename: "shivam.png",name: "Shivam",linkedin: "linkedin.com",company:"JSW Steel Ltd."},
   { filename: "abhishek.png",name: "Abhishek Ranjan Tiwary",linkedin: "https://www.linkedin.com/in/abhishek-ranjan-tiwary-318951147/",company:"Tata Power"},
+  { filename: "shweta.png",name: "Shweta Gupta",linkedin: "linkedin.com",company:"Sify Technology"},
+  { filename: "shivank.png",name: "Shivank Jaiswal",linkedin: "linkedin.com",company:"Higher Studies"},
+  { filename: "shiwani.png",name: "Shiwani Kumari",linkedin: "https://www.linkedin.com/in/shiwani-kumari-a46027145/",company:"Healthplix"},
+  { filename: "shivam.png",name: "Shivam",linkedin: "linkedin.com",company:"JSW Steel Ltd."},
+  { filename: "puja.png",name: "Puja Singh",linkedin: "linkedin.com",company:"Ericsson"},
   { filename: "sayeesta.png",name: "Sayeesta Samrin",linkedin: "https://www.linkedin.com/in/sayeesta-samrin-3a509a14b/",company:"TCS"},
   { filename: "priyanka.png", name: "Priyanka Tirkey",linkedin: "linkedin.com",company:"Media Head & PRO"},
-  { filename: "shiwani.png",name: "Shiwani Kumari",linkedin: "https://www.linkedin.com/in/shiwani-kumari-a46027145/",company:"Healthplix"},
-  { filename: "shweta.png",name: "Shweta Gupta",linkedin: "linkedin.com",company:"Sify Technology"},
-
+  { filename: "pushpendra.png",name: "Pushpendra Kumar Singh",linkedin: "linkedin.com",company:"Tata Steel"},
 ],
 
 "2015": [
@@ -2044,7 +2050,7 @@ function NetworkBackground() {
     resizeCanvas();
     draw();
 
-    const resizeObserver = new ResizeObserver(resizeCanvas);
+const resizeObserver = new ResizeObserver(resizeCanvas);
     resizeObserver.observe(section);
 
     window.addEventListener("resize", resizeCanvas);
@@ -2521,6 +2527,7 @@ function AlumniDrum({ id, title, description, alumni, showRole = false }) {
     </section>
   );
 }
+
 export default function MembersPage() {
   return (
     <main
@@ -3048,7 +3055,7 @@ export default function MembersPage() {
         }
       `}</style>
 
-      {/* HERO (unchanged) */}
+{/* HERO (unchanged) */}
       <section
         id="alumni-home"
         className="relative isolate flex min-h-[100svh] w-full items-center justify-center overflow-hidden">
