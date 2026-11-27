@@ -2226,14 +2226,29 @@ function LinkedInButton({ alumni, compact = false }) {
 
 const mod = (a, n) => ((a % n) + n) % n;
 const PX_PER_MEMBER = 140; // sideways scroll distance that turns one person
+const REF_COUNT = 15; // every ring is sized as if it had this many people
+
+// All rings share the smallest measured stage so they render at one size.
+const stageSizes = new Map();
+const stageListeners = new Set();
+const sharedStage = () => {
+  let w = Infinity, h = Infinity;
+  stageSizes.forEach((v) => { w = Math.min(w, v.w); h = Math.min(h, v.h); });
+  return w === Infinity ? null : { w, h };
+};
+const reportStage = (key, size) => {
+  if (size) stageSizes.set(key, size); else stageSizes.delete(key);
+  const shared = sharedStage();
+  stageListeners.forEach((fn) => fn(shared));
+};
 
 function AlumniDrum({ id, title, description, alumni, showRole = false }) {
   const sectionRef = useRef(null);
   const stageRef = useRef(null);
   const drumRef = useRef(null);
   const cardRefs = useRef([]);
-  const posRef = useRef(0);
-  const targetRef = useRef(0);
+  const posRef = useRef(alumni.length < REF_COUNT ? Math.floor((alumni.length - 1) / 2) : 0);
+  const targetRef = useRef(alumni.length < REF_COUNT ? Math.floor((alumni.length - 1) / 2) : 0);
   const rafRef = useRef(0);
   const loopRef = useRef(null);
   const activeRef = useRef(-1);
@@ -2244,19 +2259,23 @@ function AlumniDrum({ id, title, description, alumni, showRole = false }) {
   const [stage, setStage] = useState({ w: 1280, h: 460 });
 
   const n = alumni.length;
-  const step = n > 0 ? 360 / n : 0;
+  // Fewer people than the reference: keep the same card spacing and leave the ring open (no wrap-around).
+  const isOpen = n < REF_COUNT;
+  const step = n > 0 ? 360 / Math.max(n, REF_COUNT) : 0;
   const tanStep = Math.tan(Math.PI / Math.max(3, n));
   const isSmall = stage.w < 640;
+  const isTablet = !isSmall && stage.w < 1100;
+  // Same sizing as the Members page: every ring uses the Office Bearers (15-person) size.
+  const refTan = Math.tan(Math.PI / REF_COUNT);
   const byHeight = (stage.h - 56) / 1.32;
-  const byWidth = (2 * stage.w * (isSmall ? 1.3 : 0.64) * tanStep) / 1.08;
-  const cardW = Math.round(
+  const byWidth = (2 * stage.w * (isSmall ? 1.3 : isTablet ? 0.95 : 0.64) * refTan) / 1.08;
+  const refCardW = Math.round(
     Math.max(120, Math.min(340, byHeight, byWidth, stage.w * (isSmall ? 0.62 : 0.58)))
   );
+  const radius = Math.round((refCardW / 2 / refTan) * 1.08);
+  const cardW =
+    n > REF_COUNT ? Math.round(Math.min(refCardW, (2 * radius * tanStep) / 1.08)) : refCardW;
   const cardH = Math.round(cardW * 1.32);
-  const radius =
-    n >= 3
-      ? Math.round((cardW / 2 / tanStep) * 1.08)
-      : Math.round(cardW * 0.9);
   const perspective = Math.round(Math.max(1100, radius * 2.6));
   cardRefs.current.length = n;
 
@@ -2264,11 +2283,20 @@ function AlumniDrum({ id, title, description, alumni, showRole = false }) {
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
-    const update = () => setStage({ w: el.clientWidth, h: el.clientHeight });
+    const key = {};
+    const onShared = (shared) => {
+      if (shared) setStage((prev) => (prev.w === shared.w && prev.h === shared.h ? prev : shared));
+    };
+    stageListeners.add(onShared);
+    const update = () => reportStage(key, { w: el.clientWidth, h: el.clientHeight });
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      stageListeners.delete(onShared);
+      reportStage(key, null);
+    };
   }, []);
 
   const apply = useCallback(
@@ -2287,13 +2315,15 @@ function AlumniDrum({ id, title, description, alumni, showRole = false }) {
         card.style.setProperty("--focus", (Math.max(0, facing) ** 3).toFixed(3));
       });
 
-      const index = mod(Math.round(pos), n);
+      const index = isOpen
+        ? Math.max(0, Math.min(n - 1, Math.round(pos)))
+        : mod(Math.round(pos), n);
       if (index !== activeRef.current) {
         activeRef.current = index;
         setActive(index);
       }
     },
-    [n, step, radius]
+    [n, step, radius, isOpen]
   );
 
   useEffect(() => {
@@ -2322,13 +2352,14 @@ function AlumniDrum({ id, title, description, alumni, showRole = false }) {
   }, [apply]);
 
   const goTo = useCallback((t) => {
-    targetRef.current = t;
+    targetRef.current = n < REF_COUNT ? Math.max(0, Math.min(n - 1, t)) : t;
     loopRef.current?.();
-  }, []);
+  }, [n]);
 
   const shift = (by) => goTo(Math.round(targetRef.current) + by);
 
   const jumpTo = (i) => {
+    if (isOpen) return goTo(i);
     const cur = Math.round(targetRef.current);
     let d = mod(i - cur, n);
     if (d > n / 2) d -= n;
@@ -2633,7 +2664,7 @@ export default function MembersPage() {
         }
 
         /* ---------- navy theme for everything below the hero ---------- */
-        .alumni-page {
+        .members-page {
           --navy-950: #050b22;
           --navy-900: #071233;
           --navy-850: #0a173f;
@@ -2642,7 +2673,7 @@ export default function MembersPage() {
           --cyan: #67e8f9;
           --cyan-strong: #22d3ee;
           --nav-offset: 100px;
-          --font-alumni: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+          --font-member: var(--font-space-grotesk), "Space Grotesk", sans-serif;
         }
 
         @media (max-width: 767px) {
@@ -2766,7 +2797,6 @@ export default function MembersPage() {
         }
 
         .drum-section .section-heading {
-          margin-top:  clamp(24px, 4vh, 40px);
           margin-bottom: 0;
         }
 
@@ -2961,10 +2991,12 @@ export default function MembersPage() {
 
         .drum-meta {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 12px;
+          gap: 10px;
           margin-top: 0.35rem;
+          text-align: center;
         }
 
         .drum-branch {
@@ -3002,22 +3034,108 @@ export default function MembersPage() {
           box-shadow: 0 0 26px rgba(103, 232, 249, 0.5);
         }
 
-        @media (max-width: 639px) {
-          .drum-arrow {
-            height: 40px;
-            width: 40px;
+        
+@media (max-width: 639px) {
+  .drum-info-row {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .drum-info-inner {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 48px;
+    text-align: center;
+  }
+
+  .drum-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 38px;
+    width: 38px;
+    z-index: 5;
+  }
+
+  .drum-arrow:first-child {
+    left: 0;
+  }
+
+  .drum-arrow:last-child {
+    right: 0;
+  }
+
+  .drum-name {
+    text-align: center;
+    overflow-wrap: break-word;
+  }
+
+  .drum-meta {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .drum-branch {
+    display: block;
+    max-width: 100%;
+    text-align: center;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+}
+
+        /* ---------- tablet + mobile: one team per screen, three clearly separated parts ---------- */
+        @media (max-width: 1100px), (max-width: 1400px) and (pointer: coarse) {
+          .drum-section {
+            height: 100svh;
+            min-height: 920px;
+            justify-content: center;
+            padding-bottom: 24px;
+          }
+
+          .drum-stage {
+            flex: none;
+            height: clamp(420px, 44svh, 520px);
+            margin-top: 32px;
+          }
+
+          .drum-info {
+            padding-top: 80px;
           }
         }
 
-        .drum-hint {
-          margin-top: 0.3rem;
-          text-align: center;
-          font-family: var(--font-rajdhani), sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: #64748b;
+        @media (max-width: 639px) {
+          .drum-section {
+            min-height: 680px;
+          }
+
+          .drum-stage {
+            height: clamp(320px, 82vw, 380px);
+            margin-top: 30px;
+          }
+
+          .drum-info {
+            padding-top: 80px;
+          }
+
+          .drum-section .section-title {
+            font-size: clamp(1.35rem, 6vw, 1.8rem);
+          }
         }
+
+        // .drum-hint {
+        //   margin-top: 0.3rem;
+        //   text-align: center;
+        //   font-family: var(--font-rajdhani), sans-serif;
+        //   font-size: 11px;
+        //   letter-spacing: 0.28em;
+        //   text-transform: uppercase;
+        //   color: #64748b;
+        // }
 
         .hint-touch {
           display: none;

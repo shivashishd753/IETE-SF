@@ -491,6 +491,21 @@ function LinkedInButton({ member, compact = false }) {
 
 const mod = (a, n) => ((a % n) + n) % n;
 const PX_PER_MEMBER = 140; // sideways scroll distance that turns one person
+const REF_COUNT = 15; // every ring is sized as if it had this many members (Office Bearers)
+
+// All rings share the smallest measured stage so they render at one size.
+const stageSizes = new Map();
+const stageListeners = new Set();
+const sharedStage = () => {
+  let w = Infinity, h = Infinity;
+  stageSizes.forEach((v) => { w = Math.min(w, v.w); h = Math.min(h, v.h); });
+  return w === Infinity ? null : { w, h };
+};
+const reportStage = (key, size) => {
+  if (size) stageSizes.set(key, size); else stageSizes.delete(key);
+  const shared = sharedStage();
+  stageListeners.forEach((fn) => fn(shared));
+};
 
 function MemberDrum({ id, title, description, members, showRole = false }) {
   const sectionRef = useRef(null);
@@ -511,18 +526,22 @@ function MemberDrum({ id, title, description, members, showRole = false }) {
   const n = members.length;
   const step = n > 0 ? 360 / n : 0;
   const tanStep = Math.tan(Math.PI / Math.max(3, n));
+  const refTan = Math.tan(Math.PI / REF_COUNT); // used for sizing so all teams match
   const isSmall = stage.w < 640;
   const isTablet = !isSmall && stage.w < 1100;
+  // Every ring is sized from the smallest stage of all rings on the page,
+  // so the Office Bearers ring and the others come out exactly the same size.
   const byHeight = (stage.h - 56) / 1.32;
-  const byWidth = (2 * stage.w * (isSmall ? 1.3 : isTablet ? 0.95 : 0.64) * tanStep) / 1.08;
-  const cardW = Math.round(
+  const byWidth = (2 * stage.w * (isSmall ? 1.3 : isTablet ? 0.95 : 0.64) * refTan) / 1.08;
+  const refCardW = Math.round(
     Math.max(120, Math.min(340, byHeight, byWidth, stage.w * (isSmall ? 0.62 : 0.58)))
   );
+  // Radius is always the reference (Office Bearers) radius, whatever the member count.
+  const radius = Math.round((refCardW / 2 / refTan) * 1.08);
+  // A ring with more people than the reference gets slightly narrower cards so they still fit.
+  const cardW =
+    n > REF_COUNT ? Math.round(Math.min(refCardW, (2 * radius * tanStep) / 1.08)) : refCardW;
   const cardH = Math.round(cardW * 1.32);
-  const radius =
-    n >= 3
-      ? Math.round((cardW / 2 / tanStep) * 1.08)
-      : Math.round(cardW * 0.9);
   const perspective = Math.round(Math.max(1100, radius * 2.6));
   cardRefs.current.length = n;
 
@@ -530,11 +549,20 @@ function MemberDrum({ id, title, description, members, showRole = false }) {
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
-    const update = () => setStage({ w: el.clientWidth, h: el.clientHeight });
+    const key = {};
+    const onShared = (shared) => {
+      if (shared) setStage((prev) => (prev.w === shared.w && prev.h === shared.h ? prev : shared));
+    };
+    stageListeners.add(onShared);
+    const update = () => reportStage(key, { w: el.clientWidth, h: el.clientHeight });
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      stageListeners.delete(onShared);
+      reportStage(key, null);
+    };
   }, []);
 
   const apply = useCallback(
@@ -767,9 +795,14 @@ function MemberDrum({ id, title, description, members, showRole = false }) {
             )}
             <h3 className="drum-name">{current.name}</h3>
             <div className="drum-meta">
-              <span className="drum-branch">{current.branch}</span>
-              <LinkedInButton member={current} compact />
-            </div>
+  <span className="drum-branch">{current.branch}</span>
+
+  <div className="drum-link-slot">
+    {hasLink(current) && (
+      <LinkedInButton member={current} compact />
+    )}
+  </div>
+</div>
           </div>
 
           <button
@@ -1219,6 +1252,15 @@ export default function MembersPage() {
           margin-top: 0.35rem;
           text-align: center;
         }
+
+        .drum-link-slot {
+  height: 34px;
+  width: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
         .drum-branch {
           font-family: var(--font-member);
