@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import { Space_Grotesk, Manrope } from "next/font/google";
+import LeafletMap from "../components/LeafletMap";
 
 /* ═══════════════════════════════════════════
    TYPOGRAPHY — matches the Members page
@@ -436,8 +437,10 @@ export default function ContactPage() {
   const contacts = [
     { kind: "general", icon: <Mail className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "GENERAL QUERIES", email: "contact@ietebits.com", phone: "+91 8987475187" },
     { kind: "support", icon: <UsersRound className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "INDUCTIONS & SUPPORT", people: [{ name: "Aditya Raj", phone: "+91 8987475187" }, { name: "Amit Kumar Gupta", phone: "+91 6200983787" }] },
-    { kind: "location", icon: <MapPin className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "OUR LOCATION", location: "BIT Sindri, Dhanbad, Jharkhand, India — 828122", href: "https://maps.google.com/?q=BIT+Sindri+Dhanbad" },
+    { kind: "location", icon: <MapPin className="ct-card-icon" size={20} strokeWidth={1.7} />, label: "OUR LOCATION", location: "S-3 ECE DEPARTMENT BIT Sindri, Dhanbad, Jharkhand, India — 828122", href: "https://maps.google.com/?q=BIT+Sindri+Dhanbad" },
   ];
+   
+ 
 
   return (
     <main className={`ct-page ${headingFont.variable} ${bodyFont.variable}${hoveredCard !== null ? " ct-card-focus" : ""}`}>
@@ -990,6 +993,37 @@ export default function ContactPage() {
           .ct-watermark-dot { transition: none; }
           .ct-watermark-word.is-hovered::after { opacity: 0; }
         }
+
+        /* ══════════ LEAFLET MAP ══════════ */
+
+.ct-map-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #080d19;
+}
+
+.ct-map-wrap .leaflet-container {
+  width: 100%;
+  height: 340px;
+  background: #080d19;
+  border-radius: 14px;
+}
+
+.ct-map-wrap .leaflet-control-zoom a {
+  background: #0d1120;
+  color: white;
+  border-color: #222a40;
+}
+
+.ct-map-wrap .leaflet-control-zoom a:hover {
+  background: #17243a;
+  color: #38bdf8;
+}
       `}</style>
 
       <Navbar />
@@ -1116,9 +1150,14 @@ export default function ContactPage() {
                 </article>
               ))}
             </div>
+          
+            <div className="ct-map-wrap">
+              <LeafletMap />
+            </div>
 
-            {/* Socials */}
-            <div className="ct-socials">
+
+         
+            {/* <div className="ct-socials">
               {[
                 { name: "Instagram", href: "https://www.instagram.com/ietebits/", icon: <><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="17.6" cy="6.7" r="1.2" /></> },
                 { name: "X", href: "https://x.com/IETE_BITS", icon: <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-7.3L5.7 22H2.5l7.3-8.4L2 2h6.5l4.4 6.7zM17.8 20h1.7L7.4 3.9H5.6z" /> },
@@ -1129,8 +1168,8 @@ export default function ContactPage() {
                   <svg viewBox="0 0 24 24" aria-hidden="true">{s.icon}</svg>
                 </a>
               ))}
-              {/* <span className="ct-soc-label">FOLLOW US</span> */}
-            </div>
+             
+            </div> */}
           </div>
 
           {/* ─── RIGHT — FORM ─── */}

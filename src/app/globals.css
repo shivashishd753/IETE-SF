@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -1010,5 +1011,85 @@ h6 {
     margin-top: -26px;
   }
 }
+/* Dark theme for OpenStreetMap tiles */
+.dark-map-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+}
 
+/* IETE-SF Leaflet Zoom Controls */
 
+.leaflet-control-zoom {
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-control-zoom a {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  background: #080F20 !important;
+  color: #38BDF8 !important;
+  border: none !important;
+  font-size: 21px !important;
+  transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #122440 !important;
+  color: #7DD3FC !important;
+}
+
+.leaflet-control-zoom-in {
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15) !important;
+}
+
+/* Popup */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #080F20 !important;
+  color: #F8FAFC !important;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.leaflet-popup-content {
+  color: #F8FAFC !important;
+}
+
+/* Attribution */
+.leaflet-control-attribution {
+  background: rgba(5, 8, 18, 0.9) !important;
+  color: #94A3B8 !important;
+}
+
+.leaflet-control-attribution a {
+  color: #38BDF8 !important;
+}
+
+/* Dark map background */
+.leaflet-container {
+  background: #070b18;
+}
+
+/* Dark blue zoom controls */
+.leaflet-control-zoom a {
+  background: #080f20 !important;
+  color: #55d8ff !important;
+  border-color: #263b5c !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #10233d !important;
+  color: #ffffff !important;
+}
+
+/* Map attribution */
+.leaflet-control-attribution {
+  background: rgba(7, 11, 24, 0.85) !important;
+  color: #94a3b8 !important;
+}
+
+.leaflet-control-attribution a {
+  color: #55d8ff !important;
+}
