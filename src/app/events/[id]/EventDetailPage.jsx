@@ -19,6 +19,13 @@ const infoIcons = {
   format: Users,
 };
 
+// Turns "Minefield Rescue" into "minefield-rescue" (must match the events page).
+const slugify = (text) =>
+  String(text ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 // Ignore capitals, spaces, dashes and dots when matching titles.
 const norm = (s) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -43,9 +50,17 @@ async function fetchWithTimeout(url, ms = 15000) {
 
 export default function EventDetailPage() {
   const params = useParams();
-  const eventId = String(
+  // This is now the event name in the URL (e.g. "minefield-rescue").
+  // Old numeric links such as /events/2 still work too.
+  const rawParam = String(
     Array.isArray(params?.id) ? params.id[0] : params?.id ?? ""
   );
+  let eventId = rawParam;
+  try {
+    eventId = decodeURIComponent(rawParam);
+  } catch {
+    eventId = rawParam;
+  }
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +82,10 @@ export default function EventDetailPage() {
         }
 
         const list = Array.isArray(data.events) ? data.events : [];
-        const found = list.find((item) => String(item.id) === eventId);
+        const wanted = slugify(eventId);
+        const found =
+          list.find((item) => slugify(item.title) === wanted) ||
+          list.find((item) => String(item.id) === eventId);
 
         return { event: found || null, error: "" };
       } catch (err) {
@@ -102,14 +120,23 @@ export default function EventDetailPage() {
     };
   }, [loadEvent, attempt]);
 
-  // Extra content: match by id first, then by title.
+  // Extra content: match by the event's title.
   const extra =
-    normalizedDetails[norm(eventId)] ||
     (event ? normalizedDetails[norm(event.title)] : null) ||
+    normalizedDetails[norm(eventId)] ||
     {};
 
-  const bg =
-    "min-h-screen bg-[linear-gradient(135deg,#090B10_0%,#111722_48%,#090B10_100%)] text-white";
+  // Dark ombre: the events page navy (#111722) blending down into black,
+  // with soft blue glows in two corners so it never looks flat black.
+  const bg = "min-h-screen text-white";
+  const ombreStyle = {
+    backgroundColor: "#090B10",
+    backgroundImage: [
+      "radial-gradient(ellipse 70% 45% at 0% 0%, rgba(62,84,124,0.42) 0%, rgba(62,84,124,0) 70%)",
+      "radial-gradient(ellipse 60% 40% at 100% 100%, rgba(44,60,94,0.38) 0%, rgba(44,60,94,0) 70%)",
+      "linear-gradient(160deg, #1A2538 0%, #111722 38%, #0B0E15 72%, #06070A 100%)",
+    ].join(", "),
+  };
 
   const buttonClass =
     "inline-flex items-center justify-center gap-3 rounded-lg border border-[#46536A] bg-[#151B25] px-6 py-3.5 text-sm font-semibold text-[#C3CDDE] transition-colors duration-300 hover:border-[#687895] hover:bg-[#202A39] hover:text-white";
@@ -128,7 +155,7 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <main className={bg}>
+      <main className={bg} style={ombreStyle}>
         <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
           <div className="mb-8">{backLink}</div>
           <div className="grid animate-pulse grid-cols-1 gap-10 md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr] lg:gap-14">
@@ -151,6 +178,7 @@ export default function EventDetailPage() {
     return (
       <main
         className={`${bg} flex flex-col items-center justify-center gap-6 px-6 text-center`}
+        style={ombreStyle}
       >
         <CalendarDays className="h-10 w-10 text-[#8192AF]" />
         <h1 className="text-2xl font-semibold">
@@ -190,7 +218,7 @@ export default function EventDetailPage() {
   const isLive = event.status === "live";
 
   return (
-    <main className={bg}>
+    <main className={bg} style={ombreStyle}>
       {/* No Navbar here on purpose. */}
       <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
         <div className="mb-8">{backLink}</div>

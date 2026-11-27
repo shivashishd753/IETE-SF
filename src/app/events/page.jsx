@@ -15,6 +15,13 @@ import {
 
 const tabs = ["All", "Live Events", "Past Events"];
 
+// Turns "Minefield Rescue" into "minefield-rescue" for the page URL.
+const slugify = (text) =>
+  String(text ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 /* --------------------------------------------------
    SECTION HEADER
 -------------------------------------------------- */
@@ -42,12 +49,15 @@ function SectionHeader({ eyebrow, title, description }) {
 }
 
 /* --------------------------------------------------
-   EVENT CARD  (now clickable -> /events/[id])
+   EVENT CARD  (clickable -> /events/event-name)
 -------------------------------------------------- */
 
 function EventCard({ event, variant = "default" }) {
   return (
-    <Link href={`/events/${event.id}`} className="block">
+    <Link
+      href={`/events/${slugify(event.title) || event.id}`}
+      className="block"
+    >
       <article className="group overflow-hidden rounded-2xl border border-[#292E38] bg-[#11141A] transition-all duration-300 hover:-translate-y-1 hover:border-[#53617A]">
         <div className="relative aspect-[4/5] overflow-hidden bg-[#171B23]">
           {event.image ? (
