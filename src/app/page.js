@@ -565,8 +565,171 @@
 // }
 
 
+// "use client";
+
+// import IntroLoader from "./components/introloader";
+// import Navbar from "./components/navbar";
+// import Footer from "./components/footer";
+// import WeeklyCube from "./components/weeklycube";
+
+// export default function Home() {
+//   return (
+//     <>
+//       <IntroLoader />
+
+//       <main
+//         id="home"
+//         className="min-h-screen overflow-x-clip bg-[#070B18] text-white"
+//       >
+//         <Navbar />
+
+//         {/* Tech Udbhav + Join Us buttons */}
+//         <div className="absolute left-1/2 top-[125px] z-40 mt-5 flex -translate-x-1/2 items-center gap-3 sm:gap-5">
+//           {[
+//             {
+//               label: "Tech Udbhav",
+//               href: "https://techudbhav.ietebit.com/",
+//             },
+//             {
+//               label: "Join Us",
+//               href: "https://iete-induction-26.vercel.app/",
+//             },
+//           ].map((item) => (
+//             <a
+//               key={item.label}
+//               href={item.href}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-white/15 bg-[#10131b] px-4 py-3 shadow-sm shadow-black/20 transition-[transform,border-color,background-color,box-shadow] duration-200 before:absolute before:left-4 before:right-4 before:top-0 before:h-px before:origin-left before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-sky-400/80 before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-[#151923] hover:shadow-md hover:shadow-black/30 hover:before:scale-x-100 active:translate-y-0 sm:px-5"
+//             >
+//               <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-sky-300 shadow-[0_0_4px_rgba(125,211,252,0.35)] [animation-duration:2.4s]" />
+
+//               <span className="whitespace-nowrap text-sm font-semibold tracking-wide text-white">
+//                 {item.label}
+//               </span>
+
+//               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-base text-slate-300 transition-[transform,color,border-color] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:text-white">
+//                 ↗
+//               </span>
+//             </a>
+//           ))}
+//         </div>
+
+//         {/* Hero Section */}
+//         <section className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-48 text-center">
+
+//           {/* Background */}
+//           <div
+//             aria-hidden="true"
+//             className="pointer-events-none absolute inset-0 -z-10"
+//             style={{
+//               background: `
+//                 radial-gradient(
+//                   ellipse at 50% 45%,
+//                   rgba(30, 48, 80, 0.20) 0%,
+//                   transparent 65%
+//                 ),
+//                 linear-gradient(
+//                   145deg,
+//                   #0b0e16 0%,
+//                   #080b13 55%,
+//                   #05070c 100%
+//                 )
+//               `,
+//             }}
+//           />
+
+//           {/* Subtle technical grid */}
+//           <div
+//             aria-hidden="true"
+//             className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12]"
+//             style={{
+//               backgroundImage: `
+//                 linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+//                 linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px)
+//               `,
+//               backgroundSize: "72px 72px",
+//               maskImage:
+//                 "radial-gradient(ellipse at center, black, transparent 75%)",
+//               WebkitMaskImage:
+//                 "radial-gradient(ellipse at center, black, transparent 75%)",
+//             }}
+//           />
+
+//           <div className="relative z-10 mx-auto max-w-5xl">
+
+//             {/* Forum identity */}
+//             <div className="inline-flex items-center gap-3 rounded-full border border-white/[0.09] bg-white/[0.025] px-4 py-2">
+//               <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+
+//               <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-slate-400 sm:text-xs">
+//                 IETE Students’ Forum · BIT Sindri
+//               </span>
+//             </div>
+
+//             {/* Main heading */}
+//             <h1 className="mt-9 text-[clamp(3.5rem,11vw,8rem)] font-semibold leading-[0.95] tracking-[-0.075em] text-white">
+//               IETE<span className="text-slate-500">-</span>SF
+//             </h1>
+
+//             <div className="mx-auto mt-7 h-px w-20 bg-gradient-to-r from-transparent via-slate-400/60 to-transparent" />
+
+//             {/* Introduction */}
+//             <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-slate-200 sm:text-2xl">
+//               A community driven by technology, ideas, and innovation.
+//             </p>
+
+//             <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+//               Explore new possibilities, learn together, and turn curiosity
+//               into meaningful experiences.
+//             </p>
+//           </div>
+
+//           {/* Scroll indicator */}
+//           <div className="absolute bottom-9 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-[9px] font-medium uppercase tracking-[0.3em] text-slate-500">
+//             <span>Scroll to explore</span>
+//             <span className="text-base">↓</span>
+//           </div>
+//         </section>
+
+//         {/* Weekly Segment */}
+//         <section
+//           id="weekly-segment"
+//           className="relative z-30 mx-auto w-full max-w-6xl px-6 py-20 sm:py-28"
+//         >
+//           <div className="text-center">
+//             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300">
+//               Discover · Learn · Grow
+//             </p>
+
+//             <h2 className="mt-5 text-3xl font-semibold tracking-wide text-white sm:text-5xl">
+//               Weekly Segment
+//             </h2>
+
+//             <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
+
+//             <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+//               Fresh ideas, technology insights, and knowledge worth sharing.
+//             </p>
+//           </div>
+
+//           {/* Weekly segment content can be added here */}
+//         </section>
+
+//         <WeeklyCube />
+
+//         <Footer />
+//       </main>
+//     </>
+//   );
+// }
+
+
+
+
 "use client";
 
+import Image from "next/image";
 import IntroLoader from "./components/introloader";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -579,11 +742,11 @@ export default function Home() {
 
       <main
         id="home"
-        className="min-h-screen overflow-x-clip bg-[#070B18] text-white"
+        className="min-h-screen w-full overflow-x-clip bg-[#050812] text-white"
       >
         <Navbar />
 
-        {/* Tech Udbhav + Join Us buttons */}
+        {/* Action Buttons */}
         <div className="absolute left-1/2 top-[125px] z-40 mt-5 flex -translate-x-1/2 items-center gap-3 sm:gap-5">
           {[
             {
@@ -600,104 +763,48 @@ export default function Home() {
               href={item.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-white/15 bg-[#10131b] px-4 py-3 shadow-sm shadow-black/20 transition-[transform,border-color,background-color,box-shadow] duration-200 before:absolute before:left-4 before:right-4 before:top-0 before:h-px before:origin-left before:scale-x-0 before:bg-gradient-to-r before:from-transparent before:via-sky-400/80 before:to-transparent before:transition-transform before:duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-[#151923] hover:shadow-md hover:shadow-black/30 hover:before:scale-x-100 active:translate-y-0 sm:px-5"
+              className="group flex items-center gap-4 rounded-xl border border-white/10 bg-[#0B1120] px-4 py-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400/40 sm:px-5"
             >
-              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-sky-300 shadow-[0_0_4px_rgba(125,211,252,0.35)] [animation-duration:2.4s]" />
-
-              <span className="whitespace-nowrap text-sm font-semibold tracking-wide text-white">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-sky-400" />
+              <span className="whitespace-nowrap text-sm font-semibold text-white">
                 {item.label}
               </span>
-
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-base text-slate-300 transition-[transform,color,border-color] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:border-white/20 group-hover:text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-slate-300 group-hover:text-sky-300">
                 ↗
               </span>
             </a>
           ))}
         </div>
 
-        {/* Hero Section */}
-        <section className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-5 pb-24 pt-48 text-center">
+        {/* Hero */}
+        <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden px-5">
 
-          {/* Background */}
+          {/* Subtle logo illumination only */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background: `
-                radial-gradient(
-                  ellipse at 50% 45%,
-                  rgba(30, 48, 80, 0.20) 0%,
-                  transparent 65%
-                ),
-                linear-gradient(
-                  145deg,
-                  #0b0e16 0%,
-                  #080b13 55%,
-                  #05070c 100%
-                )
-              `,
-            }}
+            className="pointer-events-none absolute left-1/2 top-[43%] h-[450px] w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/[0.06] blur-[120px] sm:h-[600px] sm:w-[600px]"
           />
 
-          {/* Subtle technical grid */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12]"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px)
-              `,
-              backgroundSize: "72px 72px",
-              maskImage:
-                "radial-gradient(ellipse at center, black, transparent 75%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse at center, black, transparent 75%)",
-            }}
-          />
-
-          <div className="relative z-10 mx-auto max-w-5xl">
-
-            {/* Forum identity */}
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/[0.09] bg-white/[0.025] px-4 py-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-
-              <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-slate-400 sm:text-xs">
-                IETE Students’ Forum · BIT Sindri
-              </span>
-            </div>
-
-            {/* Main heading */}
-            <h1 className="mt-9 text-[clamp(3.5rem,11vw,8rem)] font-semibold leading-[0.95] tracking-[-0.075em] text-white">
-              IETE<span className="text-slate-500">-</span>SF
-            </h1>
-
-            <div className="mx-auto mt-7 h-px w-20 bg-gradient-to-r from-transparent via-slate-400/60 to-transparent" />
-
-            {/* Introduction */}
-            <p className="mx-auto mt-7 max-w-2xl text-lg font-medium leading-relaxed text-slate-200 sm:text-2xl">
-              A community driven by technology, ideas, and innovation.
-            </p>
-
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
-              Explore new possibilities, learn together, and turn curiosity
-              into meaningful experiences.
-            </p>
-          </div>
-
-          {/* Scroll indicator */}
-          <div className="absolute bottom-9 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-[9px] font-medium uppercase tracking-[0.3em] text-slate-500">
-            <span>Scroll to explore</span>
-            <span className="text-base">↓</span>
+          {/* 3D Logo */}
+          <div className="relative z-10 -translate-y-16 sm:-translate-y-20 lg:-translate-y-24">
+            <Image
+              src="/iete-3d.svg"
+              alt="IETE Students' Forum"
+              width={650}
+              height={650}
+              priority
+              className="h-auto w-[min(76vw,360px)] object-contain drop-shadow-[0_0_30px_rgba(37,99,235,0.16)] sm:w-[min(60vw,460px)] lg:w-[min(42vw,520px)]"
+            />
           </div>
         </section>
 
         {/* Weekly Segment */}
         <section
           id="weekly-segment"
-          className="relative z-30 mx-auto w-full max-w-6xl px-6 py-20 sm:py-28"
+          className="relative w-full px-6 py-20 sm:py-28"
         >
-          <div className="text-center">
+          <div className="mx-auto w-full max-w-6xl text-center">
+
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-cyan-300">
               Discover · Learn · Grow
             </p>
@@ -706,19 +813,20 @@ export default function Home() {
               Weekly Segment
             </h2>
 
-            <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-blue-400 to-transparent" />
+            <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
 
             <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
               Fresh ideas, technology insights, and knowledge worth sharing.
             </p>
-          </div>
 
-          {/* Weekly segment content can be added here */}
+          </div>
         </section>
 
+        {/* Remaining sections */}
         <WeeklyCube />
 
         <Footer />
+
       </main>
     </>
   );
